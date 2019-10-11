@@ -1,0 +1,23 @@
+- name: Ensure required packages installed
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+
+- name: Add Docker repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docer-ce.repo
+
+- name: "Install docker (version: {{docker_version}})"
+  package:
+    name: "docker-ce-{{docker_version}},docker-ce-cli-{{docker_version}},containerd.io"
+
+- name: Enable and start dockerd
+  service:
+    name: docker
+    enabled: yes
+    state: started

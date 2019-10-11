@@ -1,0 +1,28 @@
+- name: ensure ntpd is at the latest version
+  yum: pkg=ntp state=latest
+  notify:
+  - restart ntpd
+
+- name: Enable and start firewall service
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
+
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
+- name: "firewall: allow 10250/tcp for kube-apiserver"
+  firewalld:
+    port: 10250/tcp   #Kubernetes API server
+    permanent: yes
+    state: enabled
+
+# http://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
+- name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+  shell: |
+    swapoff -a
+
+- name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+  replace:
+    path: /etc/fstab
+    regexp: '^[^#](.+?\sswap\s+sw\s+.*)$'
+    replace: '# \1'

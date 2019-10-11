@@ -1,4 +1,11 @@
 ---
-- hosts: all
+- hosts: lnxclp
   roles:
-    - common
+    - lnxcommon
+    - lnxdocker
+    - lnxclp
+
+- hosts: lnxwrk
+  roles:
+    - lnxcommon
+    - lnxdocker

@@ -35,10 +35,6 @@ def config_vm(node)
         p.add_host '10.0.0.1', ['master.k8s.vm']
     end
 
-    node.vm.provision :ansible do |ansible|
-        ansible.become = true
-        ansible.playbook = "provisioning/playbook.yml"
-    end
 end
 
 # currently this is only possible on a sole master
@@ -64,9 +60,9 @@ Vagrant.configure(2) do |config|
         vb.linked_clone = true
     end
 
-    # first master (=master1)
-    config.vm.define "master" do |master|
-        master.vm.hostname = "master1.k8s.vm"
+    # first controlplane
+    config.vm.define "lnxclp1" do |master|
+        master.vm.hostname = "lnxclp1.k8s.vm"
         master.vm.network "private_network", ip:"10.0.0.2"
 
         config_vm(master)
@@ -75,12 +71,21 @@ Vagrant.configure(2) do |config|
 
     # workers    
     (1..ENV['NR_LNX_WORKERS'].to_i).each do |nr|
-        config.vm.define "worker#{nr}" do |worker|
-            worker.vm.hostname = "worker#{nr}.k8s.vm"
+        config.vm.define "lnxwrk#{nr}" do |worker|
+            worker.vm.hostname = "lnxwrk#{nr}.k8s.vm"
             worker.vm.network "private_network", ip:"10.0.0.#{10+nr}"
     
             config_vm(worker)
         end
     end
 
+    config.vm.provision "ansible" do |ansible|
+        ansible.groups = {
+          "lnxclp" => ["lnxclp1"],
+          "lnxwrk" => ["lnxwrk[1:#{ENV['NR_LNX_WORKERS']}]"]
+        }
+
+        ansible.become = true
+        ansible.playbook = "provisioning/playbook.yml"
+    end
 end
