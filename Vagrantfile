@@ -30,11 +30,15 @@ ensure_plugin("vagrant-hosts")
 
 def config_vm(node)
     node.vm.provision :hosts do |p|
-        p.sync_hosts = true
+        # p.sync_hosts = true
         p.autoconfigure = true
         p.add_host '10.0.0.1', ['master.k8s.vm']
     end
-        
+
+    node.vm.provision :ansible do |ansible|
+        ansible.become = true
+        ansible.playbook = "provisioning/playbook.yml"
+    end
 end
 
 # currently this is only possible on a sole master
