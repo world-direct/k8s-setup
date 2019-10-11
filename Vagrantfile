@@ -31,11 +31,13 @@ ensure_plugin("vagrant-hosts")
 def config_vm(node)
     node.vm.provision :hosts do |p|
         p.sync_hosts = true
+        p.autoconfigure = true
         p.add_host '10.0.0.1', ['master.k8s.vm']
     end
         
 end
 
+# currently this is only possible on a sole master
 def config_master(master)
     # Bind kubernetes admin port so we can administrate from host
     master.vm.network "forwarded_port", guest: 6443, host: 6443, hostip: "10.0.0.10"
@@ -67,5 +69,14 @@ Vagrant.configure(2) do |config|
         config_master(master)
     end
 
+    # workers    
+    (1..ENV['NR_LNX_WORKERS'].to_i).each do |nr|
+        config.vm.define "worker#{nr}" do |worker|
+            worker.vm.hostname = "worker#{nr}.k8s.vm"
+            worker.vm.network "private_network", ip:"10.0.0.#{10+nr}"
+    
+            config_vm(worker)
+        end
+    end
 
 end
