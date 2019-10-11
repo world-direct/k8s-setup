@@ -1,0 +1,15 @@
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
+- firewalld:
+    port: 2379-2380/tcp   # etcd server client API
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    port: 10251/tcp   # kube-scheduler
+    permanent: yes
+    state: enabled
+
+- firewalld:
+    port: 10252/tcp   # kube-controller-manager
+    permanent: yes
+    state: enabled
