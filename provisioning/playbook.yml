@@ -1,4 +1,5 @@
 ---
+- import_playbook: ./check-version.yml
 - hosts: lnxclp
   roles:
     - lnxcommon

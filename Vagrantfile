@@ -94,5 +94,6 @@ Vagrant.configure(2) do |config|
 
         ansible.become = true
         ansible.playbook = "provisioning/playbook.yml"
+        ansible.compatibility_mode = "2.0"
     end
 end

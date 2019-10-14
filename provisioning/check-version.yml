@@ -1,0 +1,10 @@
+---
+# We fail if ansible is not 2.0, just because we the the compatiblity-mode
+# to '2.0' in the Vagrantfile. It may also work with new versions, if they are available.
+- hosts: all
+  tasks:
+    - debug:
+        msg: "Ansible version is {{ ansible_version.full }}"
+    - fail:
+      name: Fail if ansible != 2.*.*
+      when: ansible_version.major != 2
