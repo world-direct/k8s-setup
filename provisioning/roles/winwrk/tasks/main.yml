@@ -1,0 +1,10 @@
+# todo: ntpd
+# todo: firewall: allow 10250/tcp for kube-apiserver
+# todo: check about to disable pagefile (=SWAP) for windows workers
+
+- name: Ensure 'Containers' Windows Feature
+  # https://docs.ansible.com/ansible/2.5/modules/win_feature_module.html
+  win_feature:
+    name: containers
+    state: present
+    include_sub_features: yes

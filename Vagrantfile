@@ -51,9 +51,6 @@ Vagrant.configure(2) do |config|
     # enable the vagrant-env
     config.env.enable
 
-    # general box configuration
-    config.vm.box=ENV['BOX_NAME']
-
     # virtualbox configuration
     config.vm.provider "virtualbox" do |vb|
         vb.memory = ENV['BOX_MEMORY']
@@ -62,6 +59,7 @@ Vagrant.configure(2) do |config|
 
     # first controlplane
     config.vm.define "lnxclp1" do |master|
+        master.vm.box=ENV['LNX_BOX_NAME']
         master.vm.hostname = "lnxclp1.k8s.vm"
         master.vm.network "private_network", ip:"10.0.0.2"
 
@@ -69,10 +67,22 @@ Vagrant.configure(2) do |config|
         config_master(master)
     end
 
-    # workers    
-    (1..ENV['NR_LNX_WORKERS'].to_i).each do |nr|
+    # linux workers
+    (1..ENV['LNX_NR_WORKERS'].to_i).each do |nr|
         config.vm.define "lnxwrk#{nr}" do |worker|
+            worker.vm.box=ENV['LNX_BOX_NAME']
             worker.vm.hostname = "lnxwrk#{nr}.k8s.vm"
+            worker.vm.network "private_network", ip:"10.0.0.#{10+nr}"
+    
+            config_vm(worker)
+        end
+    end
+
+    # windows workers
+    (1..ENV['WIN_NR_WORKERS'].to_i).each do |nr|
+        config.vm.define "winwrk#{nr}" do |worker|
+            worker.vm.box=ENV['WIN_BOX_NAME']
+            worker.vm.hostname = "lnxwrk#{nr}"
             worker.vm.network "private_network", ip:"10.0.0.#{10+nr}"
     
             config_vm(worker)
@@ -83,13 +93,27 @@ Vagrant.configure(2) do |config|
     # > Vagrant has detected a host range pattern in the `groups` option.
     # > Vagrant doesn't fully check the validity of these parameters!
     config.vm.provision "ansible" do |ansible|
+
+        # TODO: dynamically create for each windows worker
+        ansible.host_vars = { 
+           "winwrk1" => {
+               "ansible_winrm_scheme" => "http",
+               "ansible_become" => false
+            }
+        }
+
         ansible.groups = {
           "lnxclp" => ["lnxclp1"],
-          "lnxwrk" => []
+          "lnxwrk" => ["lnxwrk1", "lnxwrk2"],
+          "winwrk" => ["winwrk1"]
         }
 
         (1..ENV['NR_LNX_WORKERS'].to_i).each do |nr|
             ansible.groups["lnxwrk"] << "lnxwrk#{nr}"
+        end
+
+        (1..ENV['NR_WIN_WORKERS'].to_i).each do |nr|
+            ansible.groups["winwrk"] << "winwrk#{nr}"
         end
 
         ansible.become = true

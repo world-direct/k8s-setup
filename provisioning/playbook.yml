@@ -10,3 +10,7 @@
   roles:
     - lnxcommon
     - lnxdocker
+
+- hosts: winwrk
+  roles:
+    - winwrk
