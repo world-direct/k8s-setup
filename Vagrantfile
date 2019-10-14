@@ -10,7 +10,8 @@
 # The first master has: 10.0.0.2
 # Next masters:         10.0.0.3, 10.0.0.4
 # Master virtual IP:    10.0.0.10
-# Workers:              10.0.0.11-10.0.0.254
+# Linux-Workers:              10.0.0.11-10.0.0.20
+# Windows-Workers:              10.0.0.21-10.0.0.29
 
 
 # Install vagrant plugins if required
@@ -83,7 +84,7 @@ Vagrant.configure(2) do |config|
         config.vm.define "winwrk#{nr}" do |worker|
             worker.vm.box=ENV['WIN_BOX_NAME']
             worker.vm.hostname = "lnxwrk#{nr}"
-            worker.vm.network "private_network", ip:"10.0.0.#{10+nr}"
+            worker.vm.network "private_network", ip:"10.0.0.#{20+nr}"
     
             config_vm(worker)
         end
