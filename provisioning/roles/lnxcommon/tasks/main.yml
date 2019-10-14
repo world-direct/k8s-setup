@@ -23,3 +23,21 @@
     swapoff -a
   notify:
     - disable swap permanently
+
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
+- name: Add kubernetes yum repo
+  yum_repository:
+    name: Kubernetes
+    description: Kubernetes
+    baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+- name: Install kubelet kubeadm kubectl
+  yum:
+    disable_excludes: kubernetes
+    name:
+      - kubelet
+      - kubeadm
+      - kubectl

@@ -33,7 +33,6 @@
   win_shell: Install-Package Docker -ProviderName DockerMsftProvider -Force
   when: DockerMsftProvider.changed
   register: reboot_required
-  
 
 - name: Perform Reboot, if required
   win_reboot:
