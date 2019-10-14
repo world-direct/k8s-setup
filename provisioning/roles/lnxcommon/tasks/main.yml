@@ -17,12 +17,9 @@
     state: enabled
 
 # http://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
-- name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+- name: Disable swap if enabled (swaptotal={{ansible_facts['swaptotal_mb']}})
+  when: ansible_facts['swaptotal_mb'] != 0
   shell: |
     swapoff -a
-
-- name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
-  replace:
-    path: /etc/fstab
-    regexp: '^[^#](.+?\sswap\s+sw\s+.*)$'
-    replace: '# \1'
+  notify:
+    - disable swap permanently

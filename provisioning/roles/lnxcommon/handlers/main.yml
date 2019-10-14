@@ -1,2 +1,8 @@
 - name: restart ntpd
   service: name=ntpd state=restarted
+
+- name: disable swap permanently
+  replace:
+    path: /etc/fstab
+    regexp: '^[^#](.+?\sswap\s+sw\s+.*)$'
+    replace: '# \1'
