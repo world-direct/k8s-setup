@@ -1,6 +1,15 @@
 # todo: ntpd
-# todo: firewall: allow 10250/tcp for kube-apiserver
 # todo: check about to disable pagefile (=SWAP) for windows workers
+
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
+- name: "windows firewall: allow 10250/tcp for kube-apiserver"
+  win_firewall_rule:
+    action: allow
+    name: "kubeapiserver"
+    localport: 10250
+    protocol: tcp
+    direction: in
+    
 
 - name: Ensure 'Containers' Windows Feature
   # https://docs.ansible.com/ansible/2.5/modules/win_feature_module.html
@@ -8,3 +17,24 @@
     name: containers
     state: present
     include_sub_features: yes
+  register: reboot_required
+
+# https://hub.docker.com/editions/enterprise/docker-ee-server-windows
+
+# represents Install-Module DockerMsftProvider
+- name: Add a 'DockerMsftProvider' module
+  win_psmodule:
+    name: DockerMsftProvider
+    state: present
+  register: DockerMsftProvider
+
+# the 'win_psmodule' module can't specifiy -ProviderName, so we use win_shell here
+- name: Install 'docker' package from 'DockerMsftProvider'
+  win_shell: Install-Package Docker -ProviderName DockerMsftProvider -Force
+  when: DockerMsftProvider.changed
+  register: reboot_required
+  
+
+- name: Perform Reboot, if required
+  win_reboot:
+  when: reboot_required.changed
