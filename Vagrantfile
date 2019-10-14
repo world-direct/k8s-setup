@@ -79,11 +79,18 @@ Vagrant.configure(2) do |config|
         end
     end
 
+    # workers are not added by a hostname pattern, because this generates a warning:
+    # > Vagrant has detected a host range pattern in the `groups` option.
+    # > Vagrant doesn't fully check the validity of these parameters!
     config.vm.provision "ansible" do |ansible|
         ansible.groups = {
           "lnxclp" => ["lnxclp1"],
-          "lnxwrk" => ["lnxwrk[1:#{ENV['NR_LNX_WORKERS']}]"]
+          "lnxwrk" => []
         }
+
+        (1..ENV['NR_LNX_WORKERS'].to_i).each do |nr|
+            ansible.groups["lnxwrk"] << "lnxwrk#{nr}"
+        end
 
         ansible.become = true
         ansible.playbook = "provisioning/playbook.yml"
