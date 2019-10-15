@@ -54,6 +54,7 @@ Vagrant.configure(2) do |config|
     # virtualbox configuration
     config.vm.provider "virtualbox" do |vb|
         vb.memory = ENV['BOX_MEMORY']
+        vb.cpus = ENV['BOX_CPUS']
         vb.linked_clone = true
     end
 
@@ -119,5 +120,7 @@ Vagrant.configure(2) do |config|
         ansible.become = true
         ansible.playbook = "provisioning/playbook.yml"
         ansible.compatibility_mode = "2.0"
+
+        # ansible.verbose = "vvv"
     end
 end
