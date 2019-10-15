@@ -7,14 +7,19 @@
     - device-mapper-persistent-data
     - lvm2
 
-- name: Add Docker repo
-  get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docer-ce.repo
+- name: Add docker yum repository
+  yum_repository:
+    name: docker-ce-stable
+    description: docker-ce-stable
+    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://download.docker.com/linux/centos/gpg
+
 
 - name: "Install docker (version: {{docker_version}})"
   package:
-    name: "docker-ce-{{docker_version}},docker-ce-cli-{{docker_version}},containerd.io"
+    name: "docker-ce-{{docker_version}}.ce"
 
 - name: "enable net.bridge.bridge-nf-call-iptables"
   sysctl:
@@ -29,6 +34,11 @@
     value: 1
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
+
+- name: Generate demon.json
+  template:
+    src: demon.json
+    dest: /etc/docker/
 
 - name: Enable and start dockerd
   service:

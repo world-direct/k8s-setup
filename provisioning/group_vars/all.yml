@@ -1,4 +1,7 @@
-docker_version: "19.03.2"
+# recommended version
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
+docker_version: "18.06.2"
 
-# 6443 is the default port: http://blog.csdn.net/k_james/article/details/12994145
+# 6443 is the default port:
 k8s_api_server_port: 6443
+
