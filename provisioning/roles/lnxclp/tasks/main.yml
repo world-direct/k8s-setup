@@ -1,15 +1,28 @@
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
-- firewalld:
+
+- name: "firewall: allow 10250/tcp for kube-apiserver"
+  firewalld:
+    port: "{{ k8s_api_server_port }}/tcp"   #Kubernetes API server
+    permanent: yes
+    state: enabled
+
+- name: "firewall: 2379-2380/tcp for etcd server"
+  firewalld:
     port: 2379-2380/tcp   # etcd server client API
     permanent: yes
     state: enabled
 
-- firewalld:
+# 10250/tcp for Kublet API is in lnxcommon role
+
+- name: "firewall: 10251/tcp for kube-scheduler"
+  firewalld:
     port: 10251/tcp   # kube-scheduler
     permanent: yes
     state: enabled
 
-- firewalld:
+- name: "firewall: 10252/tcp for kube-controller-manager"
+  firewalld:
     port: 10252/tcp   # kube-controller-manager
     permanent: yes
     state: enabled
+

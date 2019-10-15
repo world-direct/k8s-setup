@@ -35,7 +35,6 @@ def config_vm(node)
         p.autoconfigure = true
         p.add_host '10.0.0.1', ['master.k8s.vm']
     end
-
 end
 
 # currently this is only possible on a sole master

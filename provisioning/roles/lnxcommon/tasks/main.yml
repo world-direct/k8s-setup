@@ -10,9 +10,9 @@
     state: started
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
-- name: "firewall: allow 10250/tcp for kube-apiserver"
+- name: "firewall: allow 10250/tcp for Kublet API"
   firewalld:
-    port: 10250/tcp   #Kubernetes API server
+    port: 10250/tcp
     permanent: yes
     state: enabled
 

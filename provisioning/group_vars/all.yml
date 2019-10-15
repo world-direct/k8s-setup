@@ -1,1 +1,4 @@
 docker_version: "19.03.2"
+
+# 6443 is the default port: http://blog.csdn.net/k_james/article/details/12994145
+k8s_api_server_port: 6443
