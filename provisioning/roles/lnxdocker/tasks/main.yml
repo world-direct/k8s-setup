@@ -16,6 +16,20 @@
   package:
     name: "docker-ce-{{docker_version}},docker-ce-cli-{{docker_version}},containerd.io"
 
+- name: "enable net.bridge.bridge-nf-call-iptables"
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-iptables
+    state: present
+
+- name: "enable net.bridge.bridge-nf-call-ip6tables"
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
+    state: present
+
 - name: Enable and start dockerd
   service:
     name: docker
