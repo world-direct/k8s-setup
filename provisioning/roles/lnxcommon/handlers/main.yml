@@ -6,3 +6,6 @@
     path: /etc/fstab
     regexp: '^[^#](.+?\sswap\s+sw\s+.*)$'
     replace: '# \1'
+
+- name: reload firewalld
+  command: firewall-cmd --reload

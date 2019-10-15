@@ -4,3 +4,4 @@
     port: 30000-32767/tcp   #NodePort Services
     permanent: yes
     state: enabled
+  notify: reload firewalld
