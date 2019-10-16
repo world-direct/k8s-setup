@@ -39,3 +39,12 @@ pip install "pywinrm>=0.3.0"
 # if this fails with 'Segmentation fault (core dumped)' run
 sudo apt remove python-cryptography
 ```
+
+
+# to install the controller
+
+```
+yum install bash-completion
+source <(kubectr completion bash)
+```
+

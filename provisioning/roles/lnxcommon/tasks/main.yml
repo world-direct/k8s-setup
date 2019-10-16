@@ -42,3 +42,9 @@
       - kubelet
       - kubeadm
       - kubectl
+
+- name: Enable and start kubelet
+  service:
+    name: kubelet
+    enabled: yes
+    state: started

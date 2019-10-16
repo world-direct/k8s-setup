@@ -3,5 +3,14 @@
 docker_version: "18.06.2"
 
 # 6443 is the default port:
-k8s_api_server_port: 6443
+k8s_apiserver_port: 6443
 
+# the CIDR used for the pod network, need to be used for routing
+k8s_pod_network_cidr: 192.168.0.0/16
+
+# we use the ip of clp1, because there is no keealived yet
+k8s_api_server_vip: 10.0.0.2
+
+# the hostname needs to be configured in DNS for API_SERVER_HOSTNAME.SERVICE_DNS_DOMAIN => API_SERVER_VIP
+k8s_apiserver_hostname: apiserver
+k8s_service_dns_domain: k8stest.local

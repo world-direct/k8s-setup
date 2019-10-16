@@ -9,9 +9,9 @@
 #
 # The first master has: 10.0.0.2
 # Next masters:         10.0.0.3, 10.0.0.4
-# Master virtual IP:    10.0.0.10
-# Linux-Workers:              10.0.0.11-10.0.0.20
-# Windows-Workers:              10.0.0.21-10.0.0.29
+# Master virtual IP:    10.0.0.9    (currently 2, because no keepalived yet)
+# Linux-Workers:        10.0.0.11-10.0.0.20
+# Windows-Workers:      10.0.0.21-10.0.0.29
 
 
 # Install vagrant plugins if required
@@ -33,17 +33,17 @@ def config_vm(node)
     node.vm.provision :hosts do |p|
         # p.sync_hosts = true
         p.autoconfigure = true
-        p.add_host '10.0.0.1', ['master.k8s.vm']
+        p.add_host ENV['K8S_API_SERVER_VIP'], ["#{ENV['K8S_APISERVER_HOSTNAME']}.#{ENV['K8S_SERVICE_DNS_DOMAIN']}"]
     end
 end
 
 # currently this is only possible on a sole master
 def config_master(master)
     # Bind kubernetes admin port so we can administrate from host
-    master.vm.network "forwarded_port", guest: 6443, host: 6443, hostip: "10.0.0.10"
+    master.vm.network "forwarded_port", guest: 6443, host: 6443
 
     # Bind kubernetes default proxy port
-    master.vm.network "forwarded_port", guest: 8001, host: 8001, hostip: "10.0.0.10"
+    master.vm.network "forwarded_port", guest: 8001, host: 8001
 end
 
 Vagrant.configure(2) do |config|
@@ -116,6 +116,13 @@ Vagrant.configure(2) do |config|
         (1..ENV['NR_WIN_WORKERS'].to_i).each do |nr|
             ansible.groups["winwrk"] << "winwrk#{nr}"
         end
+
+        # pass the needed vars from the .env
+        ansible.extra_vars = {
+            k8s_api_server_vip: ENV['K8S_API_SERVER_VIP'],
+            k8s_service_dns_domain: ENV['K8S_SERVICE_DNS_DOMAIN'],
+            k8s_apiserver_hostname: ENV['K8S_APISERVER_HOSTNAME']
+        }
 
         ansible.become = true
         ansible.playbook = "provisioning/playbook.yml"

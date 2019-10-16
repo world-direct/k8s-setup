@@ -2,7 +2,7 @@
 
 - name: "firewall: allow 10250/tcp for kube-apiserver"
   firewalld:
-    port: "{{ k8s_api_server_port }}/tcp"   #Kubernetes API server
+    port: "{{ k8s_apiserver_port }}/tcp"   #Kubernetes API server
     permanent: yes
     state: enabled
   notify: reload firewalld
@@ -30,3 +30,5 @@
     state: enabled
   notify: reload firewalld
 
+- debug:
+    msg: "kubeadm init --control-plane-endpoint '{{k8s_apiserver_hostname}}.{{k8s_service_dns_domain}}:{{k8s_apiserver_port}}' --service-dns-domain '{{k8s_service_dns_domain}}' --pod-network-cidr '{{k8s_pod_network_cidr}}' --upload-certs"

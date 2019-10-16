@@ -19,6 +19,7 @@
     include_sub_features: yes
   register: reboot_required
 
+# https://docs.docker.com/install/windows/docker-ee/#use-a-script-to-install-docker-ee
 # https://hub.docker.com/editions/enterprise/docker-ee-server-windows
 
 # represents Install-Module DockerMsftProvider
