@@ -33,7 +33,7 @@ def config_vm(node)
     node.vm.provision :hosts do |p|
         # p.sync_hosts = true
         p.autoconfigure = true
-        p.add_host ENV['K8S_API_SERVER_VIP'], ["#{ENV['K8S_APISERVER_HOSTNAME']}.#{ENV['K8S_SERVICE_DNS_DOMAIN']}"]
+        p.add_host ENV['K8S_API_SERVER_VIP'], ["#{ENV['K8S_APISERVER_HOSTNAME']}.#{ENV['K8S_CLUSTER_DNSNAME']}"]
     end
 end
 
@@ -61,7 +61,7 @@ Vagrant.configure(2) do |config|
     # first controlplane
     config.vm.define "lnxclp1" do |master|
         master.vm.box=ENV['LNX_BOX_NAME']
-        master.vm.hostname = "lnxclp1.k8s.vm"
+        master.vm.hostname = "lnxclp1"
         master.vm.network "private_network", ip:"10.0.0.2"
 
         config_vm(master)
@@ -72,7 +72,7 @@ Vagrant.configure(2) do |config|
     (1..ENV['LNX_NR_WORKERS'].to_i).each do |nr|
         config.vm.define "lnxwrk#{nr}" do |worker|
             worker.vm.box=ENV['LNX_BOX_NAME']
-            worker.vm.hostname = "lnxwrk#{nr}.k8s.vm"
+            worker.vm.hostname = "lnxwrk#{nr}"
             worker.vm.network "private_network", ip:"10.0.0.#{10+nr}"
     
             config_vm(worker)
@@ -120,7 +120,7 @@ Vagrant.configure(2) do |config|
         # pass the needed vars from the .env
         ansible.extra_vars = {
             k8s_api_server_vip: ENV['K8S_API_SERVER_VIP'],
-            k8s_service_dns_domain: ENV['K8S_SERVICE_DNS_DOMAIN'],
+            k8s_cluster_dnsname: ENV['K8S_CLUSTER_DNSNAME'],
             k8s_apiserver_hostname: ENV['K8S_APISERVER_HOSTNAME']
         }
 

@@ -2,15 +2,27 @@
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 docker_version: "18.06.2"
 
+## Kubernetes global cluster configuration
+#############################################################
+
 # 6443 is the default port:
 k8s_apiserver_port: 6443
 
 # the CIDR used for the pod network, need to be used for routing
-k8s_pod_network_cidr: 192.168.0.0/16
+k8s_pod_network_cidr: 10.244.0.0/16
 
-# we use the ip of clp1, because there is no keealived yet
+# we use the ip of clp1, because there is no keealived yet **)
 k8s_api_server_vip: 10.0.0.2
 
-# the hostname needs to be configured in DNS for API_SERVER_HOSTNAME.SERVICE_DNS_DOMAIN => API_SERVER_VIP
+# the base dnsname for the cluster  **)
+k8s_cluster_dnsname: k8stest.local
+
+# the hostname used for the apiserver (without the k8s_cluster_dnsname) **)
 k8s_apiserver_hostname: apiserver
-k8s_service_dns_domain: k8stest.local
+
+
+## Notes
+#############################################################
+#
+# **): If you use Vagrant for local machine tests, these values will be
+#       set from the .env file in the project root. Change them in this file
