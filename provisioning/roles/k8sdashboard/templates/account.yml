@@ -1,0 +1,29 @@
+# this creates a token for the admin user
+# https://github.com/kubernetes/dashboard/blob/master/docs/user/access-control/creating-sample-user.md
+
+---
+# a serice account with full admin rights, to logon to dashboard (tempoary).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cluster-admin-account
+  namespace: kube-system
+---
+
+# bind the service account to the 'cluster-admin' ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-admin-account
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: cluster-admin-account
+  namespace: kube-system
+---
+
+# to retrieve the token in plain test, execute this in SSH:
+# kubectl describe secret $(kubectl describe ServiceAccount cluster-admin-account -n kube-system | grep "Mountable secrets:" | awk '{print $3}') -n kube-system | grep "token:" | awk '{print $2'}

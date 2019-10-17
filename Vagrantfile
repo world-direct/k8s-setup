@@ -37,15 +37,6 @@ def config_vm(node)
     end
 end
 
-# currently this is only possible on a sole master
-def config_master(master)
-    # Bind kubernetes admin port so we can administrate from host
-    master.vm.network "forwarded_port", guest: 6443, host: 6443
-
-    # Bind kubernetes default proxy port
-    master.vm.network "forwarded_port", guest: 8001, host: 8001
-end
-
 Vagrant.configure(2) do |config|
 
     # enable the vagrant-env
@@ -64,8 +55,10 @@ Vagrant.configure(2) do |config|
         master.vm.hostname = "lnxclp1"
         master.vm.network "private_network", ip:"10.0.0.2"
 
+        # Bind kubernetes default proxy port
+        master.vm.network "forwarded_port", guest: 8001, host: 8001, ip:"10.0.0.2"
+
         config_vm(master)
-        config_master(master)
     end
 
     # linux workers
@@ -121,7 +114,8 @@ Vagrant.configure(2) do |config|
         ansible.extra_vars = {
             k8s_api_server_vip: ENV['K8S_API_SERVER_VIP'],
             k8s_cluster_dnsname: ENV['K8S_CLUSTER_DNSNAME'],
-            k8s_apiserver_hostname: ENV['K8S_APISERVER_HOSTNAME']
+            k8s_apiserver_hostname: ENV['K8S_APISERVER_HOSTNAME'],
+            k8s_enable_proxy: true
         }
 
         ansible.become = true

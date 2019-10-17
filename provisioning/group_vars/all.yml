@@ -20,9 +20,14 @@ k8s_cluster_dnsname: k8stest.local
 # the hostname used for the apiserver (without the k8s_cluster_dnsname) **)
 k8s_apiserver_hostname: apiserver
 
+k8s_install_flannel: yes
+
 
 ## Notes
 #############################################################
 #
 # **): If you use Vagrant for local machine tests, these values will be
 #       set from the .env file in the project root. Change them in this file
+#
+# Parameters, only passed by Vagrant:
+#   k8s_enable_proxy: yes
