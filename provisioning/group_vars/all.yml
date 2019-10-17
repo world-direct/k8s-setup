@@ -1,6 +1,7 @@
 # recommended version
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
-docker_version: "18.06.2"
+lnx_docker_version: "18.06.2"
+win_docker_version: "19.03.3"
 
 ## Kubernetes global cluster configuration
 #############################################################

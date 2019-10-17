@@ -1,3 +1,5 @@
+# This playbook configures the machines
+# installs docker and the kubernetes binaries kubectl, kubelet and kubeadm
 ---
 - import_playbook: ./check-version.yml
 - hosts: lnxclp

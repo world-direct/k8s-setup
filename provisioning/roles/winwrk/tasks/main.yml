@@ -1,5 +1,11 @@
+# https://docs.ansible.com/ansible/latest/modules/list_of_windows_modules.html
+# if you want de-AT keyboard in powerhsell execute:
+# Set-WinUserLanguageList -LanguageList de-AT -Force
+
+
 # todo: ntpd
 # todo: check about to disable pagefile (=SWAP) for windows workers
+
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
 - name: "windows firewall: allow 10250/tcp for kube-apiserver"
@@ -8,8 +14,7 @@
     name: "kubeapiserver"
     localport: 10250
     protocol: tcp
-    direction: in
-    
+    direction: in    
 
 - name: Ensure 'Containers' Windows Feature
   # https://docs.ansible.com/ansible/2.5/modules/win_feature_module.html
@@ -20,20 +25,24 @@
   register: reboot_required
 
 # https://docs.docker.com/install/windows/docker-ee/#use-a-script-to-install-docker-ee
-# https://hub.docker.com/editions/enterprise/docker-ee-server-windows
 
-# represents Install-Module DockerMsftProvider
-- name: Add a 'DockerMsftProvider' module
-  win_psmodule:
-    name: DockerMsftProvider
-    state: present
-  register: DockerMsftProvider
+- name: create the install-docker.ps1 script
+  win_template:
+    src: install-docker.ps1
+    dest: c:\install-docker.ps1
 
-# the 'win_psmodule' module can't specifiy -ProviderName, so we use win_shell here
-- name: Install 'docker' package from 'DockerMsftProvider'
-  win_shell: Install-Package Docker -ProviderName DockerMsftProvider -Force
-  when: DockerMsftProvider.changed
-  register: reboot_required
+
+- name: Ensure docker installed (will take some time for download)
+  win_command: powershell.exe -File install-docker.ps1
+  args:
+    chdir: c:\
+    creates: c:\docker
+
+- name: Enable and start docker service
+  win_service:
+    name: docker
+    start_mode: auto
+    state: started
 
 - name: Perform Reboot, if required
   win_reboot:

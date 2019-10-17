@@ -17,9 +17,9 @@
     gpgkey: https://download.docker.com/linux/centos/gpg
 
 
-- name: "Install docker (version: {{docker_version}})"
+- name: "Install docker (version: {{lnx_docker_version}})"
   package:
-    name: "docker-ce-{{docker_version}}.ce"
+    name: "docker-ce-{{lnx_docker_version}}.ce"
 
 - name: "enable net.bridge.bridge-nf-call-iptables"
   sysctl:

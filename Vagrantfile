@@ -119,7 +119,7 @@ Vagrant.configure(2) do |config|
         }
 
         ansible.become = true
-        ansible.playbook = "provisioning/playbook.yml"
+        ansible.playbook = "provisioning/machinesetup.yml"
         ansible.compatibility_mode = "2.0"
 
         # ansible.verbose = "vvv"
