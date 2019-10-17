@@ -1,3 +1,6 @@
+###########################################
+## System 
+
 - name: ensure ntpd is at the latest version
   yum: pkg=ntp state=latest
   notify:
@@ -9,13 +12,6 @@
     enabled: yes
     state: started
 
-# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
-- name: "firewall: allow 10250/tcp for Kublet API"
-  firewalld:
-    port: 10250/tcp
-    permanent: yes
-    state: enabled
-  notify: reload firewalld
 
 # http://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
 - name: Disable swap if enabled (swaptotal={{ansible_facts['swaptotal_mb']}})
@@ -24,6 +20,68 @@
     swapoff -a
   notify:
     - disable swap permanently
+
+###########################################
+## Install docker
+
+- name: Ensure required packages installed
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - yum-utils
+    - device-mapper-persistent-data
+    - lvm2
+
+- name: Add docker yum repository
+  yum_repository:
+    name: docker-ce-stable
+    description: docker-ce-stable
+    baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
+    enabled: yes
+    gpgcheck: yes
+    gpgkey: https://download.docker.com/linux/centos/gpg
+
+
+- name: "Install docker (version: {{lnx_docker_version}})"
+  package:
+    name: "docker-ce-{{lnx_docker_version}}.ce"
+
+- name: "enable net.bridge.bridge-nf-call-iptables"
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-iptables
+    state: present
+
+- name: "enable net.bridge.bridge-nf-call-ip6tables"
+  sysctl:
+    name: net.bridge.bridge-nf-call-ip6tables
+    value: 1
+    ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
+    state: present
+
+- name: Generate demon.json
+  template:
+    src: demon.json
+    dest: /etc/docker/
+
+- name: Enable and start dockerd
+  service:
+    name: docker
+    enabled: yes
+    state: started
+
+###########################################
+## Install kubernetes
+
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
+- name: "firewall: allow 10250/tcp for Kublet API"
+  firewalld:
+    port: 10250/tcp
+    permanent: yes
+    state: enabled
+  notify: reload firewalld
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 - name: Add kubernetes yum repo
@@ -75,3 +133,6 @@
     state: enabled
   when: k8s_enable_proxy
   notify: reload firewalld
+
+# to reload firewalld
+- meta: flush_handlers

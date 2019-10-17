@@ -1,3 +1,6 @@
+###########################################
+## Open required Ports
+
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
 
 - name: "firewall: allow 10250/tcp for kube-apiserver"
@@ -30,11 +33,15 @@
     state: enabled
   notify: reload firewalld
 
-- debug:
-    msg: "kubeadm init --control-plane-endpoint '{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}' --service-dns-domain '{{k8s_cluster_dnsname}}' --pod-network-cidr '{{k8s_pod_network_cidr}}' --upload-certs"
+- name: "create ~/resetk8s script to teardown cluster (for testing)"
+  template:
+    src: resetk8s
+    dest: ~/resetk8s
 
-# kubectl
-#  mkdir -p $HOME/.kube
-#  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-#  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+- file:
+    path: ~/resetk8s
+    mode: '755'
+
+# to reload firewalld
+- meta: flush_handlers
 

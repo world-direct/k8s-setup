@@ -1,0 +1,26 @@
+- name: check if /etc/kubernetes/kubelet.conf exists
+  stat:
+    path: /etc/kubernetes/admin.conf
+  register: admin_conf
+
+- fail:
+    msg: Kubernetes seems to be already configured on this node, to reset you can use ~./resetk8s
+  when: admin_conf.stat.exists
+
+- set_fact:
+    kubeadm_cmd: "kubeadm init --control-plane-endpoint '{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}' --service-dns-domain '{{k8s_cluster_dnsname}}' --pod-network-cidr '{{k8s_pod_network_cidr}}' --upload-certs"
+
+- name: "Init by kubeadm, this will take some time: {{kubeadm_cmd}}"
+  command: "{{kubeadm_cmd}}"
+  register: kubeadm_out
+
+- debug: 
+    stdout: "{{ kubeadm_out.cmd.stdout_lines }}"
+    stderr: "{{ kubeadm_out.cmd.stderr_lines }}"
+
+- name: "Configure admin context for kubectl for root user"
+  shell: |
+    mkdir -p $HOME/.kube
+    cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    chown $(id -u):$(id -g) $HOME/.kube/config
+

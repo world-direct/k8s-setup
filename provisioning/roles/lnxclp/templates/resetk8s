@@ -1,0 +1,9 @@
+#! /bin/sh
+kubeadm reset -f
+
+# remove config
+rm -rf /etc/kubernetes/*
+rm -rf ~/.kube
+
+# and recreate manifests, as these existed before kubeadm init
+mkdir -p /etc/kubernetes/manifests

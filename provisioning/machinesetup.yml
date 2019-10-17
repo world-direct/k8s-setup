@@ -4,16 +4,12 @@
 - import_playbook: ./check-version.yml
 - hosts: lnxclp
   roles:
-    - lnxcommon
-    - lnxdocker
-    - lnxclp
+    - lnxsetup
 
 - hosts: lnxwrk
   roles:
-    - lnxcommon
-    - lnxdocker
-    - lnxwrk
+    - lnxsetup
 
 - hosts: winwrk
   roles:
-    - winwrk
+    - winsetup

@@ -97,6 +97,7 @@ Vagrant.configure(2) do |config|
         }
 
         ansible.groups = {
+          "lnxclpsetup" => ["lnxclp1"],
           "lnxclp" => ["lnxclp1"],
           "lnxwrk" => ["lnxwrk1", "lnxwrk2"],
           "winwrk" => ["winwrk1"]
@@ -120,6 +121,7 @@ Vagrant.configure(2) do |config|
 
         ansible.become = true
         ansible.playbook = "provisioning/machinesetup.yml"
+        # ansible.playbook = "provisioning/k8sclusterinit.yml"
         ansible.compatibility_mode = "2.0"
 
         # ansible.verbose = "vvv"
