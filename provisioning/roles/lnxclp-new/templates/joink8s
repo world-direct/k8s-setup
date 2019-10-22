@@ -1,3 +1,11 @@
 #! /bin/sh
+set -x
+
+###########################################
+# Joins the local machine as a control plane
+#
+#   STDOUT: Output of kubeadm join
+#   STDERR: Output of kubeadm join
+
 cd ~
 {{ join_cmd.stdout }} --control-plane --certificate-key {{ cert_cmd.stdout }}

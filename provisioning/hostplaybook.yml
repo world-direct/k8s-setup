@@ -22,15 +22,6 @@
     - import_role: name=lnxsetup
       when: setup_skip_system_setup == false
 
-# run individual setup for workers and clp
-- hosts: lnxclp
-  roles:
-    - lnxclp
-
-- hosts: lnxwrk
-  roles:
-    - lnxwrk
-
 - hosts: winwrk
   tasks:
     - import_role: name=winsetup

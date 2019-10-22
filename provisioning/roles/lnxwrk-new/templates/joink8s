@@ -1,3 +1,11 @@
 #! /bin/sh
+set -x
+
+###########################################
+# Joins the local machine as a worker
+#
+#   STDOUT: Output of kubeadm join
+#   STDERR: Output of kubeadm join
+
 cd ~
 {{ join_cmd.stdout }}

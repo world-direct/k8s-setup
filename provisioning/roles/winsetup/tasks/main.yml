@@ -43,10 +43,15 @@
 #     dest: c:\docker.zip
 #     creates: c:\docker.zip
 
-- name: create the install-docker.ps1 script
+- name: ensure the install-docker.ps1 script
   win_template:
     src: install-docker.ps1
     dest: c:\install-docker.ps1
+
+- name: ensure the uninstall-docker.ps1 script
+  win_template:
+    src: uninstall-docker.ps1
+    dest: c:\uninstall-docker.ps1
 
 - name: Ensure docker installed (may take some time for download)
   win_command: powershell.exe -File c:\install-docker.ps1

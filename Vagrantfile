@@ -129,8 +129,6 @@ Vagrant.configure(2) do |config|
                 ansible.groups["winwrk"] << "winwrk#{nr}"
             end
 
-            puts ansible.groups
-
             # pass the needed vars from the .env
             ansible.extra_vars = {
                 k8s_api_server_vip: ENV['K8S_API_SERVER_VIP'],

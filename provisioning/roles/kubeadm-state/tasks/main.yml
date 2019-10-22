@@ -22,7 +22,7 @@
   register: k8sstate_cmd
 
 - set_fact:
-    k8s_configured: if 'k8s_configured=yes' in k8sstate_cmd.stdout 'true' else 'false'
+    k8s_configured: "{{ true if 'k8s_configured=yes' in k8sstate_cmd.stdout else false }}"
 
 - name: "ensure ~/resetk8s script to teardown configuration (for testing)"
   template:
@@ -30,7 +30,5 @@
     dest: ~/resetk8s
     mode: 755
 
-- name: DEBUG k8s_configured
-  debug:
-    msg: "{{ansible_hostname}} => k8_configured = {{k8s_configured}}"
-    verbosity: 1
+# - name: DEBUG k8s_configured
+#   debug: var=k8s_configured

@@ -1,4 +1,6 @@
 #! /bin/sh
+set -e
+
 ###########################################
 # Determinates the k8s configuration state of the machine
 #
@@ -8,9 +10,6 @@
 #
 #   STDERR: any other status or error message
 # exit when any command fails
-set -e
-
-rm -f ~/*.state
 
 CONFFILE=/etc/kubernetes/kubelet.conf
 

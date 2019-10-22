@@ -1,7 +1,0 @@
-# this is just the recommendation. We will see if, and how we will use NodePort Services
-- name: "firewall: allow 30000-32767/tcp for NodePort services"
-  firewalld:
-    port: 30000-32767/tcp   #NodePort Services
-    permanent: yes
-    state: enabled
-  notify: reload firewalld

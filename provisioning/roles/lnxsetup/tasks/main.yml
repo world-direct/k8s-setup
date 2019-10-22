@@ -14,7 +14,7 @@
   - restart ntpd
 
 # http://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
-- name: Disable swap if enabled (swaptotal={{ansible_facts['swaptotal_mb']}})
+- name: Disable swap if enabled
   when: ansible_facts['swaptotal_mb'] != 0
   shell: |
     swapoff -a

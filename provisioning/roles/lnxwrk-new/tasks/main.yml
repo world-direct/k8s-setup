@@ -12,7 +12,6 @@
   template:
     src: joink8s
     dest: ~/joink8s
-    path: ~/joink8s
     mode: 755
 
 - name: "Join kubernetes cluster, you may cat ~/kubeadm.log in ssh to check progress"

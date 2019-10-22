@@ -1,8 +1,14 @@
 #! /bin/sh
-apiserverendpoint='{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'
+set -x
+
+###########################################
+# Initializes the k8s cluster on the local machine
+#
+#   STDOUT: Output of kubeadm join
+#   STDERR: Output of kubeadm join
 
 kubeadm init \
-    --control-plane-endpoint $apiserverendpoint \
+    --control-plane-endpoint '{{k8s_cluster_url}}' \
     --service-dns-domain '{{k8s_cluster_dnsname}}' \
     --pod-network-cidr '{{k8s_pod_network_cidr}}' \
     --upload-certs
