@@ -8,3 +8,7 @@
     - fail:
       name: Fail if ansible != 2.*.*
       when: ansible_version.major != 2
+
+    - set_fact:
+        k8s_cluster_url: '{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'
+        k8s_cluster_url_with_protocol: 'https://{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'

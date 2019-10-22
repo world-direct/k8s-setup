@@ -29,13 +29,6 @@ ensure_plugin("vagrant-env")
 # Allows us to use host-resolution internaly, without DNS
 ensure_plugin("vagrant-hosts")
 
-def config_vm(node)
-    node.vm.provision :hosts do |p|
-        # p.sync_hosts = true
-        p.autoconfigure = true
-        p.add_host ENV['K8S_API_SERVER_VIP'], ["#{ENV['K8S_APISERVER_HOSTNAME']}.#{ENV['K8S_CLUSTER_DNSNAME']}"]
-    end
-end
 
 Vagrant.configure(2) do |config|
 
@@ -49,6 +42,12 @@ Vagrant.configure(2) do |config|
         vb.linked_clone = true
     end
 
+    config.vm.provision :hosts do |p|
+        # p.sync_hosts = true
+        p.autoconfigure = true
+        p.add_host ENV['K8S_API_SERVER_VIP'], ["#{ENV['K8S_APISERVER_HOSTNAME']}.#{ENV['K8S_CLUSTER_DNSNAME']}"]
+    end
+
     # first controlplane
     config.vm.define "lnxclp1" do |master|
         master.vm.box=ENV['LNX_BOX_NAME']
@@ -57,8 +56,6 @@ Vagrant.configure(2) do |config|
 
         # Bind kubernetes default proxy port
         master.vm.network "forwarded_port", guest: 8001, host: 8001, ip:"10.0.0.2"
-
-        config_vm(master)
     end
 
     # linux workers
@@ -67,8 +64,6 @@ Vagrant.configure(2) do |config|
             worker.vm.box=ENV['LNX_BOX_NAME']
             worker.vm.hostname = "lnxwrk#{nr}"
             worker.vm.network "private_network", ip:"10.0.0.#{10+nr}"
-    
-            config_vm(worker)
         end
     end
 
@@ -78,8 +73,6 @@ Vagrant.configure(2) do |config|
             worker.vm.box=ENV['WIN_BOX_NAME']
             worker.vm.hostname = "lnxwrk#{nr}"
             worker.vm.network "private_network", ip:"10.0.0.#{20+nr}"
-    
-            config_vm(worker)
         end
     end
 
@@ -97,7 +90,7 @@ Vagrant.configure(2) do |config|
         }
 
         ansible.groups = {
-          "lnxclpsetup" => ["lnxclp1"],
+          "lnxclp-master" => ["lnxclp1"],
           "lnxclp" => ["lnxclp1"],
           "lnxwrk" => ["lnxwrk1", "lnxwrk2"],
           "winwrk" => ["winwrk1"]
@@ -119,11 +112,12 @@ Vagrant.configure(2) do |config|
             k8s_enable_proxy: true
         }
 
+        ansible.limit = "all"   # provision on all machines in parallel
         ansible.become = true
-        ansible.playbook = "provisioning/machinesetup.yml"
-        # ansible.playbook = "provisioning/k8sclusterinit.yml"
+        ansible.playbook = "provisioning/hostplaybook.yml"
         ansible.compatibility_mode = "2.0"
 
-        # ansible.verbose = "vvv"
+        # ansible.verbose = "vvvv"
     end
+
 end

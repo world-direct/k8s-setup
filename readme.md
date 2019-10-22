@@ -8,6 +8,24 @@ Next masters:         10.0.0.2, 10.0.0.3
 Master virtual IP:    10.0.0.10
 Workers:              10.0.0.11-10.0.0.254
 
+# how to use vagrant here
+
+Vagrant is configured to run the ansible provisioner without --limit (see Vagrantfile).
+To avoid, that vagrant will run this (for all) on all hosts, seperate starting
+the VMs from provisioning:
+
+```sh
+
+# startup Vagrant boxes
+vagrant up --no-provision
+
+# provision the entire cluster
+# the loop is still present, so you have to CTRL+C when the first host is done :(
+vagrant provision
+
+
+```
+
 # Single Master
 
 For the first version, we use a single master, we will create a VIP later on.

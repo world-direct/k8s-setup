@@ -7,13 +7,29 @@
 # https://dockermsft.blob.core.windows.net/dockercontainer/DockerMsftIndex.json
 
 $ErrorActionPreference = "Stop"
-
-Invoke-WebRequest -UseBasicParsing -OutFile "$($env:tmp)\docker.zip" https://download.docker.com/components/engine/windows-server/19.03/docker-19.03.3.zip
-
-# Extract the archive to c:\docker
-Expand-Archive "$($env:tmp)\docker.zip" c:\
-
+$zipPath = "c:\docker.zip"
 $installpath = "c:\docker"
+
+if(Test-Path $installpath) {
+    Write-Host "$installpath exists, docker is installed. (ANSIBLE_OK)"
+    exit 0
+}
+
+##############################################
+# Download raw docker zip package 
+#
+# this is done in the script. https://github.com/ansible/ansible/issues/637354
+# If my issue is resolved, we may move this to tasks/main.yml again
+
+# try to expand first, so a partial download can be checked
+$url = "{{docker_download_url}}"
+
+try {
+    Expand-Archive "c:\docker.zip" "c:\"
+} catch {
+    Write-Host "Need to download docker.zip from $url"
+    Invoke-WebRequest -UseBasicParsing -OutFile $zipPath $url
+}
 
 # Add Docker to the path for the current session.
 $env:path += ";$installpath"
@@ -29,5 +45,4 @@ $newPath = "$installpath;" +
 # Register the Docker daemon as a service.
 dockerd --register-service
 
-# Start the Docker service.
-Start-Service docker
+exit 0

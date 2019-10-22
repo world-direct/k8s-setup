@@ -1,0 +1,30 @@
+#! /bin/sh
+
+# If creates the './k8-configured.state' or './k8-unconfigured.state' file
+# If it fails, this is a unrecoverable error
+
+# exit when any command fails
+set -e
+
+rm -f ~/*.state
+
+CONFFILE=/etc/kubernetes/kubelet.conf
+
+if [ ! -f "$CONFFILE" ]; then
+    echo "$CONFFILE does not exist, so no member node"
+    touch k8-unconfigured.state
+    exit 0
+fi
+
+EXPECTED_URL='{{k8s_cluster_url_with_protocol}}'
+CONFIGURED_URL=$(cat $CONFFILE | grep "server: " | awk '{print $2}')
+
+echo "Configured URL: $CONFIGURED_URL"
+echo "Expected URL: $EXPECTED_URL"
+
+if [ "$EXPECTED_URL" == "$CONFIGURED_URL" ]; then
+    echo $CONFIGURED_URL > ~/k8-configured.state
+    exit 0
+else
+    >&2 echo "This node is not member of the configured cluster! You may create a new node from scratch. "
+fi

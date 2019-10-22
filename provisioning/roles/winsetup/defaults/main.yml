@@ -1,0 +1,12 @@
+docker_download_url: https://download.docker.com/components/engine/windows-server/19.03/docker-19.03.3.zip
+
+# start at https://github.com/kubernetes/kubernetes/releases/
+# select release => https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.16.md#downloads-for-v1162
+# for latests, use https://github.com/kubernetes/kubernetes/releases/latest
+# to get win binaries, use like with "Additional binary downloads are lined in the CHANGELOG-x.yy.md"
+# example https://github.com/kubernetes/kubernetes/blob/master/CHANGELOG-1.16.md#downloads-for-v1162
+
+# use the 'kubernetes-node-windows-amd63.tag.gz' like, like
+k8s_node_download_url: https://dl.k8s.io/v1.16.1/kubernetes-node-windows-amd64.tar.gz
+k8s_node_download_sha512: 93ebe21c147dcb38cb1ee222975f35f7c8c8175255cfce09381c8852734d054def58bc630cf868d99baa7f90bd2c201ccaa42dbae3ef360c3135c825ec2c74b1
+

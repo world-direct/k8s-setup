@@ -14,7 +14,12 @@
     name: "kubeapiserver"
     localport: 10250
     protocol: tcp
-    direction: in    
+    direction: in
+
+# set locale
+- name: Set locale to de-AT (for keyboard, execute Set-WinUserLanguageList -language de-AT)
+  win_region:
+    format: de-AT
 
 - name: Ensure 'Containers' Windows Feature
   # https://docs.ansible.com/ansible/2.5/modules/win_feature_module.html
@@ -24,26 +29,45 @@
     include_sub_features: yes
   register: reboot_required
 
+- name: Perform Reboot, if required
+  win_reboot:
+  when: reboot_required.changed
+
 # https://docs.docker.com/install/windows/docker-ee/#use-a-script-to-install-docker-ee
+
+# this is done in the script, 
+# see : https://github.com/ansible/ansible/issues/637354
+# - name: Download raw docker package (c:\docker.zip)
+#   win_get_url:
+#     url: "{{ docker_download_url}}"
+#     dest: c:\docker.zip
+#     creates: c:\docker.zip
 
 - name: create the install-docker.ps1 script
   win_template:
     src: install-docker.ps1
     dest: c:\install-docker.ps1
 
+- name: Ensure docker installed (may take some time for download)
+  win_command: powershell.exe -File c:\install-docker.ps1
+  register: installdocker_result
+  changed_when: "'ANSIBLE_OK' not in installdocker_result.stdout"
 
-- name: Ensure docker installed (will take some time for download)
-  win_command: powershell.exe -File install-docker.ps1
-  args:
-    chdir: c:\
-    creates: c:\docker
-
+# we start the docker service with a reboot
+# this ensures the the PATH variable (on Machine) is applied
 - name: Enable and start docker service
   win_service:
     name: docker
     start_mode: auto
-    state: started
 
-- name: Perform Reboot, if required
+- name: Perform Reboot, if docker has been installed
   win_reboot:
-  when: reboot_required.changed
+  when: installdocker_result.changed
+
+# https://docs.microsoft.com/en-us/virtualization/windowscontainers/kubernetes/joining-windows-workers
+
+# Create the "pause" (infrastructure) image
+- name: create the install-kubernetes.ps1 script
+  win_template:
+    src: install-k8s.ps1
+    dest: c:\install-k8s.ps1

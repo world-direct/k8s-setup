@@ -1,6 +1,12 @@
 ###########################################
 ## System 
 
+- name: upgrade all yum packages
+  yum:
+    name: '*'
+    state: latest
+  when: setup_update_all_packages
+
 - name: ensure ntpd is at the latest version
   yum: pkg=ntp state=latest
   notify:
@@ -43,6 +49,7 @@
     gpgkey: https://download.docker.com/linux/centos/gpg
 
 
+# https://unixy.net/secure/knowledgebase/104/What-does-el5-el6-and-el7-mean.html
 - name: "Install docker (version: {{lnx_docker_version}})"
   package:
     name: "docker-ce-{{lnx_docker_version}}.ce"

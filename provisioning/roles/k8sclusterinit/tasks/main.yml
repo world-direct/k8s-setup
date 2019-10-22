@@ -1,26 +1,26 @@
-- name: check if /etc/kubernetes/kubelet.conf exists
-  stat:
-    path: /etc/kubernetes/admin.conf
-  register: admin_conf
+###########################################
+## This checks the cluster state
+##
+## It sets the k8s_config_server environment-variable, to the url of
+## the apiserver. If the host is not member of a cluster, it is blank
 
-- fail:
-    msg: Kubernetes seems to be already configured on this node, to reset you can use ~./resetk8s
-  when: admin_conf.stat.exists
 
-- set_fact:
-    kubeadm_cmd: "kubeadm init --control-plane-endpoint '{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}' --service-dns-domain '{{k8s_cluster_dnsname}}' --pod-network-cidr '{{k8s_pod_network_cidr}}' --upload-certs"
+###########################################
+## scripts ~/initk8s
 
-- name: "Init by kubeadm, this will take some time: {{kubeadm_cmd}}"
-  command: "{{kubeadm_cmd}}"
-  register: kubeadm_out
+- name: "sync ~/initk8s script to setup cluster"
+  template:
+    src: initk8s
+    dest: ~/initk8s
 
-- debug: 
-    stdout: "{{ kubeadm_out.cmd.stdout_lines }}"
-    stderr: "{{ kubeadm_out.cmd.stderr_lines }}"
+- file:
+    path: ~/initk8s
+    mode: '755'
 
-- name: "Configure admin context for kubectl for root user"
-  shell: |
-    mkdir -p $HOME/.kube
-    cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-    chown $(id -u):$(id -g) $HOME/.kube/config
 
+###########################################
+## Execute the init-script
+
+- name: "Initialize kubernetes cluster, you may cat ~/kubeadm.log in ssh to check progress"
+  shell: ~/initk8s >> ~/kubeadm.log
+  when: setup_manual_kubeadm == false

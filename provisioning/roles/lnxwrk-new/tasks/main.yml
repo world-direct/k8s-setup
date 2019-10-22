@@ -1,0 +1,59 @@
+###########################################
+## This role joins nodes to an existing cluster
+## It is added dynamically by lnxclp and lnxwrk, if new nodes need to join
+
+- name: Get Join-Token from lnxclp-master
+  command: kubeadm token create --print-join-command
+  delegate_to: "{{ groups['lnxclp-master'] | first }}"
+  run_once: true
+  register: join_cmd
+
+###########################################
+## create scripts ~/joink8s and ~/resetk8s
+
+- name: "sync ~/joink8s script to setup cluster"
+  template:
+    src: joink8s
+    dest: ~/joink8s
+
+- file:
+    path: ~/joink8s
+    mode: '755'
+
+
+###########################################
+## Execute the joink8s-script, if setup_manual_kubeadm != true
+
+- name: "Join kubernetes cluster, you may cat ~/kubeadm.log in ssh to check progress"
+  shell: ~/joink8s >> ~/kubeadm.log
+  when: setup_manual_kubeadm == false
+
+# - hosts: lnxclp-master
+#   - tasks: 
+#     - name: get join command
+#       shell: kubeadm token create --print-join-command
+#       register: join_command_raw
+
+#     - name: set join command
+#       set_fact:
+#         join_command: "{{ join_command_raw.stdout_lines[0] }}"
+
+#     ## like: kubeadm join <endpoint> --token ... --discovery-token-ca-cert-hash ...
+#     ## to add a clp, you need
+#     #   --control-plane --certificate-key 36db117f7289053fe43cb36bd86e5417981132b4d352a80b38a0567c2f05ff0b
+
+# - hosts: lnxclp
+#   tasks:
+#     - name: join control panel nodes to cluster
+#       shell: "{{ hostvars['lnxclp-master'].join_command }} >> ~/kubeadm_join.log"
+#       args:
+#         chdir: $HOME
+#         creates: kubeadm_join.log
+
+# - hosts: lnxwrk
+#   tasks:
+#     - name: join linux worker nodes to cluster
+#       shell: "{{ hostvars['lnxclp-master'].join_command }} >> ~/kubeadm_join.log"
+#       args:
+#         chdir: $HOME
+#         creates: kubeadm_join.log

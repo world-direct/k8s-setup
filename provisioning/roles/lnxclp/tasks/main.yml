@@ -33,15 +33,5 @@
     state: enabled
   notify: reload firewalld
 
-- name: "create ~/resetk8s script to teardown cluster (for testing)"
-  template:
-    src: resetk8s
-    dest: ~/resetk8s
-
-- file:
-    path: ~/resetk8s
-    mode: '755'
-
 # to reload firewalld
 - meta: flush_handlers
-

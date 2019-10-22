@@ -1,0 +1,53 @@
+###########################################
+## This checks the cluster state
+##
+## It set the k8s_configured boolean fact
+##
+## If the node is joined to a different cluster than configured, and error
+## is returned, and printed to stderr
+
+
+###########################################
+## Generate and execute ~/k8sstate script
+
+- name: "ensure ~/k8sstate script to test cluster"
+  template:
+    src: k8sstate
+    dest: ~/k8sstate
+
+- file:
+    path: ~/k8sstate
+    mode: '755'
+
+- name: "run ~/k8sstate to check configuration state"
+  command: ~/k8sstate
+  changed_when: false
+
+- stat:
+    path: ~/k8-configured.state
+  register: k8sstatetmp
+
+- set_fact:
+    k8s_configured: yes
+  when: k8sstatetmp.stat.exists
+
+- set_fact:
+    k8s_configured: no
+  when: k8sstatetmp.stat.exists == false
+
+
+###########################################
+## Generate and execute ~/k8sstate script
+- name: "ensure ~/resetk8s script to teardown configuration (for testing)"
+  template:
+    src: resetk8s
+    dest: ~/resetk8s
+
+- file:
+    path: ~/resetk8s
+    mode: '755'
+
+# todo set verbosity: 2 if this is debugged
+- name: DEBUG k8s_configured
+  debug:
+    msg: "{{ansible_hostname}} => k8_configured = {{k8s_configured}}"
