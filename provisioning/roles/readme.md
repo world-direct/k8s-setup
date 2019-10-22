@@ -5,7 +5,7 @@
 ### lnxclp
 Add all nodes to this group, that are control plane nodes.
 
-### lnxclp-master
+### lnxclp-setup
 Add any a single lnxclp node to group, that will
     - used to initialize the cluster
     - to join additional nodes to the cluster
@@ -19,3 +19,6 @@ All linux worker nodes
 ### winwkr
 All windows worker nodes
 
+# Development Nodes
+
+To check expressions in Templates, see https://jinja.palletsprojects.com/en/2.10.x/templates/#expressions

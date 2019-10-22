@@ -43,6 +43,6 @@ $newPath = "$installpath;" +
 [EnvironmentVariableTarget]::Machine)
 
 # Register the Docker daemon as a service.
-dockerd --register-service
+$installpath\dockerd --register-service
 
 exit 0

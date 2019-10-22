@@ -54,3 +54,9 @@ k8s_install_flannel: yes
 #
 # Parameters, only passed by Vagrant:
 #   k8s_enable_proxy: yes
+
+
+test_var:
+  - 10
+  - 11
+  - 12

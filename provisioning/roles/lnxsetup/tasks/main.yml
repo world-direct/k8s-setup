@@ -1,3 +1,4 @@
+
 ###########################################
 ## System 
 
@@ -12,13 +13,6 @@
   notify:
   - restart ntpd
 
-- name: Enable and start firewall service
-  service:
-    name: firewalld
-    enabled: yes
-    state: started
-
-
 # http://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
 - name: Disable swap if enabled (swaptotal={{ansible_facts['swaptotal_mb']}})
   when: ansible_facts['swaptotal_mb'] != 0
@@ -26,6 +20,30 @@
     swapoff -a
   notify:
     - disable swap permanently
+
+###########################################
+## Firewall
+
+- name: Enable and start firewall service
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
+
+- name: Evaluate firewall-rules-ROLE.yml
+  include_vars:
+    file: "firewall-rules-{{ 'wrk' if not 'lnxclp' in group_names else 'clp' }}.yml"
+    name: rulesfile
+
+# - debug: var=rulesfile
+
+- name: Configure firewalld
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+  with_items: "{{rulesfile.rules}}"
+  notify: reload firewalld
 
 ###########################################
 ## Install docker
@@ -81,14 +99,6 @@
 
 ###########################################
 ## Install kubernetes
-
-# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
-- name: "firewall: allow 10250/tcp for Kublet API"
-  firewalld:
-    port: 10250/tcp
-    permanent: yes
-    state: enabled
-  notify: reload firewalld
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
 - name: Add kubernetes yum repo

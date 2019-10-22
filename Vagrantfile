@@ -7,12 +7,19 @@
 # For the nodes to communicate, we use the following network configuration
 #   10.0.0.0/24
 #
-# The first master has: 10.0.0.2
-# Next masters:         10.0.0.3, 10.0.0.4
-# Master virtual IP:    10.0.0.9    (currently 2, because no keepalived yet)
-# Linux-Workers:        10.0.0.11-10.0.0.20
-# Windows-Workers:      10.0.0.21-10.0.0.29
-
+# We have the following dynamic ranges:
+#   10.0.0.10-19: Control Plane Nodes
+#   10.0.0.20-29: Linux Worker Nodes
+#   10.0.0.30-39: Windows Worker Nodes
+#   10.0.0.40-49: None-Cluster Nodes (like Test-Clients or AD Server)
+#
+# Special Addresses:
+#   
+#   Reserved for Gateway
+#   10.0.0.1
+#
+#   VIP (keepalived) for Control-Plane apiserver (k8s_apiserver_port=6443)
+#   10.0.0.2 (K8S_API_SERVER_VIP)
 
 # Install vagrant plugins if required
 def ensure_plugin(name)
@@ -48,76 +55,96 @@ Vagrant.configure(2) do |config|
         p.add_host ENV['K8S_API_SERVER_VIP'], ["#{ENV['K8S_APISERVER_HOSTNAME']}.#{ENV['K8S_CLUSTER_DNSNAME']}"]
     end
 
-    # first controlplane
-    config.vm.define "lnxclp1" do |master|
-        master.vm.box=ENV['LNX_BOX_NAME']
-        master.vm.hostname = "lnxclp1"
-        master.vm.network "private_network", ip:"10.0.0.2"
-
-        # Bind kubernetes default proxy port
-        master.vm.network "forwarded_port", guest: 8001, host: 8001, ip:"10.0.0.2"
+    #   10.0.0.10-19: Control Plane Nodes
+    (1..ENV['LNX_NR_CLPS'].to_i).each do |nr|
+        config.vm.define "lnxclp#{nr}" do |cpl|
+            cpl.vm.box=ENV['LNX_BOX_NAME']
+            cpl.vm.hostname = "lnxclp#{nr}"
+            cpl.vm.network "private_network", ip:"10.0.0.#{9+nr}"
+        end
     end
 
-    # linux workers
+    # 10.0.0.20-29: Linux Worker Nodes
     (1..ENV['LNX_NR_WORKERS'].to_i).each do |nr|
         config.vm.define "lnxwrk#{nr}" do |worker|
             worker.vm.box=ENV['LNX_BOX_NAME']
             worker.vm.hostname = "lnxwrk#{nr}"
-            worker.vm.network "private_network", ip:"10.0.0.#{10+nr}"
+            worker.vm.network "private_network", ip:"10.0.0.#{19+nr}"
         end
     end
 
-    # windows workers
+    # 10.0.0.30-39: Windows Worker Nodes
     (1..ENV['WIN_NR_WORKERS'].to_i).each do |nr|
         config.vm.define "winwrk#{nr}" do |worker|
             worker.vm.box=ENV['WIN_BOX_NAME']
-            worker.vm.hostname = "lnxwrk#{nr}"
-            worker.vm.network "private_network", ip:"10.0.0.#{20+nr}"
+            worker.vm.hostname = "winwrk#{nr}"
+            worker.vm.network "private_network", ip:"10.0.0.#{29+nr}"
         end
     end
 
-    # workers are not added by a hostname pattern, because this generates a warning:
-    # > Vagrant has detected a host range pattern in the `groups` option.
-    # > Vagrant doesn't fully check the validity of these parameters!
-    config.vm.provision "ansible" do |ansible|
+    # 10.0.0.40-49: None-Cluster Nodes (like Test-Clients or AD Server)
+    # define a single client box
+    #   1. for test
+    #   2. to execute the ansible setup in paralell
+    config.vm.define "client" do |client|
+        client.vm.box=ENV['LNX_BOX_NAME']
+        client.vm.hostname = "lnxclient"
+        client.vm.network "private_network", ip:"10.0.0.40"
 
-        # TODO: dynamically create for each windows worker
-        ansible.host_vars = { 
-           "winwrk1" => {
-               "ansible_winrm_scheme" => "http",
-               "ansible_become" => false
+        client.vm.provision :ansible do |ansible|
+
+            # because limit="all", the playbook is executed on all machines in parallel
+            # even if it is triggered by "client", which is the last in the Vagrantfile
+            # This ensures, that
+            #   1. ansible provisioner is called only once
+            #   2. ansible provisioner is called after others
+            ansible.limit = "all"
+
+            # groups are not configured by a hostname pattern, because this generates a warning:
+            # > Vagrant has detected a host range pattern in the `groups` option.
+            # > Vagrant doesn't fully check the validity of these parameters!
+
+            ansible.groups = {
+
+                # only the setup node needs to be configured statically
+                "lnxclp-setup" => ["lnxclp1"],
+                "lnxclp" => [],
+                "lnxwrk" => [],
+                "winwrk" => [],
+                "winwrk:vars" => {
+                    "ansible_winrm_scheme" => "http",
+                    "ansible_become" => false
+                }
             }
-        }
 
-        ansible.groups = {
-          "lnxclp-master" => ["lnxclp1"],
-          "lnxclp" => ["lnxclp1"],
-          "lnxwrk" => ["lnxwrk1", "lnxwrk2"],
-          "winwrk" => ["winwrk1"]
-        }
+            (1..ENV['LNX_NR_CLPS'].to_i).each do |nr|
+                ansible.groups["lnxclp"] << "lnxclp#{nr}"
+            end
 
-        (1..ENV['NR_LNX_WORKERS'].to_i).each do |nr|
-            ansible.groups["lnxwrk"] << "lnxwrk#{nr}"
+            (1..ENV['LNX_NR_WORKERS'].to_i).each do |nr|
+                ansible.groups["lnxwrk"] << "lnxwrk#{nr}"
+            end
+
+            (1..ENV['WIN_NR_WORKERS'].to_i).each do |nr|
+                ansible.groups["winwrk"] << "winwrk#{nr}"
+            end
+
+            puts ansible.groups
+
+            # pass the needed vars from the .env
+            ansible.extra_vars = {
+                k8s_api_server_vip: ENV['K8S_API_SERVER_VIP'],
+                k8s_cluster_dnsname: ENV['K8S_CLUSTER_DNSNAME'],
+                k8s_apiserver_hostname: ENV['K8S_APISERVER_HOSTNAME'],
+                k8s_enable_proxy: true
+            }
+
+            ansible.become = true
+            ansible.playbook = "provisioning/hostplaybook.yml"
+            ansible.compatibility_mode = "2.0"
+
+            # ansible.verbose = "vvvv"
         end
-
-        (1..ENV['NR_WIN_WORKERS'].to_i).each do |nr|
-            ansible.groups["winwrk"] << "winwrk#{nr}"
-        end
-
-        # pass the needed vars from the .env
-        ansible.extra_vars = {
-            k8s_api_server_vip: ENV['K8S_API_SERVER_VIP'],
-            k8s_cluster_dnsname: ENV['K8S_CLUSTER_DNSNAME'],
-            k8s_apiserver_hostname: ENV['K8S_APISERVER_HOSTNAME'],
-            k8s_enable_proxy: true
-        }
-
-        ansible.limit = "all"   # provision on all machines in parallel
-        ansible.become = true
-        ansible.playbook = "provisioning/hostplaybook.yml"
-        ansible.compatibility_mode = "2.0"
-
-        # ansible.verbose = "vvvv"
     end
 
 end

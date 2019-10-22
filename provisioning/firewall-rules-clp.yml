@@ -1,0 +1,12 @@
+
+# See
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
+
+# all rules needed for control-panel nodes
+rules:
+  - "{{ k8s_apiserver_port }}/tcp"  # Kubernetes API server (see group_vars/all.yml)
+  - "2379-2380/tcp"                 # etcd server client API
+  - "10251/tcp"                     # kube-scheduler
+  - "10252/tcp"                     # kube-controller-manager
+  - "10250/tcp"                     # for Kublet API
+

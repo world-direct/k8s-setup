@@ -1,0 +1,8 @@
+
+# See
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports
+
+# all rules needed for worker nodes
+rules:
+  - "10250/tcp"                     # for Kublet API
+  - 30000-32767/tcp                 # NodePort Services (we will check, if we really need NodePort)

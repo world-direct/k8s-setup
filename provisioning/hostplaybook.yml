@@ -5,12 +5,16 @@
 #   - init a new cluster (is setup_create_new_k8s_cluster is set)
 #   - join other nodes to the cluster
 ---
-- import_playbook: ./utils.yml
 
-# all linux hosts need the 'lnxutils' role
-- hosts: lnxclp:lnxwrk
-  roles:
-    - lnxutils
+# - hosts: all
+#   tasks:
+#     # - debug: var=test_var
+#     - name: testvar
+#       debug: msg="do with {{item}}"
+#       with_items: "{{ test_var }}"
+
+
+- import_playbook: ./utils.yml
 
 # add setup role to all linux hosts, if not disabled by 'setup_skip_system_setup'
 - hosts: lnxclp:lnxwrk
@@ -32,10 +36,10 @@
     - import_role: name=winsetup
       when: setup_skip_system_setup == false
 
-# check if cluster-state of the lnxclp-master
-- hosts: lnxclp-master
+# check if cluster-state of the lnxclp-setup
+- hosts: lnxclp-setup
   tasks:
-    - import_role: name=k8sclusterstate
+    - import_role: name=kubeadm-state
 
     # fail if the master node is not configured, and no cluster setup should be performed
     - fail:
@@ -44,14 +48,13 @@
 
     # if the master is not initialized, do this first
     - include_role: 
-        name: k8sclusterinit
+        name: lnxclp-first
       when: k8s_configured == false
 
 # check cluster status for all lnxwrk hosts
 - hosts: lnxwrk
   tasks:
-    - import_role: name=k8sclusterstate
-
+    - import_role: name=kubeadm-state
 
 # apply lnxwrk-new role to unconfigured linux workers
 - hosts: lnxwrk
@@ -59,5 +62,18 @@
     - include_role:
         name: lnxwrk-new
       when: k8s_configured == false
+
+# check cluster status for all lnxclp hosts
+- hosts: lnxwrk
+  tasks:
+    - import_role: name=kubeadm-state
+
+# apply lnxclp-new role to unconfigured linux workers
+- hosts: lnxwrk
+  tasks:
+    - include_role:
+        name: lnxclp-new
+      when: k8s_configured == false
+
 
 

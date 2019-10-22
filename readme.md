@@ -19,6 +19,10 @@ the VMs from provisioning:
 # startup Vagrant boxes
 vagrant up --no-provision
 
+# first provision with 'host' provider, to ensure we have /etc/hosts
+# in production, this will be an DNS server
+vagrant provision --provision-with hosts
+
 # provision the entire cluster
 # the loop is still present, so you have to CTRL+C when the first host is done :(
 vagrant provision

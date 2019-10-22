@@ -1,8 +1,12 @@
 #! /bin/sh
-
-# If creates the './k8-configured.state' or './k8-unconfigured.state' file
-# If it fails, this is a unrecoverable error
-
+###########################################
+# Determinates the k8s configuration state of the machine
+#
+#   STDOUT: (don't change, as is will be read in the task!)
+#   "k8s_configured=no" => kubeadm init / join have not been performed
+#   "k8s_configured=yes" => kubeadm init / join have been performed
+#
+#   STDERR: any other status or error message
 # exit when any command fails
 set -e
 
@@ -11,8 +15,7 @@ rm -f ~/*.state
 CONFFILE=/etc/kubernetes/kubelet.conf
 
 if [ ! -f "$CONFFILE" ]; then
-    echo "$CONFFILE does not exist, so no member node"
-    touch k8-unconfigured.state
+    echo "k8s_configured=no"
     exit 0
 fi
 
@@ -23,7 +26,7 @@ echo "Configured URL: $CONFIGURED_URL"
 echo "Expected URL: $EXPECTED_URL"
 
 if [ "$EXPECTED_URL" == "$CONFIGURED_URL" ]; then
-    echo $CONFIGURED_URL > ~/k8-configured.state
+    echo "k8s_configured=yes"
     exit 0
 else
     >&2 echo "This node is not member of the configured cluster! You may create a new node from scratch. "
