@@ -2,9 +2,9 @@
 
 https://docs.ansible.com/ansible/2.4/intro_installation.html
 
-```
-sudo yum install ansible
-```
+You should install by pip, to ensure, that you get the 2.7.12 version.
+The playbook validates that it is a 2.7.* version.
+
 
 # Create the inventory file
 

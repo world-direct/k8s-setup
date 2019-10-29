@@ -3,11 +3,10 @@
 # to '2.0' in the Vagrantfile. It may also work with new versions, if they are available.
 - hosts: all
   tasks:
-    - debug:
-        msg: "Ansible version is {{ ansible_version.full }}"
     - fail:
-      name: Fail if ansible != 2.*.*
-      when: ansible_version.major != 2
+        msg: This playbook should be run with ansible 2.7.* (it has been tested with 2.7.12). Your version is {{ ansible_version.full }}"
+      name: Fail if ansible != 2.7.*
+      when: (ansible_version.major == 2 and ansible_version.minor == 7) == false
 
     - set_fact:
         k8s_cluster_url: '{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'
