@@ -4,7 +4,7 @@
 ## It is dynamically included by hostplaybook.yml
 - name: Install keepalived package
   yum:
-    name: keepalived ipvsadm
+    name: keepalived, ipvsadm
 
 - name: keepalived sysctl
   sysctl:
@@ -49,6 +49,12 @@
     src: keepalived.conf
     dest: /etc/keepalived/keepalived.conf
   register: keepalived_conf
+
+- name: Set selinux keepalived_connect_any flag on and keep it persistent across reboots
+  seboolean:
+    name: keepalived_connect_any
+    state: yes
+    persistent: yes
 
 - name: Enable and start keepalived
   service:
