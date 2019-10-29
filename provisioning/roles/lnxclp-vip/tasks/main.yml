@@ -1,0 +1,34 @@
+###########################################
+## This is the role inits the VIP needed for the APISERVER
+##
+## It is dynamically included by hostplaybook.yml
+- name: Install keepalived package
+  yum:
+    name: keepalived
+
+- name: "sync /etc/keepalived/keepalived.conf"
+  template:
+    src: keepalived.conf
+    dest: /etc/keepalived/keepalived.conf
+  register: keepalived_conf
+
+- name: Enable and start keepalived
+  service:
+    name: keepalived
+    enabled: yes
+    state: "{{ 'restarted' if keepalived_conf.changed else 'started' }}"
+
+- name: Wait for VIP to become up (ping {{k8s_api_server_vip}})
+  shell: "ping {{k8s_api_server_vip}} -c 10"
+  changed_when: false
+  retries: 5
+  delay: 1
+
+- name: Wait for VIP to accept connections on {{k8s_api_server_vip}}:{{k8s_apiserver_port}}
+  wait_for:
+    host: "{{k8s_api_server_vip}}"
+    port: "{{k8s_apiserver_port}}"
+  retries: 5
+  delay: 1
+  when: keepalived_enable_check == true
+

@@ -37,9 +37,31 @@
         msg: "Kubernetes is not configured on {{ansible_hostname}}, and 'setup_create_new_k8s_cluster' is false."
       when: k8s_configured == false and setup_create_new_k8s_cluster == false
 
+    # add the lnxclp-vip to the setup node first, but without check (see keepalived.conf)
+    - import_role:
+        name: lnxclp-vip
+      vars:
+        keepalived_enable_check: no
+      when: k8s_configured == false
+
     # if the master is not initialized, do this first
     - include_role: 
         name: lnxclp-first
+      when: k8s_configured == false
+
+    - set_fact:
+        k8s_configured: yes
+
+# check cluster status for all lnxclp hosts
+- hosts: lnxclp
+  tasks:
+    - import_role: name=kubeadm-state
+
+# apply lnxclp-new role to unconfigured linux control plane nodes
+- hosts: lnxclp
+  tasks:
+    - include_role:
+        name: lnxclp-new
       when: k8s_configured == false
 
 # check cluster status for all lnxwrk hosts
@@ -54,17 +76,15 @@
         name: lnxwrk-new
       when: k8s_configured == false
 
-# check cluster status for all lnxclp hosts
-- hosts: lnxwrk
+# add the lnxclp-vip to all lnxclp nodex, with the check enabled (see keepalived.conf)
+# this will update the configuration of all clp nodes
+# It is important, that this runs **after** all nodes have joined!
+# Otherwise, you will get connection-issues
+- hosts: lnxclp
   tasks:
-    - import_role: name=kubeadm-state
-
-# apply lnxclp-new role to unconfigured linux workers
-- hosts: lnxwrk
-  tasks:
-    - include_role:
-        name: lnxclp-new
-      when: k8s_configured == false
-
-
+    - name: "Run role 'lnxclp-vip' for all clp nodes"
+      include_role:
+        name: lnxclp-vip
+      vars:
+        keepalived_enable_check: no   # there is an error in keepalived config, so now checks now...
 
