@@ -134,7 +134,8 @@ Vagrant.configure(2) do |config|
                 k8s_api_server_vip: ENV['K8S_API_SERVER_VIP'],
                 k8s_cluster_dnsname: ENV['K8S_CLUSTER_DNSNAME'],
                 k8s_apiserver_hostname: ENV['K8S_APISERVER_HOSTNAME'],
-                k8s_enable_proxy: true
+                k8s_enable_proxy: true,
+                host_primary_interface_name: 'eth1'
             }
 
             ansible.become = true
