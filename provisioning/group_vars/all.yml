@@ -26,8 +26,8 @@ setup_manual_kubeadm: false
 ## Kubernetes global cluster configuration
 #############################################################
 
-# 6443 is the default port:
-k8s_apiserver_port: 6443
+# The port of the load-balanced API Server
+k8s_apiserver_port: 443
 
 # the CIDR used for the pod network, need to be used for routing
 k8s_pod_network_cidr: 10.244.0.0/16

@@ -94,10 +94,10 @@
   retries: 5
   delay: 1
 
-- name: Wait for VIP to accept connections on {{k8s_api_server_vip}}:443
+- name: Wait for VIP to accept connections on {{k8s_api_server_vip}}:{{k8s_apiserver_port}}
   wait_for:
     host: "{{k8s_api_server_vip}}"
-    port: 443
+    port: {{k8s_apiserver_port}}
   retries: 5
   delay: 1
   when: keepalived_enable_check == true

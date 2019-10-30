@@ -18,7 +18,7 @@
 #   Reserved for Gateway
 #   10.0.0.1
 #
-#   VIP (keepalived) for Control-Plane apiserver (k8s_apiserver_port=6443)
+#   VIP (keepalived) for Control-Plane apiserver (k8s_apiserver_port=443)
 #   10.0.0.2 (K8S_API_SERVER_VIP)
 
 # Install vagrant plugins if required

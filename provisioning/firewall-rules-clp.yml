@@ -4,9 +4,9 @@
 
 # all rules needed for control-panel nodes
 rules:
-  - "{{ k8s_apiserver_port }}/tcp"  # Kubernetes API server (see group_vars/all.yml)
+  - "{{ k8s_apiserver_port }}/tcp"  # Kubernetes API server load-balanced port (see group_vars/all.yml)
   - "2379-2380/tcp"                 # etcd server client API
   - "10251/tcp"                     # kube-scheduler
   - "10252/tcp"                     # kube-controller-manager
   - "10250/tcp"                     # for Kublet API
-  - "443/tcp"                       # Kubernetes API server over haproxy
+  - "6443/tcp"                      # Kubernetes API server node internal port
