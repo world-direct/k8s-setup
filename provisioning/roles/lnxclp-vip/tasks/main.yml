@@ -4,7 +4,7 @@
 ## It is dynamically included by hostplaybook.yml
 - name: Install keepalived package
   yum:
-    name: keepalived, ipvsadm
+    name: keepalived, ipvsadm, haproxy
 
 - name: keepalived sysctl
   sysctl:
@@ -38,6 +38,14 @@
   command: touch /etc/sysconfig/ipvsadm 
   changed_when: false
 
+- name: Set fw rich rule
+  firewalld:
+    rich_rule: rule protocol value="vrrp" accept
+    permanent: yes
+    immediate: yes
+    state: enabled
+  notify: reload firewalld
+
 - name: Enable and start ipvsadm
   service:
     name: ipvsadm
@@ -50,17 +58,35 @@
     dest: /etc/keepalived/keepalived.conf
   register: keepalived_conf
 
+- name: Enable and start keepalived
+  service:
+    name: keepalived
+    enabled: yes
+    state: "{{ 'restarted' if keepalived_conf.changed else 'started' }}"
+
 - name: Set selinux keepalived_connect_any flag on and keep it persistent across reboots
   seboolean:
     name: keepalived_connect_any
     state: yes
     persistent: yes
 
-- name: Enable and start keepalived
+- name: "sync /etc/haproxy/haproxy.cfg"
+  template:
+    src: haproxy.cfg
+    dest: /etc/haproxy/haproxy.cfg
+  register: haproxy_conf
+
+- name: Enable and start haproxy
   service:
-    name: keepalived
+    name: haproxy
     enabled: yes
-    state: "{{ 'restarted' if keepalived_conf.changed else 'started' }}"
+    state: "{{ 'restarted' if haproxy_conf.changed else 'started' }}"
+
+- name: Set selinux haproxy_connect_any flag on and keep it persistent across reboots
+  seboolean:
+    name: haproxy_connect_any
+    state: yes
+    persistent: yes
 
 - name: Wait for VIP to become up (ping {{k8s_api_server_vip}})
   shell: "ping {{k8s_api_server_vip}} -c 10"
@@ -68,10 +94,10 @@
   retries: 5
   delay: 1
 
-- name: Wait for VIP to accept connections on {{k8s_api_server_vip}}:{{k8s_apiserver_port}}
+- name: Wait for VIP to accept connections on {{k8s_api_server_vip}}:443
   wait_for:
     host: "{{k8s_api_server_vip}}"
-    port: "{{k8s_apiserver_port}}"
+    port: 443
   retries: 5
   delay: 1
   when: keepalived_enable_check == true
