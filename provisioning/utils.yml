@@ -1,12 +1,21 @@
 ---
 # We fail if ansible is not 2.0, just because we the the compatiblity-mode
 # to '2.0' in the Vagrantfile. It may also work with new versions, if they are available.
+
+# This playbook has been tested with ansible 2.7.12 and 2.8.6
 - hosts: all
   tasks:
     - fail:
-        msg: This playbook should be run with ansible 2.7.* (it has been tested with 2.7.12). Your version is {{ ansible_version.full }}"
-      name: Fail if ansible != 2.7.*
-      when: (ansible_version.major == 2 and ansible_version.minor == 7) == false
+        msg: This playbook should be run with ansible 2.8.*. Your version is {{ ansible_version.full }}"
+      name: Fail if ansible != 2.8.*
+      when: (ansible_version.major == 2 and ansible_version.minor == 8) == false
+      run_once: true
+
+    - fail:
+        msg: fail if k8s_apiserver_port == 6443
+      name: k8s_apiserver_port
+      when: k8s_apiserver_port == 6443
+      run_once: true
 
     - set_fact:
         k8s_cluster_url: '{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'

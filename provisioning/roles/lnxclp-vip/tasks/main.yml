@@ -44,7 +44,6 @@
     permanent: yes
     immediate: yes
     state: enabled
-  notify: reload firewalld
 
 - name: Enable and start ipvsadm
   service:
@@ -97,8 +96,8 @@
 - name: Wait for VIP to accept connections on {{k8s_api_server_vip}}:{{k8s_apiserver_port}}
   wait_for:
     host: "{{k8s_api_server_vip}}"
-    port: {{k8s_apiserver_port}}
+    port: "{{k8s_apiserver_port}}"
   retries: 5
   delay: 1
-  when: keepalived_enable_check == true
+  when: vip_enable_tcp_check == true
 

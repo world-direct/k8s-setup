@@ -32,25 +32,27 @@
   tasks:
     - import_role: name=kubeadm-state
 
-    # fail if the master node is not configured, and no cluster setup should be performed
-    - fail:
-        msg: "Kubernetes is not configured on {{ansible_hostname}}, and 'setup_create_new_k8s_cluster' is false."
-      when: k8s_configured == false and setup_create_new_k8s_cluster == false
+    - block: 
 
-    # add the lnxclp-vip to the setup node first, but without check (see keepalived.conf)
-    - import_role:
-        name: lnxclp-vip
-      vars:
-        keepalived_enable_check: no
+      # fail if the master node is not configured, and no cluster setup should be performed
+      - fail:
+          msg: "Kubernetes is not configured on {{ansible_hostname}}, and 'setup_create_new_k8s_cluster' is false."
+        when: setup_create_new_k8s_cluster == false
+
+      # add the lnxclp-vip to the setup node first
+      - include_role:
+          name: lnxclp-vip
+        vars:
+          vip_enable_tcp_check: no
+
+      # if the master is not initialized, do this first
+      - include_role: 
+          name: lnxclp-first
+
+      - set_fact:
+          k8s_configured: yes
+      
       when: k8s_configured == false
-
-    # if the master is not initialized, do this first
-    - include_role: 
-        name: lnxclp-first
-      when: k8s_configured == false
-
-    - set_fact:
-        k8s_configured: yes
 
 # check cluster status for all lnxclp hosts
 - hosts: lnxclp
@@ -86,5 +88,5 @@
       include_role:
         name: lnxclp-vip
       vars:
-        keepalived_enable_check: no   # there is an error in keepalived config, so now checks now...
+        vip_enable_tcp_check: yes
 

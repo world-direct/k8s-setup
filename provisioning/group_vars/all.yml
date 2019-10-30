@@ -32,7 +32,7 @@ k8s_apiserver_port: 443
 # the CIDR used for the pod network, need to be used for routing
 k8s_pod_network_cidr: 10.244.0.0/16
 
-# we use the ip of clp1, because there is no keealived yet **)
+# this is the VIP of the clp load balancer
 k8s_api_server_vip: 10.0.0.2
 
 # the base dnsname for the cluster  **)

@@ -21,6 +21,8 @@
   notify:
     - disable swap permanently
 
+- meta: flush_handlers
+
 ###########################################
 ## Firewall
 
@@ -42,8 +44,8 @@
     port: "{{ item }}"
     permanent: yes
     state: enabled
+    immediate: yes
   with_items: "{{rulesfile.rules}}"
-  notify: reload firewalld
 
 ###########################################
 ## Install docker
@@ -117,6 +119,11 @@
       - kubelet
       - kubeadm
       - kubectl
+  register: tmp_installed_kkk
+
+- name: Pull required kubernetes images
+  command: kubeadm config images pull
+  when: tmp_installed_kkk.changed
 
 - name: Enable and start kubelet
   service:
@@ -124,32 +131,27 @@
     enabled: yes
     state: started
 
-
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
 - name: "firewall: allow 8285/udp for flannel overlay network"
   firewalld:
     port: 8285/udp
     permanent: yes
     state: enabled
+    immediate: yes
   when: k8s_install_flannel
-  notify: reload firewalld
 
 - name: "firewall: allow 8472/udp for flannel overlay network"
   firewalld:
     port: 8472/udp
     permanent: yes
     state: enabled
+    immediate: yes
   when: k8s_install_flannel
-  notify: reload firewalld
-
 
 - name: "firewall: allow 8001/tcp for kubectl proxy (only for localhost with Vagrant)"
   firewalld:
     port: 8001/tcp
     permanent: yes
     state: enabled
+    immediate: yes
   when: k8s_enable_proxy
-  notify: reload firewalld
-
-# to reload firewalld
-- meta: flush_handlers

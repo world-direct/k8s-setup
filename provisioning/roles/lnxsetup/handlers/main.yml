@@ -4,8 +4,5 @@
 - name: disable swap permanently
   replace:
     path: /etc/fstab
-    regexp: '(\/dev\/mapper\/centos-swap)'
+    regexp: '(\/swapfile)'
     replace: '# \1'
-
-- name: reload firewalld
-  command: firewall-cmd --reload
