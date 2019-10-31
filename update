@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# undo local changes
+git checkout .
+cp -f  provisioning/group_vars/all.yml ~/all.yml
+git pull
+cp -f ~/all.yml provisioning/group_vars/all.yml
