@@ -17,6 +17,6 @@
     src: config.yml
     dest: ~/k8smanifests/metallb.config.yml
 
-- name: Apply metallb-metallb.yml
-  command: kubectl apply -f ~/k8smanifests/metallb.{{metallb_current_version}}.yml -f ~/k8smanifests/metallb.config.yml"
+- name: Apply with kubectl
+  command: kubectl apply -f ~/k8smanifests/metallb.{{metallb_current_version}}.yml -f ~/k8smanifests/metallb.config.yml
 
