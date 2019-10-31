@@ -12,8 +12,8 @@
 - name: Sync kube-flannel.{{flannel_current_version}}.yml
   template:
     src: kube-flannel.{{flannel_current_version}}.yml
-    dest: ~/k8smanifests/kube-flannel.{{flannel_current_version}}
+    dest: ~/k8smanifests/kube-flannel.{{flannel_current_version}}.yml
 
 - name: Apply flannel.yml
-  command: kubectl apply -f ~/k8smanifests/kube-flannel.{{flannel_current_version}}
+  command: kubectl apply -f ~/k8smanifests/kube-flannel.{{flannel_current_version}}.yml
 
