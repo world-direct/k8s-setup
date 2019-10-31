@@ -1,0 +1,15 @@
+# https://raw.githubusercontent.com/coreos/flannel/2140ac876ef134e0ed5af15c65e414cf26827915/Documentation/kube-flannel.yml
+
+- name: ~/k8smanifests directory exists
+  file:
+    path: ~/k8smanifests
+    state: directory
+
+- name: Sync kube-flannel.v0.11.0.yml
+  template:
+    src: kube-flannel.v0.11.0
+    dest: ~/k8smanifests/kube-flannel.v0.11.0
+
+- name: Apply flannel.yml
+  command: kubectl apply -f ~/k8smanifests/kube-flannel.v0.11.0
+
