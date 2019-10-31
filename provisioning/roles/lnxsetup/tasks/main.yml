@@ -155,3 +155,10 @@
     state: enabled
     immediate: yes
   when: k8s_enable_proxy
+  
+- name: "firewall: enable masquerade"
+  firewalld:
+    masquerade: yes
+    permanent: yes
+    state: enabled
+    immediate: yes
