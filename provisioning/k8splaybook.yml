@@ -10,3 +10,4 @@
   roles:
     - k8sflannel
     - k8sdashboard
+    - k8smetallb

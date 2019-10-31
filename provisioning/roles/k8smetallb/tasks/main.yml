@@ -1,0 +1,22 @@
+- name: Set current metallb version
+  set_fact:
+    metallb_current_version: v0.8.3
+
+- name: ~/k8smanifests directory exists
+  file:
+    path: ~/k8smanifests
+    state: directory
+
+- name: Sync metallb.{{metallb_current_version}}.yml
+  template:
+    src: metallb.{{metallb_current_version}}.yml
+    dest: ~/k8smanifests/metallb.{{metallb_current_version}}.yml
+
+- name: Sync metallb.config.yml
+  template:
+    src: config.yml
+    dest: ~/k8smanifests/metallb.config.yml
+
+- name: Apply metallb-metallb.yml
+  command: kubectl apply -f ~/k8smanifests/metallb.{{metallb_current_version}}.yml -f ~/k8smanifests/metallb.config.yml"
+
