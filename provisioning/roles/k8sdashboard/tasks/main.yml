@@ -1,0 +1,17 @@
+- name: Set current dashboard version
+  set_fact:
+    dashboard_current_version: v2.0.0-beta5
+
+- name: ~/k8smanifests directory exists
+  file:
+    path: ~/k8smanifests
+    state: directory
+
+- name: Sync dashboard-recommended.{{dashboard_current_version}}.yml
+  template:
+    src: recommended.{{dashboard_current_version}}.yml
+    dest: ~/k8smanifests/dashboard-recommended.{{dashboard_current_version}}.yml
+
+- name: Apply flannel.yml
+  command: kubectl apply -f ~/k8smanifests/dashboard-recommended.{{dashboard_current_version}}.yml
+
