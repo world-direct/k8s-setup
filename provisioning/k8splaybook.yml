@@ -3,10 +3,7 @@
 # It only runs on the kubeadm-setup node
 ---
 
-- import_playbook: ./utils.yml
-
-# add setup role to all linux hosts, if not disabled by 'setup_skip_system_setup'
 - hosts: lnxclp-setup
-  roles:
-    - k8sflannel
-    - k8sdashboard
+  tasks:
+    - debug: msg="{{k8s_cluster_dnsname}}"
+ 
