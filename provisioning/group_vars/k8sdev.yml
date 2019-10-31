@@ -54,4 +54,4 @@ k8s_install_flannel: yes
 #
 # Parameters, only passed by Vagrant:
 k8s_enable_proxy: no
-apiserver_interface_name: eth0
+host_primary_interface_name: eth0
