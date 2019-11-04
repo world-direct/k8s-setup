@@ -58,6 +58,7 @@
     - yum-utils
     - device-mapper-persistent-data
     - lvm2
+    - bash-completion
 
 - name: Add docker yum repository
   yum_repository:

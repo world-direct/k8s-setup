@@ -82,3 +82,6 @@
       vars:
         vip_enable_tcp_check: yes
 
+
+# continue with k8s cluster internal setup
+- import_playbook: ./k8splaybook.yml
