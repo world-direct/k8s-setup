@@ -107,7 +107,7 @@ Vagrant.configure(2) do |config|
             ansible.groups = {
 
                 # only the setup node needs to be configured statically
-                "lnxclp-setup" => ["lnxclp1"],
+                "lnxclp_setup" => ["lnxclp1"],
                 "lnxclp" => [],
                 "lnxwrk" => [],
                 "winwrk" => [],
@@ -137,6 +137,8 @@ Vagrant.configure(2) do |config|
                 k8s_enable_proxy: true,
                 host_primary_interface_name: 'eth1'
             }
+
+            ansible.raw_arguments = ['-e@"provisioning/group_vars/vagrant.yml"']
 
             ansible.become = true
             ansible.playbook = "provisioning/hostplaybook.yml"

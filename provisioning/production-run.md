@@ -22,15 +22,15 @@ The default location is '/etc/ansible/hosts'
 lnxwrk1 ansible_host=127.0.0.1 ansible_port=2201 ansible_user='vagrant' ansible_ssh_private_key_file='...'
 lnxclp1 ansible_host=127.0.0.1 ansible_port=2222 ansible_user='vagrant' ansible_ssh_private_key_file='...'
 
-# The [lnxclp-setup] group must contain exactly one of the clp nodes
+# The [lnxclp_setup] group must contain exactly one of the clp nodes
 # This is only special about how the provisioning is done
 # The [lnx-clp-setup] node inits the cluster, while the [lnxclp] nodes join the cluster
 # as additional control plane nodes
-[lnxclp-setup]
+[lnxclp_setup]
 lnxclp1
 
 # The [lnxclp] group contains all nodes which run the control-plane.
-# This INCLUDES the node specified in lnxclp-setup
+# This INCLUDES the node specified in lnxclp_setup
 [lnxclp]
 lnxclp1
 

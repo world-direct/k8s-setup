@@ -3,15 +3,15 @@
 ##
 ## It is dynamically included by hostplaybook.yml
 
-- name: Get Join-Token from lnxclp-setup
+- name: Get Join-Token from lnxclp_setup
   command: kubeadm token create --print-join-command
-  delegate_to: "{{ groups['lnxclp-setup'] | first }}"
+  delegate_to: "{{ groups['lnxclp_setup'] | first }}"
   run_once: true
   register: join_cmd
 
-- name: Get Certificate-Key from lnxclp-setup
+- name: Get Certificate-Key from lnxclp_setup
   shell: kubeadm init phase upload-certs --upload-certs | tail -n 1
-  delegate_to: "{{ groups['lnxclp-setup'] | first }}"
+  delegate_to: "{{ groups['lnxclp_setup'] | first }}"
   run_once: true
   register: cert_cmd
 

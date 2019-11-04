@@ -9,33 +9,35 @@
 - name: keepalived sysctl
   sysctl:
     name: net.ipv4.ip_nonlocal_bind
-    value: 1
+    value: '1'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
 - name: keepalived sysctl
   sysctl:
     name: net.ipv4.conf.all.arp_ignore
-    value: 3
+    value: '3'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
 - name: keepalived sysctl
   sysctl:
     name: net.ipv4.conf.all.arp_announce
-    value: 2
+    value: '2'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
 - name: keepalived sysctl
   sysctl:
     name: net.ipv4.ip_forward
-    value: 1
+    value: '1'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
 - name: touch /etc/sysconfig/ipvsadm 
-  command: touch /etc/sysconfig/ipvsadm 
+  file:
+    path: /etc/sysconfig/ipvsadm 
+    state: touch
   changed_when: false
 
 - name: Set fw rich rule

@@ -77,14 +77,14 @@
 - name: "enable net.bridge.bridge-nf-call-iptables"
   sysctl:
     name: net.bridge.bridge-nf-call-iptables
-    value: 1
+    value: '1'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-iptables
     state: present
 
 - name: "enable net.bridge.bridge-nf-call-ip6tables"
   sysctl:
     name: net.bridge.bridge-nf-call-ip6tables
-    value: 1
+    value: '1'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
@@ -158,7 +158,7 @@
   
 - name: "firewall: enable masquerade"
   firewalld:
-    masquerade: yes
+    masquerade: 'yes'   # this is documented as string in the firewalld module
     permanent: yes
     state: enabled
     immediate: yes

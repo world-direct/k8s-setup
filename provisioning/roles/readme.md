@@ -5,7 +5,7 @@
 ### lnxclp
 Add all nodes to this group, that are control plane nodes.
 
-### lnxclp-setup
+### lnxclp_setup
 Add any a single lnxclp node to group, that will
     - used to initialize the cluster
     - to join additional nodes to the cluster

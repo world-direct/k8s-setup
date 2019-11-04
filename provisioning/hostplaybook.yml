@@ -6,14 +6,6 @@
 #   - join other nodes to the cluster
 ---
 
-# - hosts: all
-#   tasks:
-#     # - debug: var=test_var
-#     - name: testvar
-#       debug: msg="do with {{item}}"
-#       with_items: "{{ test_var }}"
-
-
 - import_playbook: ./utils.yml
 
 # add setup role to all linux hosts, if not disabled by 'setup_skip_system_setup'
@@ -27,8 +19,8 @@
     - import_role: name=winsetup
       when: setup_skip_system_setup == false
 
-# check if cluster-state of the lnxclp-setup
-- hosts: lnxclp-setup
+# check if cluster-state of the lnxclp_setup
+- hosts: lnxclp_setup
   tasks:
     - import_role: name=kubeadm-state
 

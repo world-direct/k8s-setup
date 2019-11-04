@@ -6,7 +6,7 @@
 - import_playbook: ./utils.yml
 
 # add setup role to all linux hosts, if not disabled by 'setup_skip_system_setup'
-- hosts: lnxclp-setup
+- hosts: lnxclp_setup
   roles:
     - k8sflannel
     - k8sdashboard

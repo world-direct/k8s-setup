@@ -1,5 +1,5 @@
 ###########################################
-## This is the role which initializes the cluster on the lnxclp-setup node
+## This is the role which initializes the cluster on the lnxclp_setup node
 ##
 ## It is dynamically included by hostplaybook.yml
 
