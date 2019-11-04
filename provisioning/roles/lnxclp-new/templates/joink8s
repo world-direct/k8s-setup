@@ -1,5 +1,5 @@
 #! /bin/sh
-set -x
+set -e
 
 ###########################################
 # Joins the local machine as a control plane
@@ -8,4 +8,8 @@ set -x
 #   STDERR: Output of kubeadm join
 
 cd ~
-{{ join_cmd.stdout }} --control-plane --certificate-key {{ cert_cmd.stdout }}
+{{ join_cmd.stdout }} \
+    --control-plane \
+    --certificate-key {{ cert_cmd.stdout }} \
+    --apiserver-advertise-address {{ ansible_facts['eth1'].ipv4.address }} \
+    --apiserver-bind-port 6443

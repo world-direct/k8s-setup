@@ -1,5 +1,5 @@
 #! /bin/sh
-set -x
+set -e
 
 ###########################################
 # Joins the local machine as a worker
