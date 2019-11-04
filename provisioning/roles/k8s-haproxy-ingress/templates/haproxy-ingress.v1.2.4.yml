@@ -187,7 +187,8 @@ metadata:
 spec:
   selector:
     run: haproxy-ingress
-  type: NodePort
+# type: NodePort GPR: changed from NodePort to LoadBalancer
+  type: LoadBalancer
   ports:
   - name: http
     port: 80

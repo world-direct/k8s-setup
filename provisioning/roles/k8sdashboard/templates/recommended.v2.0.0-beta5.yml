@@ -246,8 +246,16 @@ metadata:
   name: dashboard-metrics-scraper
   namespace: kubernetes-dashboard
 spec:
+  rules:
+  - host: dashboard.{{k8s_cluster_dnsname}}
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: dashboard-metrics-scraper
+          servicePort: 80
   ports:
-    - port: 8000
+    - port: 80
       targetPort: 8000
   selector:
     k8s-app: dashboard-metrics-scraper

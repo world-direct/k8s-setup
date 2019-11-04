@@ -4,5 +4,7 @@
 
 # all rules needed for worker nodes
 rules:
-  - "10250/tcp"                     # for Kublet API
+  - 10250/tcp                       # for Kublet API
   - 30000-32767/tcp                 # NodePort Services (we will check, if we really need NodePort)
+  - 80/tcp
+  - 443/tcp
