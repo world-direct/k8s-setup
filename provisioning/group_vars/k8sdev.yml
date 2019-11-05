@@ -46,6 +46,11 @@ k8s_apiserver_hostname: apiserver
 # plays well with kubadm
 k8s_install_flannel: yes
 
+# this is the IP range available for LoadBalancer objects
+# because the Ingress controller is created on setup, all ingresses use the first IP
+k8s_metallb_ip_start: 10.1.66.80
+k8s_metallb_ip_end: 10.1.66.99
+
 ## Notes
 #############################################################
 #

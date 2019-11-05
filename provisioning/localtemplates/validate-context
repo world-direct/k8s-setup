@@ -1,0 +1,24 @@
+#!/bin/sh
+set +e
+
+# This script validate, that
+#   kubeclt exists
+#   kubectl context points to the correct cluster 
+
+
+test=$(kubectl get nodes)
+if [ $? -ne 0 ]; then
+    echo "kubectl"
+    exit 1
+fi
+
+server=$(kubectl describe configmap cluster-info -n kube-public | grep "server: " | awk '{print $2}')
+expectedserver="https://{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}"
+
+if [ $server != $expectedserver ]; then
+    echo "We expected server=$expectedserver, but go $server"
+    exit 1
+else
+    echo "kubectl context validated against $expectedserver"
+    exit 0
+fi

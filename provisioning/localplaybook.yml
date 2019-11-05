@@ -1,0 +1,43 @@
+- hosts: localhost
+  tasks:
+    - fail:
+        msg: This playbook should be run with ansible 2.8.*. Your version is {{ ansible_version.full }}"
+      name: Fail if ansible != 2.8.*
+      when: (ansible_version.major == 2 and ansible_version.minor == 8) == false
+      run_once: true
+
+    - set_fact:
+        admin_conf: "~/{{ '.kube' if client_setup_default_context else k8s_cluster_dnsname }}/admin.conf"
+        bin_path: "~/{{ '.local' if client_setup_default_context else k8s_cluster_dnsname }}"
+
+    - name: "test if {{admin_conf}} exists"
+      stat: path="{{admin_conf}}"
+      register: res
+      failed_when: res.stat.exists != true
+
+    - name: "ensure binpath {{bin_path}} exists"
+      file:
+        path: "{{bin_path}}"
+        state: directory
+
+    - name: "sync install-tools"
+      template:
+        src: localtemplates/install-tools
+        dest: "{{bin_path}}/install-tools"
+        mode: 344
+
+    - name: "sync 'shell'"
+      template:
+        src: localtemplates/shell
+        dest: "{{bin_path}}/shell"
+        mode: 344
+      when: client_setup_default_context == false
+
+    - name: "sync 'validate-context'"
+      template:
+        src: localtemplates/validate-context
+        dest: "{{bin_path}}/validate-context"
+        mode: 344
+
+    - name: "run install-tools"
+      shell: "{{bin_path}}/install-tools > ~/install-tools.log"

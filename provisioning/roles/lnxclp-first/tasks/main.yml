@@ -13,3 +13,9 @@
 - name: "Initialize kubernetes cluster, you may cat ~/kubeadm.log in ssh to check progress"
   shell: ~/initk8s >> ~/kubeadm.log
   when: setup_manual_kubeadm == false
+
+- name: fetch /etc/kubernetes/admin.conf to provisioning client
+  fetch:
+    src: /etc/kubernetes/admin.conf
+    dest: "~/{{ '.kube' if client_setup_default_context else k8s_cluster_dnsname }}/admin.conf"
+    flat: true

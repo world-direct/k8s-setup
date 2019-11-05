@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+#   This script sets the environment to the cluster
+#   {{k8s_cluster_dnsname}}
+#
+#   This is only needed, if client_setup_default_context=no
+#   Otherwise we can use the default context
+#
+#   You should run 'source ./shell' to work with the cluster
+#
+
+set +e
+
+# set the environment variable
+export KUBECONFIG=~/{{k8s_cluster_dnsname}}/admin.conf
+

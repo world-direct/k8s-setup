@@ -18,7 +18,7 @@ if [ ! -f "$CONFFILE" ]; then
     exit 0
 fi
 
-EXPECTED_URL='{{k8s_cluster_url_with_protocol}}'
+EXPECTED_URL='https://{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'
 CONFIGURED_URL=$(cat $CONFFILE | grep "server: " | awk '{print $2}')
 
 echo "Configured URL: $CONFIGURED_URL"

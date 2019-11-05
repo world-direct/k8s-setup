@@ -3,7 +3,8 @@
 # to '2.0' in the Vagrantfile. It may also work with new versions, if they are available.
 
 # This playbook has been tested with ansible 2.7.12 and 2.8.6
-- hosts: all
+- hosts: localhost
+  become: false
   tasks:
     - fail:
         msg: This playbook should be run with ansible 2.8.*. Your version is {{ ansible_version.full }}"
@@ -16,7 +17,3 @@
       name: k8s_apiserver_port
       when: k8s_apiserver_port == 6443
       run_once: true
-
-    - set_fact:
-        k8s_cluster_url: '{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'
-        k8s_cluster_url_with_protocol: 'https://{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'

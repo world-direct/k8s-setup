@@ -1,0 +1,77 @@
+#!/bin/bash
+set -e
+
+binpath={{bin_path}}
+arch=linux-amd64
+
+desired_helm_version={{client_helm_version}}
+
+# this is needed for the tools to work (even to return the version)
+export KUBECONFIG={{admin_conf}}
+
+install_tool() {
+    toolpath=$1
+    url=$2
+    tarpath=$3
+    
+    echo "Downloading release from $url"
+    curl -L $url > /tmp/tool.tar.gz
+    tar -xvf /tmp/tool.tar.gz -C /tmp
+
+    if [ ! -e "/tmp/$tarpath" ]; then
+        echo "the /tmp/tool.tar.gz archive don't contain $tarpath. Exit"
+        exit 1
+    fi
+
+    if [ -e "$toolpath" ]; then rm $toolpath; fi
+
+    cp "/tmp/$tarpath" $toolpath
+    chmod +x $toolpath
+}
+
+########################
+## Install kubectl
+toolpath=$binpath/kubectl
+desired_version={{client_kubectl_version}}
+installed_version=
+if [ -f $toolpath ]; then
+
+    rawversion=$($toolpath version --short | head -n1)
+    
+    if [[ "$rawversion" =~ ^'Client Version: '(.+)$ ]]; then 
+        installed_version=${BASH_REMATCH[1]}; 
+    else
+        echo "$toolpath version unexpected output"
+        exit 1
+    fi
+fi
+
+if [ "$desired_version" != "$installed_version" ]; then
+    install_tool $toolpath "https://dl.k8s.io/$desired_version/kubernetes-client-$arch.tar.gz" kubernetes/client/bin/kubectl
+fi
+
+echo "kubectl $desired_version available at $toolpath "
+
+########################
+## Install helm3
+toolpath=$binpath/helm3
+desired_version={{client_helm_version}}
+installed_version=
+if [ -f $toolpath ]; then
+
+    rawversion=$($toolpath version --short)
+    installed_version=
+    
+    if [[ "$rawversion" =~ (.+)(\+) ]]; then 
+        installed_version=${BASH_REMATCH[1]}; 
+    else
+        echo "$toolpath version unexpected output"
+        exit 1
+    fi
+fi
+
+if [ "$desired_version" != "$installed_version" ]; then
+    install_tool $toolpath "https://get.helm.sh/helm-$desired_helm_version-linux-amd64.tar.gz" $arch/helm
+fi
+
+echo "helm3 $desired_version available at $toolpath "

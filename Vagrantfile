@@ -98,7 +98,7 @@ Vagrant.configure(2) do |config|
             # This ensures, that
             #   1. ansible provisioner is called only once
             #   2. ansible provisioner is called after others
-            ansible.limit = "all"
+            ansible.limit = "all,localhost"
 
             # groups are not configured by a hostname pattern, because this generates a warning:
             # > Vagrant has detected a host range pattern in the `groups` option.
@@ -142,6 +142,7 @@ Vagrant.configure(2) do |config|
 
             ansible.become = true
             ansible.playbook = "provisioning/hostplaybook.yml"
+            # ansible.playbook = "provisioning/k8splaybook.yml"
             ansible.compatibility_mode = "2.0"
 
             # ansible.verbose = "vvvv"

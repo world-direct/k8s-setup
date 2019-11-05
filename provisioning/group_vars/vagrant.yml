@@ -46,6 +46,27 @@ k8s_apiserver_hostname: apiserver
 # plays well with kubadm
 k8s_install_flannel: yes
 
+# this is the IP range available for LoadBalancer objects
+# because the Ingress controller is created on setup, all ingresses use the first IP
+k8s_metallb_ip_start: 10.0.0.80
+k8s_metallb_ip_end: 10.0.0.99
+
+## Provisioning Client configuration
+#############################################################
+
+# If 'yes', the kubeadm-first role, fetches the /etc/kubernetes/admin.conf
+# from the first clp node to the client unter ~/.kube/config
+# So this can be used by the default kubectl configuration
+# kubectl and helm3 will be installed in ~/.local/bin/helm3
+
+# If 'no', file is fetched to ~/{{k8s_cluster_dnsname}}/config
+# kubectl and helm3 will be installed in ~/{{k8s_cluster_dnsname}}
+# There will be a ~/{{k8s_cluster_dnsname}}/shell script, to register use this context
+client_setup_default_context: no
+
+client_helm_version: v3.0.0-rc.2
+client_kubectl_version: v1.16.2
+
 ## Notes
 #############################################################
 #

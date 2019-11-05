@@ -9,4 +9,4 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - 10.1.66.80-10.1.66.99
+      - {{k8s_metallb_ip_start}}-{{k8s_metallb_ip_end}}
