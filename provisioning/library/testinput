@@ -1,0 +1,1 @@
+{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/k8stest.local/admin.conf","chart": "charts/wd-flannel","namespace": "kube-global"}}

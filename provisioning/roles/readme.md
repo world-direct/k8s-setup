@@ -22,3 +22,8 @@ All windows worker nodes
 # Development Nodes
 
 To check expressions in Templates, see https://jinja.palletsprojects.com/en/2.10.x/templates/#expressions
+
+
+## HELM v3
+
+Regarding Namespaces: https://github.com/helm/helm/issues/5753

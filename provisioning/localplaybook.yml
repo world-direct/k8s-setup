@@ -1,5 +1,6 @@
 - hosts: localhost
   tasks:
+
     - fail:
         msg: This playbook should be run with ansible 2.8.*. Your version is {{ ansible_version.full }}"
       name: Fail if ansible != 2.8.*
@@ -41,3 +42,9 @@
 
     - name: "run install-tools"
       shell: "{{bin_path}}/install-tools > ~/install-tools.log"
+
+    - name: "test helm"
+      wd_helm3:
+        kubeconfig: "~/{{k8s_cluster_dnsname}}/admin.conf"
+        chart: charts/wd-flannel
+        namespace: kube-global
