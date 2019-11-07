@@ -1,25 +1,21 @@
 apiVersion: v2
 name: wd-flannel
+type: application
 description: |
   Helm v3 chart for deployment of flannel to wd clusters
-  Taken from version https://raw.githubusercontent.com/coreos/flannel/2140ac876ef134e0ed5af15c65e414cf26827915/Documentation/kube-flannel.yml
+  Taken from version https://raw.githubusercontent.com/coreos/flannel/3f7d3e6c24f641e7ff557ebcea1136fdf4b1b6a1/Documentation/kube-flannel.yml
 
 # This is from master, as release v0.11.0 is very old, and still uses apiVersion "extensions/v1beta1"
-
-# A chart can be either an 'application' or a 'library' chart.
-#
-# Application charts are a collection of templates that can be packaged into versioned archives
-# to be deployed.
-#
-# Library charts provide useful utilities or functions for the chart developer. They're included as
-# a dependency of application charts to inject those utilities and functions into the rendering
-# pipeline. Library charts do not define any templates and therefore cannot be deployed.
-type: application
+# To compare with new versions, open:
+# https://github.com/coreos/flannel/compare/3f7d3e6c24f641e7ff557ebcea1136fdf4b1b6a1...master
+# Then locate the 'Documentation/kube-flannel.yml' and apply the changes to the templates
 
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
-version: 0.0.2
+version: 0.0.1
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application.
-appVersion: 0.0.3-2140ac8
+
+# lasttag-commithash-release (for reapplying changed configuration)
+appVersion: 0.11.0-3f7d3e6-0

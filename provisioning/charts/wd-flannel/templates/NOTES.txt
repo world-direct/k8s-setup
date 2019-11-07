@@ -1,0 +1,11 @@
+# About this chart
+
+This was created by the {{ .Chart.AppVersion }} of the https://github.com/coreos/flannel/ repository.
+
+Original Source: https://raw.githubusercontent.com/coreos/flannel/3f7d3e6c24f641e7ff557ebcea1136fdf4b1b6a1/Documentation/kube-flannel.yml
+
+Performed the following modifications:
+1. Replaced 'namespace: metallb-system' with 'namespace={{"{{"}} .Release.Namespace }}'
+2. Removed the creation of the namespace, as this happens before
+3. Splitted the files for better navigation
+4. Removed DemonSets for architectures we do not support
