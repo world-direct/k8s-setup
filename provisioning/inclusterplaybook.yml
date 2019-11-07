@@ -43,8 +43,28 @@
     - name: "run install-tools"
       shell: "{{bin_path}}/install-tools > ~/install-tools.log"
 
-    - name: "test helm"
+    - name: "k8s: kube-flannel namespace"
+      wd_k8snamespace:
+        kubeconfig: "~/{{k8s_cluster_dnsname}}/admin.conf"
+        namespace: kube-flannel
+
+    - name: "k8s: chart wd-flannel"
       wd_helm3:
         kubeconfig: "~/{{k8s_cluster_dnsname}}/admin.conf"
         chart: charts/wd-flannel
-        namespace: kube-global
+        namespace: kube-flannel
+
+    - name: "k8s: kube-metallb namespace"
+      wd_k8snamespace:
+        kubeconfig: "~/{{k8s_cluster_dnsname}}/admin.conf"
+        namespace: kube-metallb
+
+    - name: "k8s: chart wd-metallb"
+      wd_helm3:
+        kubeconfig: "~/{{k8s_cluster_dnsname}}/admin.conf"
+        chart: charts/wd-metallb
+        namespace: kube-metallb
+        values:
+          ip_range_start: "{{k8s_metallb_ip_start}}"
+          ip_range_end: "{{k8s_metallb_ip_end}}"
+

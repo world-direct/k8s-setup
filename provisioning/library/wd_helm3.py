@@ -20,6 +20,7 @@ import os
 import sys
 import json
 import yaml
+import tempfile
 
 class ModuleFailed(Exception):
     """Exception raised for failed operation.
@@ -35,7 +36,8 @@ class ModuleFailed(Exception):
 
 class HelmChart:
 
-    def __init__(self, name, appversion, description, type, version):
+    def __init__(self, source, name, appversion, description, type, version):
+        self.source = source
         self.name = name
         self.appversion = appversion
         self.description = description
@@ -99,19 +101,38 @@ class HelmBase:
 
         return None
 
-    def showchart(self, chart):
-        res = self.__helm(["show", "chart", chart])
+    def loadchart(self, chartsource):
+        res = self.__helm(["show", "chart", chartsource])
         r = yaml.load(res, Loader=yaml.BaseLoader)
 
         # Construct return object
-        obj = HelmChart(r['name'], r['appVersion'], r['description'], r['type'], r['version'])
+        obj = HelmChart(chartsource, r['name'], r.get('appVersion'), r.get('description'), r.get('type'), r['version'])
 
         return obj;
 
-    def install(self, name, chartname, namespace):
-        res = self.__helm(["--namespace", namespace, "install", name, chartname])
+    def install(self, name, chart, namespace, values=None):
+        args = ["--namespace", namespace, "install", name, chart.source, "--atomic"]
+
+        if values:
+            # args.append("-f <(echo '%s')" % values)
+            # this works in bash, but not in ansible, so let's make a tmp file
+
+            tmpfile = tempfile.NamedTemporaryFile("w+a")
+            tmpfile.writelines(values)
+            tmpfile.flush()
+            args.append("-f")
+            args.append(tmpfile.name)
+
+        res = self.__helm(args)
         self.__log(res)
 
+    def upgrade(self, release, chart):
+        res = self.__helm(['-n', release.namespace, 'upgrade', release.name, chart.source])
+        self.__log(res)
+
+    def uninstall(self, release):
+        res = self.__helm(["--namespace", release.namespace, "uninstall", release.name])
+        self.__log(res)
 
 # ansible friendly log (only prints to stdout, if not redirected (by ansible?))
 def log(str):
@@ -149,7 +170,7 @@ class HelmAnsible(HelmBase):
         HelmBase.__init__(self, runhelm, log, kubeconfig)
 
 
-def release_present(module):
+def apply_state(module):
 
     helm = HelmAnsible(module, module.kubeconfig)
 
@@ -159,28 +180,37 @@ def release_present(module):
         raise ModuleFailed("chart not found")
 
     # get chart info
-    chart = helm.showchart(chartpath)
+    chart = helm.loadchart(chartpath)
 
-    # if unnamed, the name is the name of the chart
-    name = module.name
-    if not name:
-        name = chart.name
+    # if no nave is given, the name is the name of the chart
+    releasename = module.name
+    if not releasename:
+        releasename = chart.name
 
-    # get releases
-    release = helm.listone(module.namespace, name)
+    # get the release
+    release = helm.listone(module.namespace, releasename)
 
-    if not release:
-        log("INSTALL CHART")
-        helm.install(name, chartpath, module.namespace)
+    if(module.state == "present"):
 
-        return True # no release for this chart
-    
-    if release.appversion != chart.appversion:
-        log("PERFORM UPDATE")
+        if not release:
+            log("INSTALL CHART")
+            helm.install(releasename, chart, module.namespace, module.values)
+
+            return True # no release for this chart
+        
+        if release.appversion != chart.appversion:
+            log("PERFORM UPDATE")
+            helm.upgrade(release, chart)
+            return True
+
+        # already installed
+        return False
+    elif (module.state == "absent"):
+        log("PEROFRM UNINSTALL")
+        helm.uninstall(release)
         return True
-
-    # already installed
-    return False
+    else:
+        raise ModuleFailed("Invalid state value '%s'" % module.state)
 
 
     return False
@@ -196,16 +226,15 @@ def main():
         "name": {"required": False, "type": "str" },
         "namespace": {"required": False, "type": "str"},
         "kubeconfig": {"required": False, "type": "str"},
+        "values": {
+            "required": False,
+            "type": "json"
+        },
         "state": {
         	"default": "present", 
         	"choices": ['present', 'absent'],
         	"type": 'str' 
         },
-    }
-
-    choice_map = {
-        "present": release_present,
-        "absent": release_absent
     }
 
     log("Init complete")
@@ -215,10 +244,11 @@ def main():
     module.kubeconfig = module.params['kubeconfig']
     module.namespace = module.params['namespace']
     module.name = module.params['name']
+    module.state = module.params['state']
+    module.values = module.params['values']
 
     try:
-        fn = choice_map.get(module.params['state'])
-        has_changed = fn(module)
+        has_changed = apply_state(module)
         module.exit_json(changed=has_changed)
     except ModuleFailed as failed:
         module.fail_json(msg=failed.message)

@@ -1,2 +1,0 @@
-#!/bin/bash
-ansible-playbook provisioning/k8splaybook.yml -e @"provisioning/group_vars/k8sdev.yml"

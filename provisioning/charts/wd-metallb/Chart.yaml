@@ -1,0 +1,15 @@
+apiVersion: v2
+
+name: wd-metallb
+description: |
+  Helm v3 chart for deployment of MetalLB to kubernetes
+
+# Application chart
+type: application
+
+# This is just the Chart Version
+# Update only the chart didn't do anything
+version: 0.1
+
+# The is the version of the metallb release
+appVersion: v0.8.3

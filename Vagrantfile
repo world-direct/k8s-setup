@@ -142,10 +142,9 @@ Vagrant.configure(2) do |config|
 
             ansible.become = true
             ansible.playbook = "provisioning/hostplaybook.yml"
-            # ansible.playbook = "provisioning/k8splaybook.yml"
             ansible.compatibility_mode = "2.0"
 
-            # ansible.verbose = "vvvv"
+            # ansible.verbose = "vvv"
         end
     end
 

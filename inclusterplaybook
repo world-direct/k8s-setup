@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 for i in "$@"
@@ -36,4 +35,4 @@ if [ ! -e "$CONFIGFILE" ]; then
     exit 1
 fi
 
-ansible-playbook provisioning/hostplaybook.yml -e @"$CONFIGFILE"
+ansible-playbook provisioning/inclusterplaybook.yml --connection=local -e @"provisioning/group_vars/vagrant.yml"

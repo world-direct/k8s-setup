@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+        - {{ required "ip_range_start value is required!" .Values.ip_range_start  }} - {{ required "ip_range_end value is required!" .Values.ip_range_end  }} - 

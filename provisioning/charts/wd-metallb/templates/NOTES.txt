@@ -1,0 +1,12 @@
+# About this chart
+
+This was created by the {{ .Chart.AppVersion }} of the Metallb repository.
+
+See: https://metallb.universe.tf/
+See: https://github.com/danderson/metallb
+Original Source: https://raw.githubusercontent.com/google/metallb/{{ .Chart.AppVersion }}/manifests/metallb.yaml
+
+Performed the following modifications:
+1. Replaced 'namespace: metallb-system' with 'namespace={{"{{"}} .Release.Namespace }}'
+2. Removed the creation of the namespace, as this happens before
+3. Splitted the files for better navigation
