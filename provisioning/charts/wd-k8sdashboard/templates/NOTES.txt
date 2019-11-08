@@ -6,9 +6,7 @@ Original Source: https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-b
 
 Performed the following modifications:
 1. Splitted the files for better navigation (#2885459)
-1. Replaced 'namespace: kubernetes-dashboard' with 'namespace={{"{{"}} .Release.Namespace }}'
-2. Removed the creation of the namespace, as this happens before
-
+2. Replaced 'namespace: kubernetes-dashboard' with 'namespace={{"{{"}} .Release.Namespace }}' (#272455d)
 
 Because we will provide ssl termination (and OIDC) in the proxy on the ingress, 
 the dashboard service is configured unsecure. So we can use the "Alternative Setup"
