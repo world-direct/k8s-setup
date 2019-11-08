@@ -32,6 +32,9 @@ k8s_apiserver_port: 443
 # the CIDR used for the pod network, need to be used for routing
 k8s_pod_network_cidr: 10.244.0.0/16
 
+# the Network used internally by kubernetes for ClusterIP services
+k8s_service_cidr: 10.96.0.0/16
+
 # this is the VIP of the clp load balancer
 k8s_api_server_vip: 10.0.0.2
 
