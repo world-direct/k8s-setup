@@ -1,9 +1,6 @@
-## https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/v1.2.4/deploy/haproxy-ingress.yaml
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: haproxy-controller
+# https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/v1.2.4/deploy/haproxy-ingress.yaml
+# replaced namespace: 'kube-system' with 'namespace: {{ .Release.Namespace }}'
+# removed Namespace object
 
 ---
 apiVersion: v1
