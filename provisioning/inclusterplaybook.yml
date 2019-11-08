@@ -79,4 +79,16 @@
         chart: charts/wd-k8sdashboard
         namespace: kube-dashboard
 
+    - name: "k8s: kube-haproxy-ingress namespace"
+      wd_k8snamespace:
+        kubeconfig: "~/{{k8s_cluster_dnsname}}/admin.conf"
+        namespace: kube-haproxy-ingress
+
+    - name: "k8s: wd-haproxy-ingress"
+      wd_helm3:
+        kubeconfig: "~/{{k8s_cluster_dnsname}}/admin.conf"
+        chart: charts/wd-haproxy-ingress
+        namespace: kube-haproxy-ingress
+
+
 

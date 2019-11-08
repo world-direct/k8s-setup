@@ -1,0 +1,18 @@
+apiVersion: v2
+name: wd-haproxy-ingress
+type: application
+description: |
+  Helm v3 chart for the deployment of the shared haproxy ingress controller
+
+## Refernence: ## https://raw.githubusercontent.com/haproxytech/kubernetes-ingress/v1.2.4/deploy/haproxy-ingress.yaml
+## https://kubernetes.io/docs/tasks/access-application-cluster/web-ui-dashboard/#deploying-the-dashboard-ui
+
+# This is the chart version. This version number should be incremented each time you make changes
+# to the chart and its templates, including the app version.
+version: 0.0.1
+
+# This is the version number of the application being deployed. This version number should be
+# incremented each time you make changes to the application.
+
+# the source version
+appVersion: v1.2.4
