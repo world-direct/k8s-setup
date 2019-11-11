@@ -1,0 +1,59 @@
+k8s-setup performs the setup and upgrade of k8s clusters
+
+Commands:
+    info        Shows the current version and configuration info
+    checkout    Checks out a specific release, and installs the prequisites
+    config      Performs configuration commands
+    provision   Performs the provisioning
+    tool        Allows executing the underlying tools for diagnostics
+
+Basic Commands:
+    info        Shows the current version and configuration info
+    checkout    Checks out a specific release, and installs the prequisites
+
+Configuration:
+    config set <file>   Sets the configuration file in the user profile
+    config validate     Validates the current configuration
+
+    See the provides files in ./conf as a reference.
+    For 'virtual' mode, the 'vagrant.yml' file should be used.
+    For 'production' mode, you should provide an own conf file.
+    The provided file, is automatically merged with the 'defaults.yml' file.
+
+Provisioning:
+    provision all       Provisioning of everything. This should be the default.
+    provision hosts     Provisioning hosts
+    provision cluster   Provisioning the cluster itself
+    provision incluster Provisioning of an already provisioned k8s-cluster
+    
+    provision hosts:
+    Represents the 'lib/ansible/hostplaybook.yml'. If running in 'virtual' mode,
+    it provisions the VM instances. Then, regardless of the mode, it provisions
+    all nodes to have everything installed to used 'kubeadm'
+
+    provision cluster:
+    Runs the correct 'kubeadm' commands to provision the kubernetes cluster.
+
+    provision incluster:
+    Runs all kubectl or helm operations, to provision the clusters objects.
+
+    provision all:
+    Runs all provisioners in top-down order. Because provisioning is idempotent,
+    you can always use provision all. The distinct once are just a time-saver,
+    when you know what has changed. If you fetch a new version, allways use this
+    mode.
+
+Tool:
+    tool ansible <cmd>           Executes an ansible command
+    tool ansible-playbook <cmd>  Executes an ansible playbook command
+    tool ansible-inventory <cmd> Executes an ansible inventory command
+    tool vagrant <cmd>           Executes a vagrant command in the correct directory
+
+Modes of Operation:
+
+    Production: 
+    Executing against already existing hosts, from a distinct provisioner host
+
+    Virtual: 
+    Executing against Vagrant / VirtualBox hosts, from a local provisioner host.
+    Currently only running on Linux, and only tested with Ubuntu 18.04.3 LTS.

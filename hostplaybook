@@ -8,8 +8,8 @@ case $i in
 
     -h|--help)
     echo "Usage:"
-    echo "$0 <path_to_group.yml>"
-    echo "Example: $0 provisioning/group_vars/k8sdev.yml"
+    echo "$0 <path_to_config.yml>"
+    echo "Example: $0 conf/k8sdev.yml"
     exit 0
     ;;
 
@@ -36,4 +36,4 @@ if [ ! -e "$CONFIGFILE" ]; then
     exit 1
 fi
 
-ansible-playbook provisioning/hostplaybook.yml -e @"$CONFIGFILE"
+ansible-playbook lib/ansible/hostplaybook.yml -e @"$CONFIGFILE"

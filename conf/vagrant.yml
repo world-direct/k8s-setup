@@ -1,11 +1,17 @@
-# recommended version
-# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
-# see versions: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/
-# https://docs.docker.com/engine/release-notes/
-lnx_docker_version: "18.06.3"
-win_docker_version: "19.03.3"
+## Global Setup options
+#############################################################
 
-## Setup options
+# running in virtual mode, no inventory needs to be provided, and the default
+# configuration should be fine
+global_mode: vagrant
+
+# This is the private subnet of the cluster.
+# You can access this from the host, because virtualbox create a route for
+# the 'private_network', by a 'vboxnetX' interface.
+# So no port-forward rules are needed.
+global_vagrant_hosts_network: 10.0.0.*
+
+## System Setup options
 #############################################################
 
 # to reduce the time of provisioning, you may skip the system_setup phase,
@@ -26,28 +32,11 @@ setup_manual_kubeadm: false
 ## Kubernetes global cluster configuration
 #############################################################
 
-# The port of the load-balanced API Server
-k8s_apiserver_port: 443
-
-# the CIDR used for the pod network, need to be used for routing
-k8s_pod_network_cidr: 10.244.0.0/16
-
-# the Network used internally by kubernetes for ClusterIP services
-k8s_service_cidr: 10.96.0.0/16
-
 # this is the VIP of the clp load balancer
 k8s_api_server_vip: 10.0.0.2
 
 # the base dnsname for the cluster  **)
 k8s_cluster_dnsname: k8stest.local
-
-# the hostname used for the apiserver (without the k8s_cluster_dnsname) **)
-k8s_apiserver_hostname: apiserver
-
-# to install the flannel CNI plugin
-# we will evalute the 'Host Gateway Mode' as an alternative, specially how it 
-# plays well with kubadm
-k8s_install_flannel: yes
 
 # this is the IP range available for LoadBalancer objects
 # because the Ingress controller is created on setup, all ingresses use the first IP
@@ -67,8 +56,6 @@ k8s_metallb_ip_end: 10.0.0.99
 # There will be a ~/{{k8s_cluster_dnsname}}/shell script, to register use this context
 client_setup_default_context: no
 
-client_helm_version: v3.0.0-rc.2
-client_kubectl_version: v1.16.2
 
 ## Notes
 #############################################################
@@ -79,3 +66,5 @@ client_kubectl_version: v1.16.2
 # Parameters, only passed by Vagrant:
 #   k8s_enable_proxy: yes
 #   host_primary_interface_name: eth1
+
+host_primary_interface_name: eth1

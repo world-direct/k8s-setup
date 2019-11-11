@@ -5,6 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: k8s-setup checkout",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/k8s-setup",
+            "args": [
+                "--debug",
+                "checkout"
+            ],
+            "console": "integratedTerminal",
+            "stopOnEntry": true
+        },
+        {
             "name": "Python: Remote Attach",
             "type": "python",
             "request": "attach",

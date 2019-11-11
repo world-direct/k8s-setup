@@ -1,0 +1,96 @@
+## Global Setup options
+#############################################################
+
+# The global_vagrant_* are ignored, when the global_mode is not 'local'
+global_vagrant_lnxclp_count: 1
+global_vagrant_lnxclp_mem: 2048
+global_vagrant_lnxclp_cpu: 2
+
+global_vagrant_lnxwk_count: 1
+global_vagrant_lnxwk_mem: 1024
+global_vagrant_lnxwk_cpu: 1
+
+global_vagrant_winwrk_count: 0
+global_vagrant_winwrk_mem: 2048
+global_vagrant_winwrk_cpu: 2
+
+global_vagrant_box_linux: centos/7
+global_vagrant_box_win: StefanScherer/windows_2019
+
+global_vagrant_hosts_network: 10.0.0.*
+
+# This option is only needed for production configuration.
+# The 'vagrant' mode generates an own inventory
+ansible_inventory_file: /etc/ansible/hosts
+
+## Version Options
+#############################################################
+
+# recommended version
+# https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
+# see versions: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/
+# https://docs.docker.com/engine/release-notes/
+lnx_docker_version: "18.06.3"
+win_docker_version: "19.03.3"
+
+## Setup options
+#############################################################
+
+# if this is enabled, all yum packages are updated on host provisioning
+setup_update_all_packages: no
+
+# the playbook will only init a new cluster, if this enabled
+# this is for safty, to make sure that an existing cluster is untouched
+setup_create_new_k8s_cluster: yes
+
+
+## Kubernetes global cluster configuration
+#############################################################
+
+# The port of the load-balanced API Server
+k8s_apiserver_port: 443
+
+# the CIDR used for the pod network, need to be used for routing
+k8s_pod_network_cidr: 10.244.0.0/16
+
+# the Network used internally by kubernetes for ClusterIP services
+k8s_service_cidr: 10.96.0.0/16
+
+# this is the VIP of the clp load balancer
+k8s_api_server_vip: 
+
+# the base dnsname for the cluster  **)
+k8s_cluster_dnsname: 
+
+# the hostname used for the apiserver (without the k8s_cluster_dnsname) **)
+k8s_apiserver_hostname: apiserver
+
+# to install the flannel CNI plugin
+# we will evalute the 'Host Gateway Mode' as an alternative, specially how it 
+# plays well with kubadm
+k8s_install_flannel: yes
+
+# this is the IP range available for LoadBalancer objects
+# because the Ingress controller is created on setup, all ingresses use the first IP
+k8s_metallb_ip_start: 
+k8s_metallb_ip_end: 
+
+## Provisioning Client configuration
+#############################################################
+
+# If 'yes', the kubeadm-first role, fetches the /etc/kubernetes/admin.conf
+# from the first clp node to the client unter ~/.kube/config
+# So this can be used by the default kubectl configuration
+# kubectl and helm3 will be installed in ~/.local/bin/helm3
+
+# If 'no', file is fetched to ~/{{k8s_cluster_dnsname}}/config
+# kubectl and helm3 will be installed in ~/{{k8s_cluster_dnsname}}
+# There will be a ~/{{k8s_cluster_dnsname}}/shell script, to register use this context
+client_setup_default_context: no
+
+# specifiy the versions of the tools to install
+client_helm_version: v3.0.0-rc.2
+client_kubectl_version: v1.16.2
+
+k8s_enable_proxy: no
+
