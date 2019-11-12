@@ -135,7 +135,8 @@ def parse_args():
             parser.add_argument('name', 
                 help="The tool name",
                 choices=['ansible', 'ansible-playbook', 'ansible-inventory', 'vagrant'],
-                nargs=1)
+                nargs=1,
+                action='store')
 
             parser.add_argument('-s', '--show-only',
                 help="Don't execute the tool, only show the commandline",
@@ -150,7 +151,7 @@ def parse_args():
             args = parser.parse_args(sys.argv[2:])
 
             res = Args('tool', args.debug)
-            res.name = args.name
+            res.name = args.name[0]
             res.show_only = args.show_only
             res.toolargs = args.toolargs
             return res

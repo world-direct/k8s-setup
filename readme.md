@@ -38,13 +38,19 @@ You don't need to do anything, if you just want a vm cluster with a single contr
 For production deployments, you need to 
 
 1. Create an ansible inventory file, with the machines in it.
+You need to assign the host to these groups:
+    * lnxclp: All Linux control plane nodes
+    * lnxclp_setup: One of the linux control plane nodes, which will be the first
+    control plane instance.
+    * lnxwrk: All Linux worker nodes
+    * winwrk: All Windows worker nodes
 2. Create a .yml file, representing variables of your envrionment.
 You can check the provided files in '/conf'. The 'default.yml' contains the 
 system default settings. You can override them in your custom configuration file.
 3. Activate the configuration by executing `k8s-setup config <path>`. 
 The path can be absolute, or relative to the repository root. By default the
 `./conf/vagrant.yml` is selected.
-This Information is stored ~/.k8s-setup-current-config. This is in your home directory, so normally you only have to execute in once.
+This Information is stored `~/.k8s-setup-current-config`. This is in your home directory, so normally you only have to execute in once.
 4. You may verify everything by running `k8s-setup info`
 
 ## Running the provisioners
@@ -65,7 +71,7 @@ depending on the reflected Environmnet-Variables.
 4. Vagrant only: The Vagrantfile declares the following provisioners:
     * Host: Updates the `/etc/hosts` files on each machine, because we have no
     DNS Server in the network
-    * Ansible: Runs the `./lib/ansible/hosts.yml` playbook. This playbook only
+    * Ansible: Runs the `./lib/ansible/vagrant.yml` playbook. This playbook only
     performs connectivity tests. The provisioning playbooks are lauched later.
     The Ansible Provisioner also generates an inventory file, which is used in 
     the next step.
@@ -154,14 +160,25 @@ source <(kubectr completion bash)
 
 # run standalone
 
+```sh
+# full cmdline executed by vagrant
 ansible-playbook \
     --connection=ssh \
     --timeout=30 \
     --limit=all,localhost \
-    --inventory-file=./lib/vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory \
+    --inventory-file=../vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory \
     --extra-vars={\"k8s_api_server_vip\":\"10.0.0.2\",\"k8s_cluster_dnsname\":\"k8stest.local\",\"k8s_apiserver_hostname\":\"apiserver\",\"k8s_enable_proxy\":true,\"host_primary_interface_name\":\"eth1\"} \
     --become \
     --ssh-extra-args='-o StrictHostKeyChecking=no' \
-    -e@conf/vagrant.yml \
-    lib/ansible/utils.yml
-    
+    -e@../../conf/vagrant.yml \
+    vagrant.yml
+
+# minimum cmdline to execute vagrant.yml
+ansible-playbook \
+    --inventory-file=../vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory \
+    --ssh-extra-args='-o StrictHostKeyChecking=no' \
+    -e@../../conf/vagrant.yml \
+    vagrant.yml
+
+
+```

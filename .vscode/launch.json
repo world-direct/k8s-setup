@@ -5,15 +5,14 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: k8s-setup checkout",
+            "name": "Python: k8s-setup command",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/k8s-setup",
+            "program": "${workspaceFolder}/lib/k8s-setup/main.py",
             "args": [
-                "--debug",
-                "checkout"
+                "tool", "--debug", "vagrant"
             ],
-            "console": "integratedTerminal",
+            "console": "internalConsole",
             "stopOnEntry": true
         },
         {

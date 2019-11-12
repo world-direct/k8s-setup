@@ -6,19 +6,6 @@
 #   - join other nodes to the cluster
 ---
 
-- import_playbook: ./utils.yml
-
-# add setup role to all linux hosts, if not disabled by 'setup_skip_system_setup'
-- hosts: lnxclp:lnxwrk
-  tasks:
-    - import_role: name=lnxsetup
-      when: setup_skip_system_setup == false
-
-- hosts: winwrk
-  tasks:
-    - import_role: name=winsetup
-      when: setup_skip_system_setup == false
-
 # check if cluster-state of the lnxclp_setup
 - hosts: lnxclp_setup
   tasks:

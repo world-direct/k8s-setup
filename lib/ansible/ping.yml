@@ -1,0 +1,9 @@
+---
+# We fail if ansible is not 2.0, just because we the the compatiblity-mode
+# to '2.0' in the Vagrantfile. It may also work with new versions, if they are available.
+# TODO: Validating the ansible version will done in k8s-setup tool
+
+- hosts: all
+  tasks:
+    - name: "Ping all Nodes"
+      ping:

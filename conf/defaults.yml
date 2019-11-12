@@ -1,21 +1,21 @@
 ## Global Setup options
 #############################################################
 
-# The global_vagrant_* are ignored, when the global_mode is not 'local'
+# The global_vagrant_* are ignored, when the global_mode is not 'vagranu'
 global_vagrant_lnxclp_count: 1
 global_vagrant_lnxclp_mem: 2048
 global_vagrant_lnxclp_cpu: 2
 
-global_vagrant_lnxwk_count: 1
-global_vagrant_lnxwk_mem: 1024
-global_vagrant_lnxwk_cpu: 1
+global_vagrant_lnxwrk_count: 1
+global_vagrant_lnxwrk_mem: 1024
+global_vagrant_lnxwrk_cpu: 1
 
 global_vagrant_winwrk_count: 0
 global_vagrant_winwrk_mem: 2048
 global_vagrant_winwrk_cpu: 2
 
-global_vagrant_box_linux: centos/7
-global_vagrant_box_win: StefanScherer/windows_2019
+global_vagrant_lnx_boxname: centos/7
+global_vagrant_win_boxname: StefanScherer/windows_2019
 
 global_vagrant_hosts_network: 10.0.0.*
 
@@ -94,3 +94,4 @@ client_kubectl_version: v1.16.2
 
 k8s_enable_proxy: no
 
+host_primary_interface_name: eth0

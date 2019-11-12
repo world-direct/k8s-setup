@@ -5,6 +5,8 @@
 # configuration should be fine
 global_mode: vagrant
 
+# global_vagrant_lnxwrk_count: 2
+
 # This is the private subnet of the cluster.
 # You can access this from the host, because virtualbox create a route for
 # the 'private_network', by a 'vboxnetX' interface.
