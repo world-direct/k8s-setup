@@ -34,7 +34,7 @@ class Tool(object):
             cwd=self.get_cwd(program), 
             env=env)
 
-    def ansible_playbook_auto(self, playbook_path, clusterhosts = True, localhost = False, become = True):
+    def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False):
 
         args = []
         if(os.path.exists(self.context.inventory_file_path)):
@@ -49,12 +49,9 @@ class Tool(object):
         if become:
             args.append("--become")
 
-        limit = []
+        limit = ["all"]
 
-        if clusterhosts:
-            limit.append("all")
-
-        if localhost:
+        if add_localhost:
             limit.append("localhost")
 
         limit = ",".join(limit)

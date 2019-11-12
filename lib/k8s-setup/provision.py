@@ -25,22 +25,22 @@ class Provision():
             tool = Tool(self.context)
             tool.run("vagrant", ["up", "--provision"])
         else:
-            tool.ansible_playbook_auto("./lib/ansible/ping.yml", clusterhosts=True)
+            tool.ansible_playbook_auto("./lib/ansible/ping.yml")
 
         # run the 'hosts.yml'
-        tool.ansible_playbook_auto("./lib/ansible/hosts.yml", clusterhosts=True)
+        tool.ansible_playbook_auto("./lib/ansible/hosts.yml", become = True)
 
     def cluster(self):
         logging.info("Provisioning scope 'cluster'")
 
         tool = Tool(self.context)
-        tool.ansible_playbook_auto("./lib/ansible/cluster.yml", clusterhosts=True, localhost=False)
+        tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
 
     def incluster(self):
         logging.info("Provisioning scope 'incluster'")
 
         tool = Tool(self.context)
-        tool.ansible_playbook_auto("./lib/ansible/incluster.yml", clusterhosts=False, localhost=True)
+        tool.ansible_playbook_auto("./lib/ansible/incluster.yml", add_localhost=True, become=False)
 
     def all(self):
         self.hosts()

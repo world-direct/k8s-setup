@@ -5,12 +5,34 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Attach Ansible",
+            "type": "python",
+            "request": "attach",
+            "port": 3000,
+            "host": "localhost",
+            "pathMappings": [
+                {
+                    "localRoot": "/",
+                    "remoteRoot": "."
+                }
+            ]
+
+            // # Code snippet to attach:
+            // import ptvsd
+            // ptvsd.enable_attach(address = ('127.0.0.1', 3000))
+            // ptvsd.wait_for_attach()
+            // ptvsd.break_into_debugger()
+        
+        },
+        {
             "name": "Python: k8s-setup command",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/lib/k8s-setup/main.py",
             "args": [
-                "tool", "--debug", "vagrant"
+                "tool",
+                "--debug",
+                "vagrant"
             ],
             "console": "internalConsole",
             "stopOnEntry": true
