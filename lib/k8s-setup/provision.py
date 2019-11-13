@@ -35,6 +35,7 @@ class Provision():
 
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
+        tool.ansible_playbook_auto("./lib/ansible/cluster-local.yml", add_localhost=True, become=False)
 
     def incluster(self):
         logging.info("Provisioning scope 'incluster'")

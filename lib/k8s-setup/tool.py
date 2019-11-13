@@ -29,12 +29,15 @@ class Tool(object):
 
         logging.debug("$ " + " ".join(args))
 
-        sb = subprocess.call(
+        rc = subprocess.call(
             args, 
             cwd=self.get_cwd(program), 
             env=env)
 
-    def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False):
+        logging.debug("Tool exited with %d" % rc)
+        return rc
+
+    def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False, dont_check_exitcode = False):
 
         args = []
         if(os.path.exists(self.context.ansible_inventory_file)):
@@ -60,4 +63,9 @@ class Tool(object):
 
         args.append(playbook_path)
 
-        return self.run("ansible-playbook", args)
+        rc = self.run("ansible-playbook", args)
+        
+        if not dont_check_exitcode and rc != 0:
+            exit(rc)
+
+        return rc

@@ -148,14 +148,6 @@
     state: enabled
     immediate: yes
   when: k8s_install_flannel
-
-- name: "firewall: allow 8001/tcp for kubectl proxy (only for localhost with Vagrant)"
-  firewalld:
-    port: 8001/tcp
-    permanent: yes
-    state: enabled
-    immediate: yes
-  when: k8s_enable_proxy
   
 - name: "firewall: enable masquerade"
   firewalld:

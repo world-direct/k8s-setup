@@ -16,10 +16,6 @@ global_vagrant_hosts_network: 10.0.0.*
 ## System Setup options
 #############################################################
 
-# to reduce the time of provisioning, you may skip the system_setup phase,
-# if this has already been done. This is just an optimization for development. 
-setup_skip_system_setup: no
-
 # if this is enabled, all yum packages are updated on start
 setup_update_all_packages: no
 
@@ -27,9 +23,7 @@ setup_update_all_packages: no
 # this is for safty, to make sure that an existing cluster is untouched
 setup_create_new_k8s_cluster: yes
 
-# the playbook will create k8sinit, k8sjoin and k8steardown scripts, but don't execute them
-# this is specially for testing, to see timeing and stdout / stderr
-setup_manual_kubeadm: false
+host_primary_interface_name: eth1
 
 ## Kubernetes global cluster configuration
 #############################################################
@@ -45,28 +39,4 @@ k8s_cluster_dnsname: k8stest.local
 k8s_metallb_ip_start: 10.0.0.80
 k8s_metallb_ip_end: 10.0.0.99
 
-## Provisioning Client configuration
-#############################################################
 
-# If 'yes', the kubeadm-first role, fetches the /etc/kubernetes/admin.conf
-# from the first clp node to the client unter ~/.kube/config
-# So this can be used by the default kubectl configuration
-# kubectl and helm3 will be installed in ~/.local/bin/helm3
-
-# If 'no', file is fetched to ~/{{k8s_cluster_dnsname}}/config
-# kubectl and helm3 will be installed in ~/{{k8s_cluster_dnsname}}
-# There will be a ~/{{k8s_cluster_dnsname}}/shell script, to register use this context
-client_setup_default_context: no
-
-
-## Notes
-#############################################################
-#
-# **): If you use Vagrant for local machine tests, these values will be
-#       set from the .env file in the project root. Change them in this file
-#
-# Parameters, only passed by Vagrant:
-#   k8s_enable_proxy: yes
-#   host_primary_interface_name: eth1
-
-host_primary_interface_name: eth1

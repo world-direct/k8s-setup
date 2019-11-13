@@ -29,9 +29,9 @@ def cmd_provision(args):
 
 def cmd_tool(args):
     logging.debug ('cmd:tool(name=%s, show_only=%d, toolargs=%s)' % (args.name, args.show_only, args.toolargs))
-
     tool = Tool(context)
-    tool.run(args.name, args.toolargs)
+    rc = tool.run(args.name, args.toolargs)
+    exit(rc)
 
 res=parse_args()
 

@@ -43,9 +43,8 @@ setup_update_all_packages: no
 # this is for safty, to make sure that an existing cluster is untouched
 setup_create_new_k8s_cluster: yes
 
-# TODO: remove
-setup_skip_system_setup: no
-setup_manual_kubeadm: no
+# the interface to use
+host_primary_interface_name: eth0
 
 ## Kubernetes global cluster configuration
 #############################################################
@@ -81,20 +80,9 @@ k8s_metallb_ip_end:
 ## Provisioning Client configuration
 #############################################################
 
-# If 'yes', the kubeadm-first role, fetches the /etc/kubernetes/admin.conf
-# from the first clp node to the client unter ~/.kube/config
-# So this can be used by the default kubectl configuration
-# kubectl and helm3 will be installed in ~/.local/bin/helm3
-
-# If 'no', file is fetched to ~/{{k8s_cluster_dnsname}}/config
-# kubectl and helm3 will be installed in ~/{{k8s_cluster_dnsname}}
-# There will be a ~/{{k8s_cluster_dnsname}}/shell script, to register use this context
-client_setup_default_context: no
-
-# specifiy the versions of the tools to install
+# In the cluster-local.yml playbook, the tools kubectl and helm3 will be fetched
+# accounting to this versions:
+# You may 'source /.local/scripts/use-context' script, to activate and validate
+# The current kubectl context
 client_helm_version: v3.0.0-rc.2
 client_kubectl_version: v1.16.2
-
-k8s_enable_proxy: no
-
-host_primary_interface_name: eth0

@@ -56,8 +56,12 @@ def kubectl(module, args, check_rc):
 
 def apply_state(module):
 
+    cargs = []
+    if module.kubeconfig:
+        cargs += [ "--kubeconfig", module.kubeconfig]
+
     # check if the namespace exists
-    rc, _, _ = kubectl(module, ['--kubeconfig', module.kubeconfig, "-o", "json", "get", "namespace", module.namespace], False)
+    rc, _, _ = kubectl(module, cargs+["-o", "json", "get", "namespace", module.namespace], False)
     log("rc=" + str(rc))
     if module.state != "present":
         raise ModuleFailed("Currently only state: present is implemented")
@@ -67,7 +71,7 @@ def apply_state(module):
         return False;
     
     # create the namespace
-    rc = kubectl(module, ['--kubeconfig', module.kubeconfig, "create", "namespace", module.namespace], True)
+    rc = kubectl(module, cargs+["create", "namespace", module.namespace], True)
     return True
 
 def release_absent(module):
@@ -78,7 +82,7 @@ def main():
 
     fields = {
         "namespace": {"required": True, "type": "str"},
-        "kubeconfig": {"required": True, "type": "str"},
+        "kubeconfig": {"required": False, "type": "str"},
         "state": {
         	"default": "present", 
         	"choices": ['present'],

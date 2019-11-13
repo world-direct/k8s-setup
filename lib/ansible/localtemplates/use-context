@@ -1,0 +1,67 @@
+#!/bin/bash
+set -eu
+
+# This script validate, that
+#   kubectl has the context 'admin@{{k8s_cluster_dnsname}}'
+#   this is the default kubectl context
+#   the context is configured correctly to 'https://{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}'
+#
+# To start an interactive shell, you can source this file, like
+#   $ source use-context
+
+# The vars (from template)
+cluster="{{k8s_cluster_dnsname}}"
+adminconf="{{local_path}}/admin.conf"
+context="admin@{{k8s_cluster_dnsname}}"
+server="https://{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}"
+
+# check context exists
+set +e
+kubectl config get-contexts $context > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+
+    # no context setup has been done, let's import the admin.conf
+    echo importing admin.conf into kubectl context "$context"
+
+    set -e
+    sourcedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"    
+    $sourcedir/import-admin.conf $cluster $adminconf
+
+fi
+
+# check kubectl current-context
+set +e
+use=0
+kubectl config current-context > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    use=1
+else
+    cur_context=$(kubectl config current-context)
+    if [ "$cur_context" != "$context" ]; then
+        use=1
+    fi
+fi
+
+if [ $use -eq 1 ]; then
+    kubectl config use-context $context
+fi
+
+
+# check connection
+test=$(kubectl get nodes)
+if [ $? -ne 0 ]; then
+    exit 1
+fi
+
+# extract the server from the cluster-info configmap
+# rational: It's easier to parse the yaml, then the output of kubectl cluster-info
+cur_server=$(kubectl describe configmap cluster-info -n kube-public | grep "server: " | awk '{print $2}')
+
+# validate the server
+if [ $cur_server != $server ]; then
+    echo "We expected server=$server, but go $cur_server"
+    exit 1
+else
+    echo "kubectl context validated against $server"
+    exit 0
+fi

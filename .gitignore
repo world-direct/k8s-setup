@@ -1,4 +1,13 @@
+# Vagrant working directory
 .vagrant/
-provisioning/*.retry
+
+# Ansible retry files
+*.retry
+
+# Python cache and compiled files
 __pycache__/
 *.pyc
+
+# Files in /local are created by running the provisioning
+# You should not delete those manually
+/.local

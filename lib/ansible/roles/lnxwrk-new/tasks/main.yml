@@ -16,4 +16,3 @@
 
 - name: "Join kubernetes cluster, you may cat ~/kubeadm.log in ssh to check progress"
   shell: ~/joink8s >> ~/kubeadm.log
-  when: setup_manual_kubeadm == false
