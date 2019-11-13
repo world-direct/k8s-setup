@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 set -ex
 
 file=$2
@@ -10,21 +10,25 @@ if [ ! -e "$file" ]; then
 fi
 
 extract() {
-    cat $file | grep "$1: " | awk '{print $2}' > /$wd/$1
+    if [ "$2" == base64 ]; then
+        cat $file | grep "$1: " | awk '{print $2}' | base64 --decode > /$wd/$1
+    else
+        cat $file | grep "$1: " | awk '{print $2}' > /$wd/$1
+    fi
     cat /$wd/$1
 }
 
-extract "certificate-authority-data"
-extract "server"
-extract "client-certificate-data"
-extract "client-key-data"
+extract "certificate-authority-data" base64
+extract "server" raw
+extract "client-certificate-data" base64
+extract "client-key-data" base64
 
 kubectl config set-cluster $1 \
     --server=$(cat $wd/server) \
     --certificate-authority=$wd/certificate-authority-data \
     --embed-certs=true
 
-kubectl config set-context $1 \
+kubectl config set-context admin@$1 \
     --cluster=$1 \
     --namespace=default \
     --user=$1-admin
