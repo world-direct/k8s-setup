@@ -15,14 +15,14 @@ class Provision():
             # So this also works when no file has been generated yet.
             # It will be generated in the 'hosts' scope by executing the 
             # 'vagrant.yml' playbook
-            self.context.inventory_file_path = "./lib/vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory"
+            self.context.ansible_inventory_file = "./lib/vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory"
 
     def hosts(self):
         logging.info("Provisioning scope 'hosts'")
 
+        tool = Tool(self.context)
         if(self.context.mode == "vagrant"):
             # run 'vagrant up', which runs also the vagrant playbook
-            tool = Tool(self.context)
             tool.run("vagrant", ["up", "--provision"])
         else:
             tool.ansible_playbook_auto("./lib/ansible/ping.yml")

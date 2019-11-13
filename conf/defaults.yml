@@ -43,6 +43,9 @@ setup_update_all_packages: no
 # this is for safty, to make sure that an existing cluster is untouched
 setup_create_new_k8s_cluster: yes
 
+# TODO: remove
+setup_skip_system_setup: no
+setup_manual_kubeadm: no
 
 ## Kubernetes global cluster configuration
 #############################################################

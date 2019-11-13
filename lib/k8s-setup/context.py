@@ -11,7 +11,7 @@ class Context(object):
         ## Constants
         #############################################################
 
-        pn_current_config="~.k8s-setup-current-config"
+        pn_current_config = os.path.expandvars("$HOME/.k8s-setup-current-config")
         pn_conf = "./conf"
         fn_default_config="defaults.yml"
         fn_vagrant_config="vagrant.yml"
@@ -23,10 +23,13 @@ class Context(object):
 
         # read the current config
         if not os.path.isfile(pn_current_config):
+            logging.debug("Found %s config pointer file" % pn_current_config)
             self.config_files.append(os.path.join(pn_conf, fn_vagrant_config))
         else:
             with open(pn_current_config, 'r') as fs:
-                self.config_files.append(fs.read())
+                configfile = os.path.expandvars(fs.read()).rstrip()
+                logging.debug("Using %s as config file" % configfile)
+                self.config_files.append(configfile)
 
         # TODO: check if all self.config_files exists
 
@@ -44,6 +47,7 @@ class Context(object):
 
         # TODO: check if global_mode exists, and if it is 'vagrant' or 'production'
         self.mode = self.config['global_mode']
+        self.ansible_inventory_file = self.config['ansible_inventory_file']        
         logging.info("Using mode '%s'" % self.mode)
 
     def get_environment(self):

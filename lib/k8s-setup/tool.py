@@ -37,8 +37,8 @@ class Tool(object):
     def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False):
 
         args = []
-        if(os.path.exists(self.context.inventory_file_path)):
-            args.append("--inventory-file=%s" % self.context.inventory_file_path)
+        if(os.path.exists(self.context.ansible_inventory_file)):
+            args.append("--inventory-file=%s" % self.context.ansible_inventory_file)
         
         if(self.context.mode == "vagrant"):
             args.append("--ssh-extra-args='-o StrictHostKeyChecking=no'")
