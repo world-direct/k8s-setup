@@ -1,3 +1,74 @@
+
+# VM CONFIGURATION
+
+For the nodes to communicate, we create a "NodeNetwork"
+   10.0.0.0/24
+
+```
+The first master has: 10.0.0.1
+Next masters:         10.0.0.2, 10.0.0.3
+Master virtual IP:    10.0.0.10
+Workers:              10.0.0.11-10.0.0.254
+```
+
+# Single Master
+
+For the first version, we use a single master, we will create a VIP later on.
+
+# references
+
+https://github.com/oracle/vagrant-boxes/blob/master/Kubernetes/Vagrantfile
+
+# test ansible without vagrant
+
+```sh
+ansible winwrk1 -i .vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory -m win_ping
+# if you get SSL_WRONG_VERSION_NUMBER, read https://github.com/hashicorp/vagrant/issues/10765
+# you may set this manually by now
+```
+
+# winrt SSL_WRONG_VERSION_NUMBER
+
+
+
+After setting `ansible_winrm_scheme=http` in the vagrant_ansible
+
+
+# setup winrt for python
+
+```sh
+pip install "pywinrm>=0.3.0"
+
+# if this fails with 'Segmentation fault (core dumped)' run
+sudo apt remove python-cryptography
+```
+
+
+# run standalone
+
+```sh
+# full cmdline executed by vagrant
+ansible-playbook \
+    --connection=ssh \
+    --timeout=30 \
+    --limit=all,localhost \
+    --inventory-file=../vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory \
+    --extra-vars={\"k8s_api_server_vip\":\"10.0.0.2\",\"k8s_cluster_dnsname\":\"k8stest.local\",\"k8s_apiserver_hostname\":\"apiserver\",\"k8s_enable_proxy\":true,\"host_primary_interface_name\":\"eth1\"} \
+    --become \
+    --ssh-extra-args='-o StrictHostKeyChecking=no' \
+    -e@../../conf/vagrant.yml \
+    vagrant.yml
+
+# minimum cmdline to execute vagrant.yml
+ansible-playbook \
+    --inventory-file=../vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory \
+    --ssh-extra-args='-o StrictHostKeyChecking=no' \
+    -e@../../conf/vagrant.yml \
+    vagrant.yml
+
+
+```
+
 # Install ansible
 
 https://docs.ansible.com/ansible/2.4/intro_installation.html
@@ -59,15 +130,6 @@ ansible all -m ping
 ansible all -a "/bin/echo hello"
 ```
 
-# Install git and clone the 'k8s-setup' repository
-
-```bash
-cd ~
-$repo=https://ads.world-direct.at/Company/Technology/_git/k8s-setup
-git clone $repo
-cd k8s-setup
-```
-
 # Checkout the current version
 
 The current version is v0.0.1, so the command should be
@@ -77,19 +139,3 @@ cd ~/k8s-setup
 git fetch && git fetch tags
 git checkout v0.0.1
 ```
-
-# Modify the playbook vars to match desired configuration
-
-This is documented in the configuration-file itself:
-provisioning/group_vars/all.yml
-
-# Run ansible-playbook
-
-https://docs.ansible.com/ansible/2.4/playbooks.html
-
-
-```bash
-cd ~/k8s-setup/provisioning
-ansible-playbook hostplaybook.yml 
-```
-
