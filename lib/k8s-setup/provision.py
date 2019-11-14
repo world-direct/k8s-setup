@@ -4,6 +4,8 @@ import logging
 
 from tool import Tool
 
+logger = logging.getLogger(__name__)
+
 class Provision():
     
     def __init__(self, context):
@@ -18,7 +20,7 @@ class Provision():
             self.context.ansible_inventory_file = "./lib/vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory"
 
     def hosts(self):
-        logging.info("Provisioning scope 'hosts'")
+        logger.info("Provisioning scope 'hosts'")
 
         tool = Tool(self.context)
         if(self.context.mode == "vagrant"):
@@ -31,14 +33,14 @@ class Provision():
         tool.ansible_playbook_auto("./lib/ansible/hosts.yml", become = True)
 
     def cluster(self):
-        logging.info("Provisioning scope 'cluster'")
+        logger.info("Provisioning scope 'cluster'")
 
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
         tool.ansible_playbook_auto("./lib/ansible/cluster-local.yml", add_localhost=True, become=False)
 
     def incluster(self):
-        logging.info("Provisioning scope 'incluster'")
+        logger.info("Provisioning scope 'incluster'")
 
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/incluster.yml", add_localhost=True, become=False)

@@ -1,17 +1,23 @@
 #!/usr/bin/env python
 
 import os
+import sys
 import logging
 import yaml
 
+logger = logging.getLogger(__name__)
+
 class Context(object):
+
+
+    ## Constants
+    #############################################################
+
+    pn_current_config = ".local/current-config"
 
     def __init__(self):
 
-        ## Constants
-        #############################################################
-
-        pn_current_config = os.path.expandvars("$HOME/.k8s-setup-current-config")
+        pn_current_config = Context.pn_current_config
         pn_conf = "./conf"
         fn_default_config="defaults.yml"
         fn_vagrant_config="vagrant.yml"
@@ -22,14 +28,13 @@ class Context(object):
         self.config_files.append(os.path.join(pn_conf, fn_default_config))
 
         # read the current config
-        if not os.path.isfile(pn_current_config):
-            logging.debug("Found %s config pointer file" % pn_current_config)
-            self.config_files.append(os.path.join(pn_conf, fn_vagrant_config))
-        else:
-            with open(pn_current_config, 'r') as fs:
-                configfile = os.path.expandvars(fs.read()).rstrip()
-                logging.debug("Using %s as config file" % configfile)
-                self.config_files.append(configfile)
+        if not os.path.islink(pn_current_config):
+            pn_vagrantconf = os.path.abspath(os.path.join(pn_conf, fn_vagrant_config))
+            logger.debug("'%s' doesnt exist, defaulting to %s" % (pn_current_config, pn_vagrantconf))
+            self.set_file(pn_vagrantconf)
+        
+        logger.debug("'%s' --> '%s'" % (pn_current_config, os.readlink(pn_current_config)))
+        self.config_files.append(pn_current_config)
 
         # TODO: check if all self.config_files exists
 
@@ -44,11 +49,18 @@ class Context(object):
 
         self.config = yaml.load(self.config_string, Loader=yaml.SafeLoader)
 
-
         # TODO: check if global_mode exists, and if it is 'vagrant' or 'production'
         self.mode = self.config['global_mode']
-        self.ansible_inventory_file = self.config['ansible_inventory_file']        
-        logging.info("Using mode '%s'" % self.mode)
+        self.ansible_inventory_file = self.config['ansible_inventory_file']
+        logger.debug("Using mode '%s'" % self.mode)
+
+    def set_file(self, filepath):
+        if not os.path.isfile(filepath):
+            print("File '%s' not found. Exiting" % filepath)
+            exit(1)
+
+        logger.debug("Creating symlink '%s' --> '%s'" % (Context.pn_current_config, filepath))
+        os.symlink(filepath, Context.pn_current_config)
 
     def get_environment(self):
 

@@ -1,8 +1,0 @@
-## Global Setup options
-#############################################################
-
-global_mode:
-  choise:
-    - production
-    - localvm
-

@@ -44,14 +44,22 @@ You need to assign the host to these groups:
     control plane instance.
     * lnxwrk: All Linux worker nodes
     * winwrk: All Windows worker nodes
+
 2. Create a .yml file, representing variables of your envrionment.
 You can check the provided files in '/conf'. The 'default.yml' contains the 
 system default settings. You can override them in your custom configuration file.
+
 3. Activate the configuration by executing `k8s-setup config <path>`. 
 The path can be absolute, or relative to the repository root. By default the
 `./conf/vagrant.yml` is selected.
-This Information is stored `~/.k8s-setup-current-config`. This is in your home directory, so normally you only have to execute in once.
+
+This Information is stored `.local/current-config`. This is persistent, so normally you only have to execute in once.
 4. You may verify everything by running `k8s-setup info`
+
+## Provide the configuration in an own repository
+
+k8s-setup doesn't care, where the config file is comming from. Just clone the
+repository containing your configuration file, and register it by `k8s-setup config <path>`
 
 ## Running the provisioners
 

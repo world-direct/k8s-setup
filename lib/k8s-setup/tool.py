@@ -6,6 +6,8 @@ import os
 
 from context import Context
 
+logger = logging.getLogger(__name__)
+
 class Tool(object):
     
     def __init__(self, context):
@@ -27,14 +29,15 @@ class Tool(object):
 
         args = [program] + args
 
-        logging.debug("$ " + " ".join(args))
+        cwd = os.path.abspath(self.get_cwd(program))
+        logger.debug("RUN in '%s': %s" % (cwd, " ".join(args)))
 
         rc = subprocess.call(
             args, 
-            cwd=self.get_cwd(program), 
+            cwd=cwd, 
             env=env)
 
-        logging.debug("Tool exited with %d" % rc)
+        logger.debug("EXIT rc=%d" % rc)
         return rc
 
     def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False, dont_check_exitcode = False):
@@ -64,7 +67,7 @@ class Tool(object):
         args.append(playbook_path)
 
         rc = self.run("ansible-playbook", args)
-        
+
         if not dont_check_exitcode and rc != 0:
             exit(rc)
 
