@@ -6,10 +6,14 @@
 #   - join other nodes to the cluster
 ---
 
+# common tasks for all control plane nodes
+- hosts: lnxclp:lnxwrk
+  roles:
+    - lnxkubeadm-common
+
 # check if cluster-state of the lnxclp_setup
 - hosts: lnxclp_setup
   tasks:
-    - import_role: name=kubeadm-state
 
     - block: 
 
@@ -33,22 +37,12 @@
       
       when: k8s_configured == false
 
-# check cluster status for all lnxclp hosts
-- hosts: lnxclp
-  tasks:
-    - import_role: name=kubeadm-state
-
 # apply lnxclp-new role to unconfigured linux control plane nodes
 - hosts: lnxclp
   tasks:
     - include_role:
         name: lnxclp-new
       when: k8s_configured == false
-
-# check cluster status for all lnxwrk hosts
-- hosts: lnxwrk
-  tasks:
-    - import_role: name=kubeadm-state
 
 # apply lnxwrk-new role to unconfigured linux workers
 - hosts: lnxwrk

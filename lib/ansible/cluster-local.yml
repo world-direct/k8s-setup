@@ -19,6 +19,7 @@
     - set_fact:
         admin_conf: "{{local_path}}/admin.conf"
         script_path: "{{local_path}}/scripts"
+        log_path: "{{local_path}}/scripts/log"
       no_log: yes
 
     - name: "ensure directories exists"
@@ -28,6 +29,7 @@
       with_items:
         - "{{bin_path}}"
         - "{{script_path}}"
+        - "{{log_path}}"
 
     - name: "test if {{admin_conf}} exists"
       stat: path="{{local_path}}/admin.conf"
@@ -39,22 +41,21 @@
         src: localtemplates/install-tools
         dest: "{{script_path}}/install-tools"
         mode: 344
-      register: ddd
 
-    - name: "sync 'import-admin.conf'"
+    - name: "sync import-admin.conf"
       template:
         src: localtemplates/import-admin.conf
         dest: "{{script_path}}/import-admin.conf"
         mode: 344
 
-    - name: "sync 'use-context'"
+    - name: "sync use-context"
       template:
         src: localtemplates/use-context
         dest: "{{script_path}}/use-context"
         mode: 344
 
     - name: "run install-tools"
-      shell: "{{script_path}}/install-tools > {{script_path}}/install-tools.log"
+      shell: "{{script_path}}/install-tools > {{log_path}}/install-tools.log"
 
     - name: "run 'use-context' for setup and verification"
-      shell: "{{script_path}}/use-context > {{script_path}}/use-context.log"
+      shell: "{{script_path}}/use-context > {{log_path}}/use-context.log"

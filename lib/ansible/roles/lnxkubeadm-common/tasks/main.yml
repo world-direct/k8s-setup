@@ -1,0 +1,41 @@
+###########################################
+## This checks the cluster state
+##
+## It set the k8s_configured boolean fact
+##
+## If the node is joined to a different cluster than configured, and error
+## is returned, and printed to stderr
+
+- set_fact:
+    k8s_setup_dir: "~/k8s-setup"
+    k8s_setup_logdir: "~/k8s-setup/log"
+  no_log: yes
+
+- name: "ensure k8s-setup directories"
+  file:
+    path: "{{item}}"
+    state: directory
+  with_items:
+    - "{{ k8s_setup_dir }}"
+    - "{{ k8s_setup_logdir }}"
+
+- name: "sync ~/k8sstate script to test cluster state"
+  template:
+    src: k8sstate
+    dest: "{{ k8s_setup_dir }}/k8sstate"
+    mode: 755
+
+- name: "run {{ k8s_setup_dir }}/k8sstate to check configuration state"
+  command: "{{ k8s_setup_dir }}/k8sstate"
+  changed_when: false
+  register: k8sstate_cmd
+
+- set_fact:
+    k8s_configured: "{{ true if 'k8s_configured=yes' in k8sstate_cmd.stdout else false }}"
+
+- name: "ensure {{ k8s_setup_dir }}/resetk8s script to teardown configuration (for testing)"
+  template:
+    src: resetk8s
+    dest: "{{ k8s_setup_dir }}/resetk8s"
+    mode: 755
+    

@@ -1,17 +1,16 @@
 ###########################################
 ## This is the role which initializes the cluster on the lnxclp_setup node
 ##
-## It is dynamically included by hostplaybook.yml
+## It is dynamically included by cluster.yml playbook
 
-
-- name: "sync ~/initk8s script to setup cluster"
+- name: "sync {{ k8s_setup_dir }}/initk8s init script"
   template:
     src: initk8s
-    dest: ~/initk8s
+    dest: "{{ k8s_setup_dir }}/initk8s"
     mode: 755
 
-- name: "Initialize kubernetes cluster, you may cat ~/kubeadm.log in ssh to check progress"
-  shell: ~/initk8s >> ~/kubeadm.log
+- name: "Running init script (you may cat {{ k8s_setup_logdir }}/kubeadm.log to check progress"
+  shell: "{{ k8s_setup_dir }}/initk8s >> {{ k8s_setup_logdir }}/kubeadm.log"
 
 - name: fetch admin.conf to provisioning client for later import
   fetch:
