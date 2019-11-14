@@ -1,0 +1,29 @@
+###########################################
+## Firewall
+
+- name: Enable and start firewall service
+  service:
+    name: firewalld
+    enabled: yes
+    state: started
+
+- name: Read firewall-rules-wrk.yml
+  include_vars:
+    file: "firewall-rules-wrk.yml"
+    name: rulesfile
+
+- name: Apply firewall-rules-wrk.yml
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+    immediate: yes
+  with_items: "{{rulesfile.rules}}"
+
+- name: Apply custom firewall rules
+  firewalld:
+    port: "{{ item }}"
+    permanent: yes
+    state: enabled
+    immediate: yes
+  with_items: "{{lnxwrk_custom_firewall_rules}}"

@@ -32,20 +32,6 @@
     enabled: yes
     state: started
 
-- name: Evaluate firewall-rules-ROLE.yml
-  include_vars:
-    file: "firewall-rules-{{ 'wrk' if not 'lnxclp' in group_names else 'clp' }}.yml"
-    name: rulesfile
-
-# - debug: var=rulesfile
-
-- name: Configure firewalld
-  firewalld:
-    port: "{{ item }}"
-    permanent: yes
-    state: enabled
-    immediate: yes
-  with_items: "{{rulesfile.rules}}"
 
 ###########################################
 ## Install docker
