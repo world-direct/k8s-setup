@@ -9,9 +9,6 @@
         # https://github.com/ansible/ansible/blob/143bafec9a506aff8f42ca573c7006a8c5549e12/lib/ansible/vars/hostvars.py#L40
         local_path: "{{playbook_dir}}/../../.local"
 
-        # this is a writeable bin directory in path
-        # https://unix.stackexchange.com/questions/316765/which-distributions-have-home-local-bin-in-path
-        bin_path: "~/.local/bin"
       no_log: yes
 
       # this is a seperate step, because we reference {{localpath}}
@@ -27,7 +24,6 @@
         path: "{{item}}"
         state: directory
       with_items:
-        - "{{bin_path}}"
         - "{{script_path}}"
         - "{{log_path}}"
 

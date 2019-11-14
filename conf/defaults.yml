@@ -86,3 +86,14 @@ k8s_metallb_ip_end:
 # The current kubectl context
 client_helm_version: v3.0.0-rc.2
 client_kubectl_version: v1.16.2
+
+# This is the directory where kubectl and helm are stored
+# This should be in $PATH for provisioning to workok
+client_bin_dir: /usr/local/bin
+
+## Custom firewall rules
+#############################################################
+
+lnxclp_custom_firewall_rules: []
+lnxwrk_custom_firewall_rules: []
+winclp_custom_firewall_rules: []
