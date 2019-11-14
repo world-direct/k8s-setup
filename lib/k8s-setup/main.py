@@ -22,7 +22,7 @@ def cmd_checkout(args):
 
 def cmd_config(args):
     logger.debug ('cmd:config(file=%s)' % args.file)
-    context.setfile(args.file)
+    context.set_file(args.file)
 
 def cmd_provision(args):
     logger.debug ('cmd:provision(scope=%s, ansible_options=%s)' % (args.scope, args.ansible_options))
