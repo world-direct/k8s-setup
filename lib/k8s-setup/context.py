@@ -64,6 +64,10 @@ class Context(object):
             print("File '%s' not found. Exiting" % filepath)
             exit(1)
 
+         if os.path.islink(Context.pn_current_config):
+            logger.debug("'%s' exist. Removing" % (Context.pn_current_config))
+            os.remove(Context.pn_current_config)
+
         logger.debug("Creating symlink '%s' --> '%s'" % (Context.pn_current_config, filepath))
         os.symlink(filepath, Context.pn_current_config)
 

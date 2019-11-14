@@ -22,4 +22,4 @@
     mode: 755
 
 - name: "Running join script (you may cat {{ k8s_setup_logdir }}/kubeadm.log to check progress"
-  shell: {{ k8s_setup_dir }}/joink8s >> {{ k8s_setup_logdir }}/kubeadm.log
+  shell: "{{ k8s_setup_dir }}/joink8s >> {{ k8s_setup_logdir }}/kubeadm.log"
