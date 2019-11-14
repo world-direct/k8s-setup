@@ -55,6 +55,11 @@ class Context(object):
         logger.debug("Using mode '%s'" % self.mode)
 
     def set_file(self, filepath):
+
+        localpath=os.path.dirname(Context.pn_current_config)
+        if not os.path.isdir(localpath):
+            os.mkdir(localpath)
+
         if not os.path.isfile(filepath):
             print("File '%s' not found. Exiting" % filepath)
             exit(1)
