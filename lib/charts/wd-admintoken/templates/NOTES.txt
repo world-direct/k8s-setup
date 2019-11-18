@@ -1,0 +1,14 @@
+# About this chart
+
+A ServiceAccount with the cluster-admin role has been created:
+
+    namespace: {{ .Release.Namespace }}
+    name:      {{ .Values.account_name }}
+
+Retrieve the token by executing:
+
+  secret=$(kubectl -n {{ .Release.Namespace }} get secret | grep "{{ .Values.account_name }}" | awk '{print $1}')
+  token=$(kubectl -n {{ .Release.Namespace }} describe secret $secret | grep "token:" | awk '{print $2}')
+  echo $token
+
+

@@ -1,16 +1,13 @@
 # About this chart
 
-This was created by the {{ .Chart.AppVersion }} of the https://github.com/kubernetes/dashboard repository.
-
-Original Source: https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta5/aio/deploy/alternative.yaml
+This was created by the {{ .Chart.AppVersion }} of 
+https://github.com/kubernetes/dashboard/tree/v2.0.0-beta6/aio/deploy/recommended 
 
 Performed the following modifications:
-1. Splitted the files for better navigation (#2885459)
-2. Replaced 'namespace: kubernetes-dashboard' with 'namespace={{"{{"}} .Release.Namespace }}' (#272455d)
+* Removed '00-dashboard-namespace.yml', because namespaces are created externally
+* Replaced 'namespace: kubernetes-dashboard' with 'namespace={{"{{"}} .Release.Namespace }}'
 
-Because we will provide ssl termination (and OIDC) in the proxy on the ingress, 
-the dashboard service is configured unsecure. So we can use the "Alternative Setup"
 
-https://github.com/kubernetes/dashboard/blob/master/docs/user/installation.md#alternative-setup
+https://github.com/kubernetes/dashboard/blob/master/docs/user/installation.md
 
 
