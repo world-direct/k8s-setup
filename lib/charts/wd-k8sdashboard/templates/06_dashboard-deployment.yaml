@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# https://github.com/kubernetes/dashboard/blob/master/docs/common/dashboard-arguments.md
+
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -40,8 +42,8 @@ spec:
             - containerPort: 8443
               protocol: TCP
           args:
-            - --auto-generate-certificates
             - --namespace={{ .Release.Namespace }}
+            - --enable-skip-login=true
             # Uncomment the following line to manually specify Kubernetes API server Host
             # If not specified, Dashboard will attempt to auto discover the API server and connect
             # to it. Uncomment only if the default does not work.
