@@ -42,6 +42,8 @@
       wd_helm3:
         chart: "{{ charts_dir }}/wd-k8sdashboard"
         namespace: kube-dashboard
+        values:
+          cluster_display_name: "{{k8s_cluster_dnsname}}"
 
     - name: "k8s: kube-haproxy-ingress namespace"
       wd_k8snamespace:
