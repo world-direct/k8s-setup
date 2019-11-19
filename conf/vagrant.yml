@@ -29,7 +29,7 @@ host_primary_interface_name: eth1
 #############################################################
 
 # this is the VIP of the clp load balancer
-k8s_api_server_vip: 10.0.0.2
+k8s_apiserver_vip: 10.0.0.2
 
 # the base dnsname for the cluster  **)
 k8s_cluster_dnsname: k8stest.local

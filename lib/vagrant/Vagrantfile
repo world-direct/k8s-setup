@@ -1,26 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-
-## VM CONFIGURATION
-#
-# For the nodes to communicate, we use the following network configuration
-#   10.0.0.0/24
-#
-# We have the following dynamic ranges:
-#   10.0.0.10-19: Control Plane Nodes
-#   10.0.0.20-29: Linux Worker Nodes
-#   10.0.0.30-39: Windows Worker Nodes
-#   10.0.0.40-49: None-Cluster Nodes (like Test-Clients or AD Server)
-#
-# Special Addresses:
-#   
-#   Reserved for Gateway
-#   10.0.0.1
-#
-#   VIP (keepalived) for Control-Plane apiserver (k8s_apiserver_port=443)
-#   10.0.0.2 (K8S_API_SERVER_VIP)
-
 # Install vagrant plugins if required
 def ensure_plugin(name)
     unless Vagrant.has_plugin?(name)
@@ -36,7 +16,6 @@ ensure_plugin("vagrant-env")
 # Allows us to use host-resolution internaly, without DNS
 ensure_plugin("vagrant-hosts")
 
-
 Vagrant.configure(2) do |config|
 
     # enable the vagrant-env
@@ -48,7 +27,7 @@ Vagrant.configure(2) do |config|
     config.vm.provision :hosts do |p|
         # p.sync_hosts = true
         p.autoconfigure = true
-        p.add_host ENV['K8S_API_SERVER_VIP'], ["#{ENV['K8S_APISERVER_HOSTNAME']}.#{ENV['K8S_CLUSTER_DNSNAME']}"]
+        p.add_host ENV['K8S_APISERVER_VIP'], ["#{ENV['K8S_APISERVER_HOST']}}"]
     end
 
     #   10.0.0.10-19: Control Plane Nodes

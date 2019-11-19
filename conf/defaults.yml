@@ -59,7 +59,7 @@ k8s_pod_network_cidr: 10.244.0.0/16
 k8s_service_cidr: 10.96.0.0/16
 
 # this is the VIP of the clp load balancer
-k8s_api_server_vip: 
+k8s_apiserver_vip: 
 
 # the base dnsname for the cluster  **)
 k8s_cluster_dnsname: 

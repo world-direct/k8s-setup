@@ -89,15 +89,15 @@
     state: yes
     persistent: yes
 
-- name: Wait for VIP to become up (ping {{k8s_api_server_vip}})
-  shell: "ping {{k8s_api_server_vip}} -c 10"
+- name: Wait for VIP to become up (ping {{k8s_apiserver_vip}})
+  shell: "ping {{k8s_apiserver_vip}} -c 10"
   changed_when: false
   retries: 5
   delay: 1
 
-- name: Wait for VIP to accept connections on {{k8s_api_server_vip}}:{{k8s_apiserver_port}}
+- name: Wait for VIP to accept connections on {{k8s_apiserver_vip}}:{{k8s_apiserver_port}}
   wait_for:
-    host: "{{k8s_api_server_vip}}"
+    host: "{{k8s_apiserver_vip}}"
     port: "{{k8s_apiserver_port}}"
   retries: 5
   delay: 1

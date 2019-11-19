@@ -23,7 +23,7 @@ class Tool(object):
 
         return "."
 
-    def run(self, program, args):
+    def run(self, program, args, dont_check_exitcode = False):
         program = str(program)
         env = self.context.get_environment()
 
@@ -38,6 +38,9 @@ class Tool(object):
             env=env)
 
         logger.debug("EXIT rc=%d" % rc)
+        if not dont_check_exitcode and rc != 0:
+            exit(rc)
+
         return rc
 
     def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False, dont_check_exitcode = False):
@@ -66,9 +69,5 @@ class Tool(object):
 
         args.append(playbook_path)
 
-        rc = self.run("ansible-playbook", args)
-
-        if not dont_check_exitcode and rc != 0:
-            exit(rc)
-
+        rc = self.run("ansible-playbook", args, dont_check_exitcode)
         return rc

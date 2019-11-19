@@ -17,7 +17,7 @@ designed in a way, that Windows support is possible. It just need to be implemen
 1. Clone the repository
 2. Install python (>=2.7) and pip
 3. Install k8s-setup 
-3. Vagrant (tested against Vagrant 2.2.4)
+3. [Vagrant](https://www.vagrantup.com/intro/getting-started/install.html) (tested against Vagrant 2.2.4)
 4. VirtualBox (tested against VirtualBox 6.0.12)
 
 The steps 3. and 4. is only required, if you want to setup a local virtual cluster.
@@ -91,3 +91,38 @@ depending on the reflected Environmnet-Variables.
     * cluster: Provisions by kubeadm operations like `kubeadm init` or 
     `kubeadm join` to initialize the cluster, or add new nodes
     * incluster: Provisions all kubernetes objects in an existing cluster
+
+
+# Vagrant Development Environment
+
+## Networking
+
+k8s-setup uses a default ip plan to setup the cluster network:
+There is a configurable /24 network which is used for the Vagrant boxes.
+
+```yaml
+# conf/defaults.yml
+global_vagrant_hosts_network: 10.0.0.*
+```
+
+You only need to change this settings, if you have conflicting IP Adresses
+in your LAN.
+
+The following addresses are used:
+
+* 10.0.0.1: Reserver (Gateway)
+* 10.0.0.2: Virtual IP (keepalived) for apiserver
+* 10.0.0.10-19: Control Plane Nodes
+* 10.0.0.20-29: Linux Worker Nodes
+* 10.0.0.30-39: Windows Worker Nodes
+* 10.0.0.40-49: None-Cluster Nodes (like Test-Clients or AD Server)
+
+After the hosts are provisioned, you get a route by virtualbox, like:
+
+```bash
+$ ip route | grep 10.0.0.0
+10.0.0.0/24 dev vboxnet3 proto kernel scope link src 10.0.0.1 
+```
+
+So you can just access the Network from you host. You may add an entry in your
+/etc/hosts file, like `10.0.0.2 apiserver.k8stest.local`

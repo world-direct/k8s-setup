@@ -81,7 +81,7 @@ class Context(object):
                 env[key.upper()] = str(self.config[key])
 
         # provide the VAGRANT_APISERVER_IP and VAGRANT_APISERVER_HOSTNAME setting
-        env['K8S_APISERVER_IP'] = str(self.config['k8s_api_server_vip'])
-        env['K8S_APISERVER_HOST'] = str(self.config['k8s_cluster_dnsname'])
+        env['K8S_APISERVER_VIP'] = str(self.config['k8s_apiserver_vip'])
+        env['K8S_APISERVER_HOST'] = str(self.config['k8s_apiserver_hostname'] + "." + self.config['k8s_cluster_dnsname'])
 
         return env
