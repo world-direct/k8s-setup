@@ -27,6 +27,10 @@ class Tool(object):
         program = str(program)
         env = self.context.get_environment()
 
+        if program.startswith("ansible"):
+            if(os.path.exists(self.context.ansible_inventory_file)):
+                args.append("--inventory-file=%s" % self.context.ansible_inventory_file)
+
         args = [program] + args
 
         cwd = os.path.abspath(self.get_cwd(program))
@@ -46,8 +50,6 @@ class Tool(object):
     def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False, dont_check_exitcode = False):
 
         args = []
-        if(os.path.exists(self.context.ansible_inventory_file)):
-            args.append("--inventory-file=%s" % self.context.ansible_inventory_file)
         
         if(self.context.mode == "vagrant"):
             args.append("--ssh-extra-args='-o StrictHostKeyChecking=no'")

@@ -11,14 +11,6 @@ class Provision():
     def __init__(self, context):
         self.context = context
 
-        if(self.context.mode == "vagrant"):
-            # This is the path where the Vagrant Provisioner writes the inventory file
-            # The Tool checks if this file exists, before running vagrant
-            # So this also works when no file has been generated yet.
-            # It will be generated in the 'hosts' scope by executing the 
-            # 'vagrant.yml' playbook
-            self.context.ansible_inventory_file = "./lib/vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory"
-
     def hosts(self):
         logger.info("Provisioning scope 'hosts'")
 

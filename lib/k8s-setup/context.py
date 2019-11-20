@@ -52,7 +52,8 @@ class Context(object):
         # TODO: check if global_mode exists, and if it is 'vagrant' or 'production'
         self.mode = self.config['global_mode']
         self.ansible_inventory_file = self.config['ansible_inventory_file']
-        logger.debug("Using mode '%s'" % self.mode)
+        
+        logger.debug("Using mode '%s', inventory-file '%s'" % (self.mode, self.ansible_inventory_file))
 
     def set_file(self, filepath):
 
