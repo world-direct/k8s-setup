@@ -31,6 +31,9 @@ class Tool(object):
             if(os.path.exists(self.context.ansible_inventory_file)):
                 args.append("--inventory-file=%s" % self.context.ansible_inventory_file)
 
+            if(self.context.mode == "vagrant"):
+                args.append("--ssh-extra-args='-o StrictHostKeyChecking=no'")
+
         args = [program] + args
 
         cwd = os.path.abspath(self.get_cwd(program))
@@ -51,9 +54,6 @@ class Tool(object):
 
         args = []
         
-        if(self.context.mode == "vagrant"):
-            args.append("--ssh-extra-args='-o StrictHostKeyChecking=no'")
-
         for config_file in self.context.config_files:
             args.append("-e@%s" % config_file)
 
