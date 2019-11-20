@@ -45,14 +45,14 @@
         values:
           cluster_display_name: "{{k8s_cluster_dnsname}}"
 
-    - name: "k8s: kube-haproxy-ingress namespace"
-      wd_k8snamespace:
-        namespace: kube-haproxy-ingress
+    # - name: "k8s: kube-haproxy-ingress namespace"
+    #   wd_k8snamespace:
+    #     namespace: kube-haproxy-ingress
 
-    - name: "k8s: wd-haproxy-ingress"
-      wd_helm3:
-        chart: "{{ charts_dir }}/wd-haproxy-ingress"
-        namespace: kube-haproxy-ingress
+    # - name: "k8s: wd-haproxy-ingress"
+    #   wd_helm3:
+    #     chart: "{{ charts_dir }}/wd-haproxy-ingress"
+    #     namespace: kube-haproxy-ingress
 
 
 

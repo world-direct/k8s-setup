@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wd-nginx-test
+spec:
+  type: ClusterIP
+  selector:
+    app: wd-nginx-test
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
