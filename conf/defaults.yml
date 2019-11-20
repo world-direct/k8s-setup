@@ -26,12 +26,19 @@ ansible_inventory_file: /etc/ansible/hosts
 ## Version Options
 #############################################################
 
+# this is the target kubernetes version
+# Provisioning the cluster will bring the cluster to this version
+# Currently only install is implemented, but after implementing upgrade,
+# you can control upgrading as well with this option.
+k8s_version: 1.16.0
+
 # recommended version
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
 # see versions: https://download.docker.com/linux/centos/7/x86_64/stable/Packages/
 # https://docs.docker.com/engine/release-notes/
 lnx_docker_version: "18.06.3"
 win_docker_version: "19.03.3"
+
 
 ## Setup options
 #############################################################

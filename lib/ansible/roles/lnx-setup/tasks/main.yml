@@ -103,14 +103,14 @@
   yum:
     disable_excludes: kubernetes
     name:
-      - kubelet
-      - kubeadm
-      - kubectl
-  register: tmp_installed_kkk
+      - "kubelet-{{k8s_version}}-0"
+      - "kubeadm-{{k8s_version}}-0"
+      - "kubectl-{{k8s_version}}-0"
+  register: out_k8s_install
 
 - name: Pull required kubernetes images
-  command: kubeadm config images pull
-  when: tmp_installed_kkk.changed
+  command: kubeadm config images pull --kubernetes-version={{k8s_version}}
+  when: out_k8s_install.changed
 
 - name: Enable and start kubelet
   service:

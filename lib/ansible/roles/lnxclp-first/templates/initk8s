@@ -13,6 +13,7 @@ kubeadm init \
     --pod-network-cidr '{{k8s_pod_network_cidr}}' \
     --service-cidr '{{k8s_service_cidr}}' \
     --apiserver-advertise-address '{{ ansible_facts[host_primary_interface_name].ipv4.address }}' \
+    --kubernetes-version '{{k8s_version}}' \
     --apiserver-bind-port 6443 \
     --upload-certs
 
