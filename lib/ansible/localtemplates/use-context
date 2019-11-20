@@ -15,42 +15,57 @@ adminconf="{{local_path}}/admin.conf"
 context="admin@{{k8s_cluster_dnsname}}"
 server="https://{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}"
 
-# check context exists
-set +e
-kubectl config get-contexts $context > /dev/null 2>&1
-if [ $? -ne 0 ]; then
+sourcedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-    # no context setup has been done, let's import the admin.conf
-    echo importing admin.conf into kubectl context "$context"
+register() {
+    # check context exists
+    set +e
+    kubectl config get-contexts $context > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
 
-    set -e
-    sourcedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"    
-    $sourcedir/import-admin.conf $cluster $adminconf
+        # no context setup has been done, let's import the admin.conf
+        echo importing admin.conf into kubectl context "$context"
 
-fi
+        set -e
+        $sourcedir/import-admin.conf $cluster $adminconf
 
-# check kubectl current-context
-set +e
-use=0
-kubectl config current-context > /dev/null 2>&1
-if [ $? -ne 0 ]; then
-    use=1
-else
-    cur_context=$(kubectl config current-context)
-    if [ "$cur_context" != "$context" ]; then
-        use=1
     fi
-fi
 
-if [ $use -eq 1 ]; then
-    kubectl config use-context $context
-fi
+    # check kubectl current-context
+    set +e
+    use=0
 
+    # first, test only return-code
+    kubectl config current-context > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        use=1
+    else
+
+        # then test result
+        cur_context=$(kubectl config current-context)
+        if [ "$cur_context" != "$context" ]; then
+            use=1
+        fi
+    fi
+
+    if [ $use -eq 1 ]; then
+        kubectl config use-context $context
+    fi
+}
+
+register
 
 # check connection
-test=$(kubectl get nodes)
+test=$(kubectl get nodes > /dev/null 2>&1)
 if [ $? -ne 0 ]; then
-    exit 1
+    echo "Failed to retrieve nodes, try to re-register the context"
+    $sourcedir/import-admin.conf $cluster $adminconf
+
+    test=$(kubectl get nodes > /dev/null 2>&1)
+    if [ $? -ne 0 ]; then
+        echo "Failed to retrieve nodes, exiting"
+        exit 1
+    fi
 fi
 
 # extract the server from the cluster-info configmap
