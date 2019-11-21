@@ -15,7 +15,7 @@
     log_path: "{{local_path}}/scripts/log"
   no_log: yes
 
-- name: Creating backend.json file from configuration
+- name: sync backend.json file from 'trident_backend_config' setting
   copy:
     content: "{{ trident_backend_config }}"
     dest: "{{local_path}}/trident.json"
