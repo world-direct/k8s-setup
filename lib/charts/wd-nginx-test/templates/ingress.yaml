@@ -4,7 +4,7 @@ metadata:
   name: wd-nginx-test
 spec:
   rules:
-  - host: wd-nginx-test.k8stest.local
+  - host: wd-nginx-test.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
     http:
       paths:
       - path: /
