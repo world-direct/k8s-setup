@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: kubernetes-dashboard
+  namespace: {{ .Release.Namespace }}
+spec:
+  rules:
+  - host: k8sdashboard.k8stest.local
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: kubernetes-dashboard
+          servicePort: 80
+
+# Manual setup works
+# 
+# https://docs.traefik.io/v1.7/user-guide/kubernetes/
+# https://github.com/containous/traefik/blob/v1.7.19/examples/k8s/traefik-rbac.yaml
+# https://github.com/containous/traefik/blob/v1.7/examples/k8s/traefik-ds.yaml
+
