@@ -20,6 +20,7 @@
     - name: "k8s: chart wd-flannel"
       wd_helm3:
         chart: "{{ charts_dir }}/wd-flannel"
+        atomic: yes
         namespace: kube-flannel
 
     - name: "k8s: kube-metallb namespace"
@@ -30,6 +31,7 @@
       wd_helm3:
         chart: "{{ charts_dir }}/wd-metallb"
         namespace: kube-metallb
+        atomic: yes
         values:
           ip_range_start: "{{k8s_metallb_ip_start}}"
           ip_range_end: "{{k8s_metallb_ip_end}}"
@@ -42,6 +44,7 @@
       wd_helm3:
         chart: "{{ charts_dir }}/wd-k8sdashboard"
         namespace: kube-dashboard
+        atomic: yes
         values:
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
 
@@ -53,6 +56,7 @@
       wd_helm3:
         chart: "{{ charts_dir }}/wd-traefik-ingress"
         namespace: kube-traefik-ingress
+        atomic: yes
 
     - name: "k8s: wd-nginx-test"
       wd_helm3:
@@ -65,4 +69,105 @@
       include_tasks: tasks/tridentinstall.yml
       when: trident_version != ""
 
+    - name: "k8s: kube-harbor namespace"
+      wd_k8snamespace:
+        namespace: kube-harbor
 
+    - name: "k8s: install harbor chart"
+      wd_helm3:
+        chart: "{{ charts_dir }}/harbor"
+        namespace: kube-harbor
+        atomic: no
+        keepvaluesfile: yes
+        values:
+
+          # check https://github.com/goharbor/harbor-helm#configuration
+          # for options reference
+
+          # Expose
+          expose:
+            type: ingress
+            ingress:
+              hosts:
+                core: "harbor.{{k8s_cluster_dnsname}}"
+                notary: "notary.{{k8s_cluster_dnsname}}"
+            tls:
+              enabled: false   # we will enable ssl later on
+
+          # Persistence
+          persistence:
+            enabled: "{{harbor.enable_persistence}}"
+            resourcePolicy: keep    # keep the persistent volumnes on uninstall
+            persistentVolumeClaim:
+              registry:
+                size: 10Gi # use 10Gi for registry store
+
+          # General
+          externalURL: "harbor.{{k8s_cluster_dnsname}}"
+          harborAdminPassword: "{{harbor.admin_password}}"
+          secretkey: "{{harbor.secret_key}}"
+
+          # Portal
+          portal:
+            image:
+              tag: "v{{harbor.version}}"
+
+          # Core
+          core:
+            image:
+              tag: "v{{harbor.version}}"
+
+          # Jobservice
+          jobservice:
+            image:
+              tag: "v{{harbor.version}}"
+
+          # Registry
+          registry:
+            registry:
+              image:
+                # according to https://hub.docker.com/r/goharbor/registry-photon/tags
+                # the tags are postfixed with -dev
+                tag: "v{{harbor.version}}-dev"
+            controller:
+              image:
+                tag: "v{{harbor.version}}"
+
+          # Chartmuseum
+          chartmuseum:
+            enabled: false
+            image:
+              tag: "v{{harbor.version}}"
+
+          # Clair
+          clair:
+            enabled: false
+            adapter:
+              image:
+                tag: "v{{harbor.version}}"
+
+          # Notary
+          notary:
+            enabled: false
+            signer:
+              image:
+                tag: "v{{harbor.version}}"
+            server:
+              image:
+                tag: "v{{harbor.version}}"
+
+          # Database
+          database:
+            type: internal
+            internal:
+              image:
+                tag: "v{{harbor.version}}"
+
+          # Redis
+          redis:
+            type: internal
+            internal:
+              image:
+                tag: "v{{harbor.version}}"
+
+      when: harbor.enabled

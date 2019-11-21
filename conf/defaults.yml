@@ -7,7 +7,7 @@ global_vagrant_lnxclp_mem: 2048
 global_vagrant_lnxclp_cpu: 2
 
 global_vagrant_lnxwrk_count: 1
-global_vagrant_lnxwrk_mem: 1024
+global_vagrant_lnxwrk_mem: 2048
 global_vagrant_lnxwrk_cpu: 1
 
 global_vagrant_winwrk_count: 0

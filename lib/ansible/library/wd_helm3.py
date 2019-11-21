@@ -110,18 +110,21 @@ class HelmBase:
 
         return obj;
 
-    def install(self, name, chart, namespace, values=None):
-        args = ["--namespace", namespace, "install", name, chart.source, "--atomic"]
+    def install(self, name, chart, namespace, keepvaluesfile, atomic, values=None):
+        args = ["--namespace", namespace, "install", name, chart.source]
+
+        if atomic:
+            args.append("--atomic")
 
         if values:
             # args.append("-f <(echo '%s')" % values)
             # this works in bash, but not in ansible, so let's make a tmp file
+            valfile = tempfile.NamedTemporaryFile("w+a", delete=(not keepvaluesfile))
+            valfile.writelines(values)
+            valfile.flush()
 
-            tmpfile = tempfile.NamedTemporaryFile("w+a")
-            tmpfile.writelines(values)
-            tmpfile.flush()
             args.append("-f")
-            args.append(tmpfile.name)
+            args.append(valfile.name)
 
         res = self.__helm(args)
         self.__log(res)
@@ -194,7 +197,7 @@ def apply_state(module):
 
         if not release:
             log("INSTALL CHART")
-            helm.install(releasename, chart, module.namespace, module.values)
+            helm.install(releasename, chart, module.namespace, module.keepvaluesfile, module.atomic, module.values)
 
             return True # no release for this chart
         
@@ -226,6 +229,8 @@ def main():
         "name": {"required": False, "type": "str" },
         "namespace": {"required": False, "type": "str"},
         "kubeconfig": {"required": False, "type": "str"},
+        "atomic": {"default": False, "type": "bool"},
+        "keepvaluesfile": {"default": False, "type": "bool"},
         "values": {
             "required": False,
             "type": "json"
@@ -246,6 +251,8 @@ def main():
     module.name = module.params['name']
     module.state = module.params['state']
     module.values = module.params['values']
+    module.keepvaluesfile = module.params['keepvaluesfile']
+    module.atomic = module.params['atomic']
 
     try:
         has_changed = apply_state(module)
