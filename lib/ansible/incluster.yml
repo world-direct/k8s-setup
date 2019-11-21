@@ -61,4 +61,8 @@
         values:
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
 
+    - name: Include trident tasks, if trident_version is set
+      include_tasks: tasks/tridentinstall.yml
+      when: trident_version != ""
+
 

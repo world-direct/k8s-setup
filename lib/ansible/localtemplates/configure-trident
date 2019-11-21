@@ -1,0 +1,31 @@
+#!/bin/bash
+
+set -eu
+
+namespace=kube-trident
+backendjson_path={{local_path}}/trident.json
+
+# currently we support only initial install
+# so after the first 'trident install' the script do no further provisioning
+# This is expected so far.
+# Later we will improve this in comparing "server" with "client" version
+
+
+# run tridentctl version to check if trident is already configured
+set +e
+tridentctl -n $namespace version > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo "trident has already been installed into namespace $namespace"
+    exit 255
+fi
+
+set -e
+
+# run trident install
+echo "Installing tridentctl into namespace $namespace"
+tridentctl -n $namespace install
+
+tridentctl -n $namespace create backend -f $backendjson_path
+
+# create the basic storage-class
+kubectl apply -f {{local_path}}/trident-standard-storageclass.yaml

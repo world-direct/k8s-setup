@@ -45,10 +45,17 @@ k8s_metallb_ip_end: 10.0.0.99
 ## Provisioning Client configuration
 #############################################################
 
-# This is the directory where kubectl and helm are stored
+# This is the directory where kubectl, helm and tridentctl are stored
 # We don't use /usr/local/bin, because this is not writeable without root,
 # and we don't run rooted in localhost
 # So we use ~/.local/bin
 # https://unix.stackexchange.com/questions/316765/which-distributions-have-home-local-bin-in-path
 # If the provisioning can't find kubectl or helm3, check config and $PATH
 client_bin_dir: ~/.local/bin
+
+## Trident information
+#############################################################
+
+# this specifes the version of trident to be installed.
+# If this is left blank, trident will not be installed.
+trident_version: ""

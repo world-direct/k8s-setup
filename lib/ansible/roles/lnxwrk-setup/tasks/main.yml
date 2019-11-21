@@ -27,3 +27,7 @@
     state: enabled
     immediate: yes
   with_items: "{{lnxwrk_custom_firewall_rules}}"
+
+- name: Include trident tasks, if trident_version is set
+  include_tasks: trident.yml
+  when: trident_version != ""

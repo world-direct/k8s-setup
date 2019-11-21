@@ -1,0 +1,35 @@
+- set_fact:
+
+    # this file has been fetched from the lnx_setup host, by the lnxclp-new role
+    # playbook_dir is undocumented, but check the source:
+    # https://github.com/ansible/ansible/blob/143bafec9a506aff8f42ca573c7006a8c5549e12/lib/ansible/vars/hostvars.py#L40
+    local_path: "{{playbook_dir}}/../../.local"
+
+  no_log: yes
+
+  # this is a seperate step, because we reference {{localpath}}
+  # set_fact module adds the facts at the end, so it can't reference its own vars
+- set_fact:
+    admin_conf: "{{local_path}}/admin.conf"
+    script_path: "{{local_path}}/scripts"
+    log_path: "{{local_path}}/scripts/log"
+  no_log: yes
+
+- name: Creating backend.json file from configuration
+  copy:
+    content: "{{ trident_backend_config }}"
+    dest: "{{local_path}}/trident.json"
+
+- name: "sync configure-trident script"
+  template:
+    src: localtemplates/configure-trident
+    dest: "{{script_path}}/configure-trident"
+    mode: 344
+
+- name: "sync trident-standard-storageclass.yaml"
+  template:
+    src: localtemplates/trident-standard-storageclass.yaml
+    dest: "{{local_path}}/trident-standard-storageclass.yaml"
+
+- name: "run configure-trident"
+  shell: "{{script_path}}/configure-trident > {{log_path}}/configure-trident.log"

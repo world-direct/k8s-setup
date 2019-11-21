@@ -75,3 +75,46 @@ if [ "$desired_version" != "$installed_version" ]; then
 fi
 
 echo "helm3 $desired_version available at $toolpath "
+
+########################
+## Install tridentctl
+toolpath=$binpath/tridentctl
+desired_version={{trident_version}}
+if [ "$desired_version" != "" ]; then
+    installed_version=
+    if [ -f $toolpath ]; then
+
+        rawversion=$($toolpath version --client -o yaml)
+        installed_version=
+        
+        if [[ "$rawversion" =~ 'version: '(.+)$ ]]; then 
+            installed_version=${BASH_REMATCH[1]}; 
+        else
+            echo "$toolpath version unexpected output"
+            exit 1
+        fi
+    fi
+
+    if [ "$desired_version" != "$installed_version" ]; then
+        url=https://github.com/NetApp/trident/releases/download/v$desired_version/trident-installer-$desired_version.tar.gz
+        echo "Downloading release from $url to /tmp/trident-installer.tar.gz"
+        curl -L $url > /tmp/trident-installer.tar.gz
+
+        echo "Extract to {{local_path}}/trident-installer"
+        tar -xvf /tmp/trident-installer.tar.gz -C {{local_path}}
+
+        if [ ! -e "{{local_path}}/trident-installer/tridentctl" ]; then
+            echo "cannot find {{local_path}}/trident-installer/tridentctl. Exit"
+            exit 1
+        fi
+
+        if [ -e "$toolpath" ]; then rm $toolpath; fi
+
+        echo "symlinking {{local_path}}/trident-installer/tridentctl to $toolpath"
+        ln -s -T {{local_path}}/trident-installer/tridentctl $toolpath
+    fi
+
+    echo "tridentctl $desired_version available at $toolpath "
+
+fi
+
