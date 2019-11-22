@@ -33,8 +33,8 @@
         namespace: kube-metallb
         atomic: yes
         values:
-          ip_range_start: "{{k8s_metallb_ip_start}}"
-          ip_range_end: "{{k8s_metallb_ip_end}}"
+          default_ip_range: "{{k8s_loadbalancers_default_ip_range}}"
+          ingress_ip: "{{k8s_loadbalancers_ingress_ip}}"
 
     - name: "k8s: kube-dashboard namespace"
       wd_k8snamespace:

@@ -5,7 +5,13 @@ metadata:
 data:
   config: |
     address-pools:
+
+    - name: ingress
+      protocol: layer2
+      addresses:
+        - {{ required "ingress_ip value is required!" .Values.ingress_ip }}-{{ .Values.ingress_ip }}
+
     - name: default
       protocol: layer2
       addresses:
-        - {{ .Values.ip_range_start }}-{{ .Values.ip_range_end }}
+        - {{ required "default_ip_range value is required!" .Values.default_ip_range }}
