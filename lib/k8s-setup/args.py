@@ -43,6 +43,7 @@ def parse_args():
         config      Performs configuration commands
         provision   Performs the provisioning
         tool        Allows executing the underlying tools for diagnostics
+        generate    Generators (for /etc/hosts)
     ''')
 
             parser.add_argument('command', help='Subcommand to run')
@@ -154,6 +155,28 @@ def parse_args():
             res.name = args.name[0]
             res.show_only = args.show_only
             res.toolargs = args.toolargs
+            return res
+
+        def generate(self):
+            parser = argparse.ArgumentParser(prog='k8s-setup generate',
+                description='Generates artifactes')
+
+            self.add_global_args(parser)
+
+            parser.add_argument('type', 
+                help="the type of the artifact",
+                choices=['hostsfile'],
+                nargs='?')
+            parser.add_argument('--merge',
+                help="Merges the existing /etc/hosts",
+                action='store_true'
+            )
+
+            args = parser.parse_args(sys.argv[2:])
+
+            res = Args('generate', args.debug)
+            res.type = args.type
+            res.merge = args.merge
             return res
 
     parser = ArgsParser()

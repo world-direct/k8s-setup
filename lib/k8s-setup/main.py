@@ -7,6 +7,7 @@ from args import parse_args
 from tool import Tool
 from context import Context
 from provision import Provision
+from generator import Generator
 
 def cmd_info(args):
     logger.debug('cmd:info()')
@@ -35,6 +36,15 @@ def cmd_tool(args):
     logger.debug ('cmd:tool(name=%s, show_only=%d, toolargs=%s)' % (args.name, args.show_only, args.toolargs))
     tool = Tool(context)
     rc = tool.run(args.name, args.toolargs)
+    exit(rc)
+
+def cmd_generate(args):
+    logger.debug ('cmd:generate(type=%s, merge=%d)' % (args.type, args.merge))
+    generator = Generator(context)
+
+    if args.type == "hostsfile":
+        rc = generator.hostsfile(args.merge)
+
     exit(rc)
 
 res=parse_args()

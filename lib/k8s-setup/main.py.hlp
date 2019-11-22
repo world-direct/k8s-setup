@@ -6,6 +6,7 @@ Commands:
     config      Performs configuration commands
     provision   Performs the provisioning
     tool        Allows executing the underlying tools for diagnostics
+    generate    Generators (for /etc/hosts)
 
 Basic Commands:
     info        Shows the current version and configuration info
@@ -42,6 +43,10 @@ Provisioning:
     you can always use provision all. The distinct once are just a time-saver,
     when you know what has changed. If you fetch a new version, allways use this
     mode.
+
+Generators:
+    generate hostsfile          Returns the lines of the /etc/hosts file, for ingresses
+    generate hostsfile --merge  Returns the current /etc/hosts file, and ingresses
 
 Tool:
     tool ansible <cmd>           Executes an ansible command
