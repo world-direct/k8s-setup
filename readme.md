@@ -32,10 +32,26 @@ See `k8s-setup checkout --help`.
 
 ## Provide the configuration
 
-For local vm deployments, the default 'vagrant.yml' file should work.
-You don't need to do anything, if you just want a vm cluster with a single control plane and worker node.
+### Local Deployment
 
-For production deployments, you need to 
+For local vm deployments, the default 'vagrant.yml' file should work.
+You don't need provide a custom configuration, if you just want a vm cluster with a single control plane and worker node.
+
+To access the cluster from your machine, you should have an host record for the
+apiserver. The IP is configured by the `k8s_apiserver_vip` configuration setting.
+The hostname is constructed by the `k8s_apiserver_hostname` and `k8s_cluster_dnsname` settings.
+
+To generate the correct /etc/hosts file, you can run `./k8s-setup generate hostsfile --merge`.
+The --merge flag instructs the generator to merge the current /etc/hosts file with
+the generated records.
+
+NOTE: Because write-access to /etc/hosts needs root permissions, you can't just
+simply redirect the output to /etc/hosts. I used a tempoary file, with a move
+operation: `./k8s-setup generate hostsfile --merge > /tmp/hosts && sudo mv /tmp/hosts /etc/hosts`
+
+### Production Deployment
+
+For production deployments, you need to:
 
 1. Create an ansible inventory file, with the machines in it.
 You need to assign the host to these groups:
