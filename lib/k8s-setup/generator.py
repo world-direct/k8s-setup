@@ -5,8 +5,6 @@ import os
 
 from context import Context
 
-from kubernetes import config, client
-
 logger = logging.getLogger(__name__)
 
 class Generator(object):
@@ -15,6 +13,8 @@ class Generator(object):
         self.context = context
 
     def hostsfile(self, merge):
+        from kubernetes import config, client
+        
         config.load_kube_config()
 
         # rule tuple: (ip, host, comment)
