@@ -6,4 +6,4 @@ metadata:
     storageclass.kubernetes.io/is-default-class: "true"
 provisioner: csi.trident.netapp.io
 parameters:
-  backendType: "{{ trident_backend_config.storageDriverName }}"
+  backendType: "{{ trident.backend_config.storageDriverName }}"
