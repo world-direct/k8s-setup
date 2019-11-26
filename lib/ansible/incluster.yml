@@ -103,7 +103,7 @@
                 size: 10Gi # use 10Gi for registry store
 
           # General
-          externalURL: "harbor.{{k8s_cluster_dnsname}}"
+          externalURL: "http://harbor.{{k8s_cluster_dnsname}}"
           harborAdminPassword: "{{harbor.admin_password}}"
           secretkey: "{{harbor.secret_key}}"
 
