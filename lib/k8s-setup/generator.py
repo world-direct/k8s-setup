@@ -2,7 +2,6 @@
 
 import logging
 import os
-import requests
 
 from context import Context
 
@@ -15,6 +14,7 @@ class Generator(object):
 
     def hostsfile(self, merge):
         from kubernetes import config, client
+        import requests
 
         # SSL Verification:
         # Because we use self-signed certs (at least for Vagrant-Mode), we
