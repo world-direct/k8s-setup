@@ -48,6 +48,8 @@ the generated records.
 NOTE: Because write-access to /etc/hosts needs root permissions, you can't just
 simply redirect the output to /etc/hosts. I used a temporary file, with a move
 operation: `./k8s-setup generate hostsfile --merge > /tmp/hosts && sudo mv /tmp/hosts /etc/hosts`
+First you should run the generator before running the provisioner, because it needs
+a 'apiserver' host. After provisioning is done, run it again, so that the ingress hosts are included.
 
 ### Production Deployment
 
