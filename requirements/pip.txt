@@ -2,3 +2,4 @@ ansible >= 2.8.6
 argcomplete >= 1.10.0
 argparse >= 1.4.0
 kubernetes >= 10.0
+colorlog
