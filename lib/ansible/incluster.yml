@@ -13,6 +13,16 @@
     - name: "run 'use-context' for verification"
       shell: "{{playbook_dir}}/../../.local/scripts/use-context"
 
+    - name: Install kubectl completion
+      lineinfile:
+        path: ~/.bashrc
+        line: source <(kubectl completion bash)
+
+    - name: Install helm completion
+      lineinfile:
+        path: ~/.bashrc
+        line: source <(helm3 completion bash)
+
     - name: "k8s: kube-flannel namespace"
       wd_k8snamespace:
         namespace: kube-flannel
