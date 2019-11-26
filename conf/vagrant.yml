@@ -59,16 +59,11 @@ client_bin_dir: ~/.local/bin
 
 ## Trident information
 #############################################################
-
-# this specifes the version of trident to be installed.
-# If this is left blank, trident will not be installed.
-trident_version: ""
+trident:
+  enabled: no
 
 ## Harbor information
 #############################################################
-
-# this specifes the version of harbor to be installed
-# If this is left blank, harbor will not be installed.
 harbor:
   enabled: no
   version: 1.9.3

@@ -102,6 +102,22 @@ client_kubectl_version: v1.16.2
 # This should be in $PATH for provisioning to workok
 client_bin_dir: /usr/local/bin
 
+## Trident information
+#############################################################
+trident:
+  enabled: no
+  version: 19.10.0
+
+  # this is the configuration file that is used for tridentctl:
+  # https://netapp-trident.readthedocs.io/en/stable-v19.10/kubernetes/operations/tasks/backends/index.html
+  backend_config:
+
+## Harbor information
+#############################################################
+harbor:
+  enabled: no
+  version: 1.9.3
+
 ## Custom firewall rules
 #############################################################
 

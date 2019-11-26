@@ -79,7 +79,7 @@ echo "helm3 $desired_version available at $toolpath "
 ########################
 ## Install tridentctl
 toolpath=$binpath/tridentctl
-desired_version={{trident_version}}
+desired_version={{trident.version}}
 if [ "$desired_version" != "" ]; then
     installed_version=
     if [ -f $toolpath ]; then
