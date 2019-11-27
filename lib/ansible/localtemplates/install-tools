@@ -3,8 +3,7 @@ set -e
 
 binpath={{client_bin_dir}}
 arch=linux-amd64
-
-desired_helm_version={{client_helm_version}}
+changed=0
 
 # this is needed for the tools to work (even to return the version)
 export KUBECONFIG={{admin_conf}}
@@ -27,6 +26,7 @@ install_tool() {
 
     cp "/tmp/$tarpath" $toolpath
     chmod +x $toolpath
+    changed=1
 }
 
 ########################
@@ -71,11 +71,12 @@ if [ -f $toolpath ]; then
 fi
 
 if [ "$desired_version" != "$installed_version" ]; then
-    install_tool $toolpath "https://get.helm.sh/helm-$desired_helm_version-linux-amd64.tar.gz" $arch/helm
+    install_tool $toolpath "https://get.helm.sh/helm-$desired_version-linux-amd64.tar.gz" $arch/helm
 fi
 
 echo "helm3 $desired_version available at $toolpath "
 
+{% if trident.enabled %}
 ########################
 ## Install tridentctl
 toolpath=$binpath/tridentctl
@@ -112,9 +113,12 @@ if [ "$desired_version" != "" ]; then
 
         echo "symlinking {{local_path}}/trident-installer/tridentctl to $toolpath"
         ln -s -T {{local_path}}/trident-installer/tridentctl $toolpath
+        changed=1
     fi
 
     echo "tridentctl $desired_version available at $toolpath "
 
 fi
+{% endif %}
 
+exit $(( $changed == "1" ? 0 : 255))

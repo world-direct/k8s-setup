@@ -52,6 +52,12 @@
 
     - name: "run install-tools"
       shell: "{{script_path}}/install-tools > {{log_path}}/install-tools.log"
+      register: cmd
+      failed_when: cmd.rc > 0 and cmd.rc < 255
+      changed_when: cmd.rc == 0
 
     - name: "run 'use-context' for setup and verification"
       shell: "{{script_path}}/use-context > {{log_path}}/use-context.log"
+      register: cmd
+      failed_when: cmd.rc > 0 and cmd.rc < 255
+      changed_when: cmd.rc == 0

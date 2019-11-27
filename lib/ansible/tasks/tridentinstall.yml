@@ -33,6 +33,6 @@
 
 - name: "run configure-trident"
   shell: "{{script_path}}/configure-trident > {{log_path}}/configure-trident.log"
-  register: cfg_cmd
-  failed_when: cfg_cmd.rc > 0 and cfg_cmd.rc < 255
-  changed_when: cfg_cmd.rc == 0
+  register: cmd
+  failed_when: cmd.rc > 0 and cmd.rc < 255
+  changed_when: cmd.rc == 0

@@ -17,6 +17,8 @@ server="https://{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserv
 
 sourcedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
+changed=0
+
 register() {
     # check context exists
     set +e
@@ -28,6 +30,7 @@ register() {
 
         set -e
         $sourcedir/import-admin.conf $cluster $adminconf
+        changed=1
 
     fi
 
@@ -50,6 +53,7 @@ register() {
 
     if [ $use -eq 1 ]; then
         kubectl config use-context $context
+        changed=1
     fi
 }
 
@@ -78,5 +82,5 @@ if [ $cur_server != $server ]; then
     exit 1
 else
     echo "kubectl context validated against $server"
-    exit 0
+    exit $(( $changed == "1" ? 0 : 255))
 fi
