@@ -1,18 +1,18 @@
 ###########################################
 ## Firewall
 
-- name: Enable and start firewall service
+- name: system - firewall service enabled and started
   service:
     name: firewalld
     enabled: yes
     state: started
 
-- name: Read firewall-rules-wrk.yml
+- name: system - read firewall-rules-wrk.yml
   include_vars:
     file: "firewall-rules-wrk.yml"
     name: rulesfile
 
-- name: Apply firewall-rules-wrk.yml
+- name: system - apply firewall-rules-wrk.yml
   firewalld:
     port: "{{ item }}"
     permanent: yes
@@ -20,7 +20,7 @@
     immediate: yes
   with_items: "{{rulesfile.rules}}"
 
-- name: Apply custom firewall rules
+- name: system - apply custom firewall rules (lnxwrk_custom_firewall_rules)
   firewalld:
     port: "{{ item }}"
     permanent: yes
@@ -28,6 +28,6 @@
     immediate: yes
   with_items: "{{lnxwrk_custom_firewall_rules}}"
 
-- name: Include trident tasks, if trident is enabled
+- name: trident - install if trident.enabled
   include_tasks: trident.yml
   when: trident.enabled

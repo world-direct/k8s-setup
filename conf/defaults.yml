@@ -123,4 +123,4 @@ harbor:
 
 lnxclp_custom_firewall_rules: []
 lnxwrk_custom_firewall_rules: []
-winclp_custom_firewall_rules: []
+winwrk_custom_firewall_rules: []

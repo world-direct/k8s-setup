@@ -2,100 +2,100 @@
 ## This is the role inits the VIP needed for the APISERVER
 ##
 ## It is dynamically included by hostplaybook.yml
-- name: Install keepalived package
+- name: apiserver-vip - yum keepalived package
   yum:
     name: keepalived, ipvsadm, haproxy
 
-- name: keepalived sysctl
+- name: apiserver-vip - keepalived sysctl net.ipv4.ip_nonlocal_bind=1
   sysctl:
     name: net.ipv4.ip_nonlocal_bind
     value: '1'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
-- name: keepalived sysctl
+- name: apiserver-vip - keepalived sysctl net.ipv4.conf.all.arp_ignore=3
   sysctl:
     name: net.ipv4.conf.all.arp_ignore
     value: '3'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
-- name: keepalived sysctl
+- name: apiserver-vip - keepalived sysctl net.ipv4.conf.all.arp_announce=2
   sysctl:
     name: net.ipv4.conf.all.arp_announce
     value: '2'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
-- name: keepalived sysctl
+- name: apiserver-vip - keepalived sysctl net.ipv4.ip_forward=1
   sysctl:
     name: net.ipv4.ip_forward
     value: '1'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
-- name: touch /etc/sysconfig/ipvsadm 
+- name: apiserver-vip - touch /etc/sysconfig/ipvsadm 
   file:
     path: /etc/sysconfig/ipvsadm 
     state: touch
   changed_when: false
 
-- name: Set fw rich rule
+- name: apiserver-vip - fw rich rule to accept "vrrp"
   firewalld:
     rich_rule: rule protocol value="vrrp" accept
     permanent: yes
     immediate: yes
     state: enabled
 
-- name: Enable and start ipvsadm
+- name: apiserver-vip - ipvsadm enabled and started
   service:
     name: ipvsadm
     enabled: yes
     state: started
 
-- name: "sync /etc/keepalived/keepalived.conf"
+- name: apiserver-vip - generate /etc/keepalived/keepalived.conf configuration
   template:
     src: keepalived.conf
     dest: /etc/keepalived/keepalived.conf
   register: keepalived_conf
 
-- name: Enable and start keepalived
+- name: apiserver-vip - keepalived enabled and started
   service:
     name: keepalived
     enabled: yes
     state: "{{ 'restarted' if keepalived_conf.changed else 'started' }}"
 
-- name: Set selinux keepalived_connect_any flag on and keep it persistent across reboots
+- name: apiserver-vip - selinux keepalived_connect_any flag active and persistent
   seboolean:
     name: keepalived_connect_any
     state: yes
     persistent: yes
 
-- name: "sync /etc/haproxy/haproxy.cfg"
+- name: apiserver-vip - generate /etc/haproxy/haproxy.cfg configuration
   template:
     src: haproxy.cfg
     dest: /etc/haproxy/haproxy.cfg
   register: haproxy_conf
 
-- name: Enable and start haproxy
+- name: apiserver-vip - haproxy enabled and started
   service:
     name: haproxy
     enabled: yes
     state: "{{ 'restarted' if haproxy_conf.changed else 'started' }}"
 
-- name: Set selinux haproxy_connect_any flag on and keep it persistent across reboots
+- name: apiserver-vip - selinux haproxy_connect_any flag active and persistent
   seboolean:
     name: haproxy_connect_any
     state: yes
     persistent: yes
 
-- name: Wait for VIP to become up (ping {{k8s_apiserver_vip}})
+- name: apiserver-vip - IP is up (ping {{k8s_apiserver_vip}} -c 10)
   shell: "ping {{k8s_apiserver_vip}} -c 10"
   changed_when: false
   retries: 5
   delay: 1
 
-- name: Wait for VIP to accept connections on {{k8s_apiserver_vip}}:{{k8s_apiserver_port}}
+- name: apiserver-vip - {{k8s_apiserver_vip}}:{{k8s_apiserver_port}} accepts connections
   wait_for:
     host: "{{k8s_apiserver_vip}}"
     port: "{{k8s_apiserver_port}}"

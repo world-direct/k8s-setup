@@ -1,7 +1,7 @@
-- name: restart ntpd
+- name: system - restart ntpd
   service: name=ntpd state=restarted
 
-- name: disable swap permanently
+- name: system - disable swap permanently in /etc/fstab
   replace:
     path: /etc/fstab
     regexp: '(\/swapfile)'

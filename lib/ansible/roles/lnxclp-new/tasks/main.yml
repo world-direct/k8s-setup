@@ -3,23 +3,23 @@
 ##
 ## It is dynamically included by hostplaybook.yml
 
-- name: Get Join-Token from lnxclp_setup
+- name: clustersetup - get join-token from lnxclp_setup node
   command: kubeadm token create --print-join-command
   delegate_to: "{{ groups['lnxclp_setup'] | first }}"
   run_once: true
   register: join_cmd
 
-- name: Get Certificate-Key from lnxclp_setup
+- name: clustersetup - get certificate-key from lnxclp_setup
   shell: kubeadm init phase upload-certs --upload-certs | tail -n 1
   delegate_to: "{{ groups['lnxclp_setup'] | first }}"
   run_once: true
   register: cert_cmd
 
-- name: "sync {{ k8s_setup_dir }}/joink8s join script"
+- name: clustersetup - sync ./joink8s join script
   template:
     src: joink8s
     dest: "{{ k8s_setup_dir }}/joink8s"
     mode: 755
 
-- name: "Running join script (you may cat {{ k8s_setup_logdir }}/kubeadm.log to check progress"
+- name: "clustersetup - running join script (you may cat {{ k8s_setup_logdir }}/kubeadm.log to check progress"
   shell: "{{ k8s_setup_dir }}/joink8s >> {{ k8s_setup_logdir }}/kubeadm.log"

@@ -34,6 +34,7 @@
 
       - set_fact:
           k8s_configured: yes
+        no_log: yes
       
       when: k8s_configured == false
 
@@ -57,7 +58,7 @@
 # Otherwise, you will get connection-issues
 - hosts: lnxclp
   tasks:
-    - name: "Run role 'lnxclp-vip' for all clp nodes"
+    - name: run role 'lnxclp-vip' for all clp nodes
       include_role:
         name: lnxclp-vip
       vars:

@@ -2,31 +2,31 @@
 ###########################################
 ## System 
 
-- name: upgrade all yum packages
+- name: system - upgrade all yum packages
   yum:
     name: '*'
     state: latest
   when: setup_update_all_packages
 
-- name: ensure ntpd is at the latest version
-  yum: pkg=ntp state=latest
-  notify:
-  - restart ntpd
-
 # http://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
-- name: Disable swap if enabled
+- name: system - swap disabled
   when: ansible_facts['swaptotal_mb'] != 0
   shell: |
     swapoff -a
   notify:
-    - disable swap permanently
+    - system - disable swap permanently in /etc/fstab
 
 - meta: flush_handlers
+
+- name: ntpd - ensure ntpd is at the latest version
+  yum: pkg=ntp state=latest
+  notify:
+  - system - restart ntpd
 
 ###########################################
 ## Firewall
 
-- name: Enable and start firewall service
+- name: system - firewall service enabled and started
   service:
     name: firewalld
     enabled: yes
@@ -36,7 +36,7 @@
 ###########################################
 ## Install docker
 
-- name: Ensure required packages installed
+- name: docker - ensure required packages installed
   yum:
     name: "{{ packages }}"
   vars:
@@ -46,7 +46,7 @@
     - lvm2
     - bash-completion
 
-- name: Add docker yum repository
+- name: docker - docker yum repository
   yum_repository:
     name: docker-ce-stable
     description: docker-ce-stable
@@ -57,30 +57,30 @@
 
 
 # https://unixy.net/secure/knowledgebase/104/What-does-el5-el6-and-el7-mean.html
-- name: "Install docker (version: {{lnx_docker_version}})"
+- name: "docker - docker ce {{lnx_docker_version}} installed"
   package:
     name: "docker-ce-{{lnx_docker_version}}.ce"
 
-- name: "enable net.bridge.bridge-nf-call-iptables"
+- name: docker - enable net.bridge.bridge-nf-call-iptables
   sysctl:
     name: net.bridge.bridge-nf-call-iptables
     value: '1'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-iptables
     state: present
 
-- name: "enable net.bridge.bridge-nf-call-ip6tables"
+- name: docker - enable net.bridge.bridge-nf-call-ip6tables
   sysctl:
     name: net.bridge.bridge-nf-call-ip6tables
     value: '1'
     ignoreerrors: yes # otherwise it tries to stat /proc/sys/bridge-nf-call-ip6tables
     state: present
 
-- name: Generate demon.json
+- name: docker - generate demon.json
   template:
     src: demon.json
     dest: /etc/docker/
 
-- name: Enable and start dockerd
+- name: docker - dockerd enabled and started
   service:
     name: docker
     enabled: yes
@@ -90,7 +90,7 @@
 ## Install kubernetes
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl
-- name: Add kubernetes yum repo
+- name: kubernetes - kubernetes yum repository
   yum_repository:
     name: Kubernetes
     description: Kubernetes
@@ -99,7 +99,7 @@
     gpgcheck: yes
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
-- name: Install kubelet kubeadm kubectl
+- name: "kubernetes - kubelet kubeadm kubectl ({{k8s_version}}) installed"
   yum:
     disable_excludes: kubernetes
     name:
@@ -108,18 +108,18 @@
       - "kubectl-{{k8s_version}}-0"
   register: out_k8s_install
 
-- name: Pull required kubernetes images
+- name: kubernetes - pull required kubernetes images
   command: kubeadm config images pull --kubernetes-version={{k8s_version}}
   when: out_k8s_install.changed
 
-- name: Enable and start kubelet
+- name: kubernetes - kubelet enabled and started
   service:
     name: kubelet
     enabled: yes
     state: started
 
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network
-- name: "firewall: allow 8285/udp for flannel overlay network"
+- name: flannel - allow 8285/udp
   firewalld:
     port: 8285/udp
     permanent: yes
@@ -127,7 +127,7 @@
     immediate: yes
   when: k8s_install_flannel
 
-- name: "firewall: allow 8472/udp for flannel overlay network"
+- name: flannel - allow 8472/udp
   firewalld:
     port: 8472/udp
     permanent: yes
@@ -135,7 +135,7 @@
     immediate: yes
   when: k8s_install_flannel
   
-- name: "firewall: enable masquerade"
+- name: flannel - enable firewalld masquerade
   firewalld:
     masquerade: 'yes'   # this is documented as string in the firewalld module
     permanent: yes

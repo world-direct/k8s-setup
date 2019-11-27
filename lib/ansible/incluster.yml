@@ -1,43 +1,42 @@
 - hosts: localhost
+  vars:
+      # this file has been fetched from the lnx_setup host, by the lnxclp-new role
+      # playbook_dir is undocumented, but check the source:
+      # https://github.com/ansible/ansible/blob/143bafec9a506aff8f42ca573c7006a8c5549e12/lib/ansible/vars/hostvars.py#L40
+      charts_dir: "{{playbook_dir}}/../charts"
   tasks:
 
-    - set_fact:
-
-        # this file has been fetched from the lnx_setup host, by the lnxclp-new role
-        # playbook_dir is undocumented, but check the source:
-        # https://github.com/ansible/ansible/blob/143bafec9a506aff8f42ca573c7006a8c5549e12/lib/ansible/vars/hostvars.py#L40
-        charts_dir: "{{playbook_dir}}/../charts"
-
-      no_log: yes
-
-    - name: "run 'use-context' for verification"
+    - name: incluster - run 'use-context' for verification
       shell: "{{playbook_dir}}/../../.local/scripts/use-context"
+      register: cmd
+      failed_when: cmd.rc > 0 and cmd.rc < 255
+      changed_when: cmd.rc == 0
 
-    - name: Install kubectl completion
+    - name: incluster - kubectl completion on provisioner
       lineinfile:
         path: ~/.bashrc
         line: source <(kubectl completion bash)
 
-    - name: Install helm completion
+    - name: incluster - helm3 completion on provisioner
       lineinfile:
         path: ~/.bashrc
         line: source <(helm3 completion bash)
 
-    - name: "k8s: kube-flannel namespace"
+    - name: incluster - namespace kube-flannel
       wd_k8snamespace:
         namespace: kube-flannel
 
-    - name: "k8s: chart wd-flannel"
+    - name: incluster - chart wd-flannel installed
       wd_helm3:
         chart: "{{ charts_dir }}/wd-flannel"
         atomic: yes
         namespace: kube-flannel
 
-    - name: "k8s: kube-metallb namespace"
+    - name: incluster - namespace kube-metallb
       wd_k8snamespace:
         namespace: kube-metallb
 
-    - name: "k8s: chart wd-metallb"
+    - name: incluster - chart wd-metallb installed
       wd_helm3:
         chart: "{{ charts_dir }}/wd-metallb"
         namespace: kube-metallb
@@ -46,11 +45,21 @@
           default_ip_range: "{{k8s_loadbalancers_default_ip_range}}"
           ingress_ip: "{{k8s_loadbalancers_ingress_ip}}"
 
-    - name: "k8s: kube-dashboard namespace"
+    - name: incluster - namespace kube-traefik-ingress
+      wd_k8snamespace:
+        namespace: kube-traefik-ingress
+
+    - name: incluster - chart wd-traefik-ingress installed
+      wd_helm3:
+        chart: "{{ charts_dir }}/wd-traefik-ingress"
+        namespace: kube-traefik-ingress
+        atomic: yes
+
+    - name: incluster - namespace kube-dashboard
       wd_k8snamespace:
         namespace: kube-dashboard
 
-    - name: "k8s: wd-k8sdashboard"
+    - name: incluster - chart wd-dashboard installed
       wd_helm3:
         chart: "{{ charts_dir }}/wd-k8sdashboard"
         namespace: kube-dashboard
@@ -58,17 +67,7 @@
         values:
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
 
-    - name: "k8s: kube-traefik-ingress namespace"
-      wd_k8snamespace:
-        namespace: kube-traefik-ingress
-
-    - name: "k8s: wd-traefik-ingress"
-      wd_helm3:
-        chart: "{{ charts_dir }}/wd-traefik-ingress"
-        namespace: kube-traefik-ingress
-        atomic: yes
-
-    - name: "k8s: wd-nginx-test"
+    - name: incluster - chart wd-nginx-test installed
       wd_helm3:
         chart: "{{ charts_dir }}/wd-nginx-test"
         namespace: default
@@ -79,11 +78,12 @@
       include_tasks: tasks/tridentinstall.yml
       when: trident.enabled
 
-    - name: "k8s: kube-harbor namespace"
+    - name: incluster - namespace kube-harbor
       wd_k8snamespace:
         namespace: kube-harbor
+      when: harbor.enabled
 
-    - name: "k8s: install harbor chart"
+    - name: incluster - chart wd-harbor installed (if harbor.enabled)
       wd_helm3:
         chart: "{{ charts_dir }}/harbor"
         namespace: kube-harbor

@@ -15,23 +15,23 @@
     log_path: "{{local_path}}/scripts/log"
   no_log: yes
 
-- name: sync backend.json file from 'trident.backend_config' setting
+- name: trident - sync backend.json file from 'trident.backend_config' setting
   copy:
     content: "{{ trident.backend_config }}"
     dest: "{{local_path}}/trident.json"
 
-- name: "sync configure-trident script"
+- name: trident - sync configure-trident script
   template:
     src: localtemplates/configure-trident
     dest: "{{script_path}}/configure-trident"
     mode: 344
 
-- name: "sync trident-standard-storageclass.yaml"
+- name: trident - sync trident-standard-storageclass.yaml
   template:
     src: localtemplates/trident-standard-storageclass.yaml
     dest: "{{local_path}}/trident-standard-storageclass.yaml"
 
-- name: "run configure-trident"
+- name: "trident - run configure-trident (check log at {{log_path}}/configure-trident.log)"
   shell: "{{script_path}}/configure-trident > {{log_path}}/configure-trident.log"
   register: cmd
   failed_when: cmd.rc > 0 and cmd.rc < 255
