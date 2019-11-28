@@ -41,8 +41,6 @@ k8s_cluster_dnsname: k8stest.local
 k8s_loadbalancers_ingress_ip: 10.0.0.80
 
 # this is the IP range for all other services of type=LoadBalancer
-# don't introduce any whitespace here, because MetalLB doesn't accept 
-# spaces here (https://github.com/danderson/metallb/issues/499)
 k8s_loadbalancers_default_ip_range: 10.0.0.81-10.0.0.99
 
 
