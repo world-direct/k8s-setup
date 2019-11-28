@@ -3,7 +3,12 @@
 # to '2.0' in the Vagrantfile. It may also work with new versions, if they are available.
 # TODO: Validating the ansible version will done in k8s-setup tool
 
-- hosts: all
+- hosts: 'lnx*'
   tasks:
-    - name: "Ping all Nodes"
+    - name: "Ping all Linux Hosts"
       ping:
+
+- hosts: 'win*'
+  tasks:
+    - name: "Ping all Windows Hosts"
+      win_ping:
