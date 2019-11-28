@@ -5,8 +5,6 @@
 # configuration should be fine
 global_mode: vagrant
 
-# global_vagrant_lnxwrk_count: 2
-
 # This is the private subnet of the cluster.
 # You can access this from the host, because virtualbox create a route for
 # the 'private_network', by a 'vboxnetX' interface.
@@ -26,6 +24,7 @@ setup_update_all_packages: no
 # this is for safty, to make sure that an existing cluster is untouched
 setup_create_new_k8s_cluster: yes
 
+# Vagrant has the nat adapter on eth0. This sucks a little.
 host_primary_interface_name: eth1
 
 ## Kubernetes global cluster configuration

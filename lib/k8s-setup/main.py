@@ -33,8 +33,17 @@ def cmd_checkout(context, args):
     exit(1)
 
 def cmd_config(context, args):
-    logger.debug ('cmd:config(file=%s)' % args.file)
-    context.set_file(args.file)
+    logger.debug ('cmd:config(file=%s, value=%s)' % (args.file, args.value))
+
+    if(args.file):
+        context.set_file(args.file)
+    elif(args.value):
+        parts = args.value.split('=')
+        if len(parts) != 2:
+            print("The value must be specified with key=value")
+            exit(1)
+
+        context.set_config_value(parts[0], parts[1])
 
 def cmd_provision(context, args):
     logger.debug ('cmd:provision(scope=%s, ansible_options=%s)' % (args.scope, args.ansible_options))

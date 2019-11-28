@@ -14,18 +14,30 @@ class Context(object):
     #############################################################
 
     pn_current_config = ".local/current-config"
+    pn_private_config = ".local/cli-config"
 
     def __init__(self):
 
         pn_current_config = Context.pn_current_config
+        pn_private_config = Context.pn_private_config
         pn_conf = "./conf"
         fn_default_config="defaults.yml"
         fn_vagrant_config="vagrant.yml"
 
+        def add_config_file(file):
+
+            if os.path.islink(file):
+                logger.debug("Using %s -> %s configuration file" % (file, os.readlink(file)))
+            else:
+                logger.debug("Using %s configuration file" % file)
+
+            self.config_files.append(file)
+
+
         ## Read configuration
         #############################################################
         self.config_files = []  # from lowest to highest priority
-        self.config_files.append(os.path.join(pn_conf, fn_default_config))
+        add_config_file(os.path.join(pn_conf, fn_default_config))
 
         # read the current config
         if not os.path.islink(pn_current_config):
@@ -33,8 +45,11 @@ class Context(object):
             logger.debug("'%s' doesnt exist, defaulting to %s" % (pn_current_config, pn_vagrantconf))
             self.set_file(pn_vagrantconf)
         
-        logger.debug("'%s' --> '%s'" % (pn_current_config, os.readlink(pn_current_config)))
-        self.config_files.append(pn_current_config)
+        add_config_file(pn_current_config)
+
+        # add private config if set
+        if os.path.isfile(pn_private_config):
+            add_config_file(pn_private_config)
 
         # TODO: check if all self.config_files exists
 
@@ -45,7 +60,10 @@ class Context(object):
         self.config_string = ""
         for config_file in self.config_files:
             with open(config_file, 'r') as fs:
-                self.config_string = self.config_string + fs.read()
+                val = fs.read()
+                doc = yaml.load(val, Loader=yaml.SafeLoader)
+                if len(doc) > 0:
+                    self.config_string = self.config_string + "\n" + val
 
         self.config = yaml.load(self.config_string, Loader=yaml.SafeLoader)
 
@@ -71,6 +89,29 @@ class Context(object):
 
         logger.debug("Creating symlink '%s' --> '%s'" % (Context.pn_current_config, filepath))
         os.symlink(filepath, Context.pn_current_config)
+
+    def set_config_value(self, name, value):
+        pn_private_config = Context.pn_private_config
+
+        vals=None
+
+        if os.path.isfile(pn_private_config):
+            with open(pn_private_config, 'r') as fs:
+                content = fs.read()
+                vals = yaml.load(content, Loader=yaml.SafeLoader)
+
+        vals = {} if not vals else vals
+
+        if value:
+            logger.debug("Setting private config %s=%s" % (name, value))
+            vals[name]=value
+        elif vals.has_key(name):
+            logger.debug("Deleting private config %s=%s" % (name, value))
+            del vals[name]
+
+        with open(pn_private_config, 'w+') as fs:
+            content = yaml.dump(vals, Dumper=yaml.SafeDumper)
+            fs.write(content)
 
     def get_environment(self):
 

@@ -97,11 +97,33 @@ def parse_args():
 
             self.add_global_args(parser)
 
-            parser.add_argument('file', help="Sets the configuration file in the user profile")
+            parser.add_argument(
+                "operation", help="must be 'set'",
+                choices=["set"],
+                nargs=1)
+
+            parser.add_argument('--file',
+                help="Specifies the global configuration file",
+                nargs='?',
+                default=''
+            )
+
+            parser.add_argument('--value',
+                help="Specifies a single configuration value (key=value)",
+                nargs='?',
+                default=''
+            )
+
             args = parser.parse_args(sys.argv[2:])
+
+            if not args.value and not args.file:
+                print("Eighter --file or --value has to be specified")
+                exit(1)
 
             res = Args('config', args.debug)
             res.file = args.file
+            res.value = args.value
+            
             return res
 
         def provision(self):
@@ -115,6 +137,7 @@ def parse_args():
                 choices=['all', 'hosts', 'cluster', 'incluster'],
                 default='all',
                 nargs='?')
+
             parser.add_argument('--ansible-options',
                 help="Pass additional arguments to ansible-playbook",
                 nargs='?',
