@@ -9,17 +9,21 @@
   run_once: true
   register: join_cmd
 
+- name: clustersetup - writing /tmp/k8s-setup-join-cmd
+  copy:
+    dest: /tmp/k8s-setup-join-cmd
+    content: "{{ join_cmd }}"
+
 - name: clustersetup - get certificate-key from lnxclp_setup
   shell: kubeadm init phase upload-certs --upload-certs | tail -n 1
   delegate_to: "{{ groups['lnxclp_setup'] | first }}"
   run_once: true
   register: cert_cmd
 
-- name: clustersetup - sync ./joink8s join script
-  template:
-    src: joink8s
-    dest: "{{ k8s_setup_dir }}/joink8s"
-    mode: 755
+- name: clustersetup - writing /tmp/k8s-setup-join-certificatekey
+  copy:
+    dest: /tmp//tmp/k8s-setup-join-certificatekey
+    content: "{{ cert_cmd }}"
 
-- name: "clustersetup - running join script (you may cat {{ k8s_setup_logdir }}/kubeadm.log to check progress"
-  shell: "{{ k8s_setup_dir }}/joink8s >> {{ k8s_setup_logdir }}/kubeadm.log"
+- name: "clustersetup - running k8s-setup joinclp (you may cat {{ k8s_setup_logdir }}/k8s-setup.log to check progress"
+  shell: "{{ k8s_setup_dir }}/k8s-setup joinclp >> {{ k8s_setup_logdir }}/k8s-setup.log"

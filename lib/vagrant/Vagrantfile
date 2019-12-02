@@ -27,7 +27,7 @@ Vagrant.configure(2) do |config|
     config.vm.provision :hosts do |p|
         # p.sync_hosts = true
         p.autoconfigure = true
-        p.add_host ENV['K8S_APISERVER_VIP'], ["#{ENV['K8S_APISERVER_HOST']}}"]
+        p.add_host ENV['K8S_APISERVER_VIP'], ["#{ENV['K8S_APISERVER_HOST']}"]
     end
 
     #   10.0.0.10-19: Control Plane Nodes

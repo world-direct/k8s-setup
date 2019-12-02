@@ -1,0 +1,187 @@
+#! /bin/sh
+set -eu
+
+###########################################
+# Provisioning CLI for cluster-nodes
+#
+
+usage()
+{
+    echo "./k8s-setup COMMAND"
+    echo ""
+    echo "Commands:"
+    echo "   state   Evaluates the state of the node"
+    echo "   init    Runs kubeadm init for the first control plane node"
+    echo "   joinwrk Runs kubeadm join for a new worker node"
+    echo "   joinclp Runs kubeadm join for a new control plane node"
+    echo "   reset   Runs kubeadm reset (only for testing!)"
+}
+
+state()
+{
+    CONFFILE=/etc/kubernetes/kubelet.conf
+
+    if [ ! -f "$CONFFILE" ]; then
+        echo "k8s_configured=no"
+        exit 0
+    fi
+
+    EXPECTED_URL='https://$k8s_apiserver_endpoint'
+    CONFIGURED_URL=$(cat $CONFFILE | grep "server: " | awk '{print $2}')
+
+    echo "Configured URL: $CONFIGURED_URL"
+    echo "Expected URL: $EXPECTED_URL"
+
+    if [ "$EXPECTED_URL" == "$CONFIGURED_URL" ]; then
+        echo "k8s_configured=yes"
+        exit 0
+    else
+        >&2 echo "This node is not member of the configured cluster! You may create a new node from scratch. "
+    fi
+}
+
+init()
+{
+
+    # perform the initialization
+    kubeadm init \
+        --control-plane-endpoint $k8s_apiserver_endpoint \
+        --service-dns-domain $k8s_cluster_dnsname \
+        --pod-network-cidr $k8s_pod_network_cidr \
+        --service-cidr $k8s_service_cidr \
+        --apiserver-advertise-address $k8s_apiserver_advertise_address \
+        --kubernetes-version $k8s_version \
+        --apiserver-bind-port 6443 \
+        --upload-certs
+
+    kubeconfig
+
+    exit 0
+}
+
+joinwrk()
+{
+    if [ ! -e "/tmp/k8s-setup-joincmd" ]; then
+        echo "/tmp/k8s-setup-joincmd not found"
+        exit 1
+    fi
+
+    joincmd=$(cat /tmp/k8s-setup-joincmd)
+
+    echo "Running kubeadm join"
+    $joincmd
+
+    kubeconfig
+
+    exit 0
+}
+
+joinclp()
+{
+    if [ ! -e "/tmp/k8s-setup-join-cmd" ]; then
+        echo "/tmp/k8s-setup-joincmd not found"
+        exit 1
+    fi
+
+    if [ ! -e "/tmp/k8s-setup-join-certificatekey" ]; then
+        echo "/tmp/k8s-setup-join-certificatekey"
+        exit 1
+    fi
+
+    joincmd=$(cat /tmp/k8s-setup-joincmd)
+    certificatekey=$(cat /tmp/k8s-setup-join-certificatekey)
+
+    echo "Running kubeadm join"
+    $joincmd \
+        --control-plane \
+        --certificate-key $certificatekey \
+        --apiserver-advertise-address $k8s_apiserver_advertise_address \
+        --apiserver-bind-port 6443
+
+    kubeconfig
+
+    exit 0
+}
+
+reset()
+{
+    echo "Resetting kubernetes"
+    kubeadm reset -f
+
+    # remove host config
+    rm -rf /etc/kubernetes/*
+    
+    # and recreate manifests, as these existed before kubeadm init
+    mkdir -p /etc/kubernetes/manifests
+
+    # remove kubeconfig
+    rm -rf ~/.kube
+
+    exit 0
+}
+
+kubeconfig()
+{
+    # copy the admin.conf as kubeconfig to home/.kube
+    mkdir -p $HOME/.kube
+    cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    chown $(id -u):$(id -g) $HOME/.kube/config
+    echo 'source <(kubectl completion bash)' >>~/.bashrc
+}
+
+# get sourcedir
+sourcedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
+# read variables
+cat $sourcedir/k8s-setup.env | grep -o '^[^#]*' | xargs > /tmp/workaround
+source /tmp/workaround
+rm /tmp/workaround
+
+## TODO: revisit workaround
+## original version:
+# source <(cat $sourcedir/k8s-setup.env | grep -o '^[^#]*' | xargs)
+## This failed with 
+## [root@lnxclp1 k8s-setup]# ./k8s-setup state
+## ./k8s-setup: line 136: syntax error near unexpected token `('
+## But when executed with trace, it doesn't show the syntax error... :-(
+## [root@lnxclp1 k8s-setup]# bash -x ./k8s-setup state
+
+# handle command in $1
+set +u
+command=$1
+set -u
+
+case $command in
+
+    state)
+        state
+        ;;
+
+    init)
+        init
+        ;;
+
+    joinwrk)
+        joinwrk
+        ;;
+
+    joinclp)
+        joinlp;;
+
+    reset)
+        reset
+        exit 0
+        ;;
+
+    *)
+        usage
+        exit 1
+esac
+
+
+###########################################
+# Deletes the local cluster state
+#   
+#   THIS IS FOR TESTING ONLY!
+#   NOT TESTED FOR PRODUCTION USE!
+

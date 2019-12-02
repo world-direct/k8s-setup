@@ -19,14 +19,20 @@
     - "{{ k8s_setup_dir }}"
     - "{{ k8s_setup_logdir }}"
 
-- name: clustersetup - sync ./k8sstate test script
+- name: clustersetup - sync ./k8s-setup script for node operations
   template:
-    src: k8sstate
-    dest: "{{ k8s_setup_dir }}/k8sstate"
+    src: k8s-setup
+    dest: "{{ k8s_setup_dir }}/k8s-setup"
     mode: 755
 
-- name: "clustersetup - run {{ k8s_setup_dir }}/k8sstate to check configuration state"
-  command: "{{ k8s_setup_dir }}/k8sstate"
+- name: clustersetup - sync ./k8s-setup.env script containing configuration values
+  template:
+    src: k8s-setup.env
+    dest: "{{ k8s_setup_dir }}/k8s-setup.env"
+    mode: 755
+
+- name: "clustersetup - running 'k8s-setup state' to check configuration state"
+  command: "{{ k8s_setup_dir }}/k8s-setup state"
   changed_when: false
   register: k8sstate_cmd
 
@@ -34,9 +40,3 @@
     k8s_configured: "{{ true if 'k8s_configured=yes' in k8sstate_cmd.stdout else false }}"
   no_log: yes
 
-- name: clustersetup - sync ./resetk8s script to teardown configuration for testing"
-  template:
-    src: resetk8s
-    dest: "{{ k8s_setup_dir }}/resetk8s"
-    mode: 755
-    

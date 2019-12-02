@@ -3,14 +3,8 @@
 ##
 ## It is dynamically included by cluster.yml playbook
 
-- name: clustersetup - sync ./initk8s init script
-  template:
-    src: initk8s
-    dest: "{{ k8s_setup_dir }}/initk8s"
-    mode: 755
-
-- name: "clustersetup - running init script (you may cat {{ k8s_setup_logdir }}/kubeadm.log to check progress"
-  shell: "{{ k8s_setup_dir }}/initk8s >> {{ k8s_setup_logdir }}/kubeadm.log"
+- name: "clustersetup - running k8s-setup init (you may cat {{ k8s_setup_logdir }}/k8s-setup.log to check progress"
+  shell: "{{ k8s_setup_dir }}/k8s-setup init >> {{ k8s_setup_logdir }}/k8s-setup.log"
 
 - name: clustersetup - fetch admin.conf to provisioning client for later import
   fetch:
