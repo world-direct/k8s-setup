@@ -67,7 +67,7 @@ You need to assign the host to these groups:
 You can check the provided files in '/conf'. The 'default.yml' contains the 
 system default settings. You can override them in your custom configuration file.
 
-3. Activate the configuration by executing `k8s-setup config <path>`. 
+3. Register a custom configuration by executing `k8s-setup config set --file <path>`. 
 The path can be absolute, or relative to the repository root. By default the
 `./conf/vagrant.yml` is selected.
 
