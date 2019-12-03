@@ -30,9 +30,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/lib/k8s-setup/main.py",
             "args": [
-                "config",
-                "set", "--value", "global_vagrant_winwrk_count=1"
-
+                "tool", "ansible", "lnxclp1", "-m ping"
             ],
             "console": "internalConsole",
             "stopOnEntry": true

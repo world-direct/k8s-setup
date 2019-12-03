@@ -33,6 +33,36 @@ class Context(object):
 
             self.config_files.append(file)
 
+        def read_config_file(filepath):
+
+            with open(filepath, 'r') as fs:
+                doc = yaml.load(fs.read(), Loader=yaml.SafeLoader)
+                if len(doc) == 0:
+                    return None
+                
+                # all values ending with 'filepath' rewritten to an absolute path, 
+                # based on pathname(path)
+                for name in doc.keys():
+                    if not name.endswith("filepath"): continue
+
+                    val = doc[name]
+                    
+                    if not val:
+                        # empty value
+                        continue
+
+                    if not os.path.isabs(val):
+
+                        dirname = os.path.dirname(
+                            filepath if filepath != pn_current_config else os.readlink(filepath)
+                        )
+
+                        absval = os.path.normpath(os.path.join(dirname, val))
+                        logger.debug("'%s' configuration rewritten to absolute path %s" % (name, absval))
+                        doc[name] = absval
+
+                # reserialize to yaml and return
+                return yaml.dump(doc, Dumper=yaml.SafeDumper)
 
         ## Read configuration
         #############################################################
@@ -59,19 +89,17 @@ class Context(object):
         # highest to lowest priority. 'defaults.yml' is the last one
         self.config_string = ""
         for config_file in self.config_files:
-            with open(config_file, 'r') as fs:
-                val = fs.read()
-                doc = yaml.load(val, Loader=yaml.SafeLoader)
-                if len(doc) > 0:
-                    self.config_string = self.config_string + "\n" + val
+            val = read_config_file(config_file)
+            if val:
+                self.config_string = self.config_string + "\n" + val
 
         self.config = yaml.load(self.config_string, Loader=yaml.SafeLoader)
 
         # TODO: check if global_mode exists, and if it is 'vagrant' or 'production'
         self.mode = self.config['global_mode']
-        self.ansible_inventory_file = self.config['ansible_inventory_file']
+        self.ansible_inventory_filepath = self.config['ansible_inventory_filepath']
         
-        logger.debug("Using mode '%s', inventory-file '%s'" % (self.mode, self.ansible_inventory_file))
+        logger.debug("Using mode '%s', inventory-file '%s'" % (self.mode, self.ansible_inventory_filepath))
 
     def set_file(self, filepath):
 

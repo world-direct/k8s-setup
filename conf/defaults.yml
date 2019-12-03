@@ -21,7 +21,8 @@ global_vagrant_hosts_network: 10.0.0.*
 
 # This option is only needed for production configuration.
 # The 'vagrant' mode generates an own inventory
-ansible_inventory_file: /etc/ansible/hosts
+# A relative path is interpreted relative to the directory of the configuration file
+ansible_inventory_filepath: 
 
 ## Version Options
 #############################################################

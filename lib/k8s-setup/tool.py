@@ -28,8 +28,8 @@ class Tool(object):
         env = self.context.get_environment()
 
         if program.startswith("ansible"):
-            if(os.path.exists(self.context.ansible_inventory_file)):
-                args.append("--inventory-file=%s" % self.context.ansible_inventory_file)
+            if(os.path.exists(self.context.ansible_inventory_filepath)):
+                args.append("--inventory-file=%s" % self.context.ansible_inventory_filepath)
 
             if(self.context.mode == "vagrant"):
                 args.append("--ssh-extra-args='-o StrictHostKeyChecking=no'")
