@@ -26,8 +26,12 @@ class Context(object):
 
         def add_config_file(file):
 
+            file = os.path.normpath(file)
+
             if os.path.islink(file):
-                logger.debug("Using %s -> %s configuration file" % (file, os.readlink(file)))
+                linkedto=os.path.normpath(os.readlink(file))
+                logger.debug("Using %s -> %s configuration file" % (file, linkedto))
+                file = linkedto
             else:
                 logger.debug("Using %s configuration file" % file)
 
@@ -46,7 +50,7 @@ class Context(object):
                     if not name.endswith("filepath"): continue
 
                     val = doc[name]
-                    
+
                     if not val:
                         # empty value
                         continue
@@ -57,7 +61,7 @@ class Context(object):
                             filepath if filepath != pn_current_config else os.readlink(filepath)
                         )
 
-                        absval = os.path.normpath(os.path.join(dirname, val))
+                        absval = os.path.relpath(os.path.join(dirname, val))
                         logger.debug("'%s' configuration rewritten to absolute path %s" % (name, absval))
                         doc[name] = absval
 

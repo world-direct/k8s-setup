@@ -30,7 +30,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/lib/k8s-setup/main.py",
             "args": [
-                "tool", "ansible", "lnxclp1", "-m ping"
+                "info"
             ],
             "console": "internalConsole",
             "stopOnEntry": true

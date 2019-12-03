@@ -23,8 +23,45 @@ def main():
 def cmd_info(context, args):
     logger.debug('cmd:info()')
 
-    print('not implemented')
-    exit(1)
+    import subprocess
+    import os
+    import yaml
+
+    # It would be way better to preserve insertion order
+    # For python, you have to use a 'collections.OrderedDict' object
+    # But pyyaml 5.2 (installed with pip) don't handle OrderDict.
+    # This should work and is documented, and also implemented in source:
+    # https://github.com/yaml/pyyaml/blob/5.2/lib3/yaml/representer.py#L358
+    # But when debugging, the file is different. This seems more a pip issue. 
+    # TODO: Fix ordering
+    vals = dict()
+
+    # version
+    versionsh = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../version.sh"))
+    logger.debug("using script %s" % versionsh)
+    version=subprocess.check_output(versionsh).strip()
+    vals["version"] = version
+
+    # config metadata
+    vals["config-files"] = context.config_files
+
+    # important configuration values
+    conf = dict()
+    vals["configuration"] = conf
+    conf["mode"] = context.mode
+    conf["cluster-dns-name"] = context.config["k8s_cluster_dnsname"]
+    conf["ansible_inventory_filepath"] = context.ansible_inventory_filepath
+    conf["k8s-version"] = context.config["k8s_version"]
+
+    if context.mode == "vagrant":
+        conf["lnxclp-nodes"] = context.config["global_vagrant_lnxclp_count"]
+        conf["lnxwrk-nodes"] = context.config["global_vagrant_lnxwrk_count"]
+        conf["winwrk-nodes"] = context.config["global_vagrant_winwrk_count"]
+
+    out = yaml.dump(vals, Dumper=yaml.SafeDumper)
+    print(out)
+
+    exit(0)
 
 def cmd_checkout(context, args):
     logger.debug('cmd:checkout(version=%s, no_deps=%i)' % (args.version, args.no_deps))

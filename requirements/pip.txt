@@ -3,3 +3,4 @@ argcomplete >= 1.10.0
 argparse >= 1.4.0
 kubernetes >= 10.0
 colorlog
+pyyaml >= 5.2
