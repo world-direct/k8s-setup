@@ -22,14 +22,6 @@ designed in a way, that Windows support is possible. It just needs to be impleme
 
 The steps 3. and 4. are only required, if you want to setup a local virtual cluster.
 
-## Checkout a specific version
-
-Use the 'k8s-setup checkout' command. You may provide a version, or omit it for
-the latest version.
-
-This will also install the required pip packages, including Ansible.
-See `k8s-setup checkout --help`.
-
 ## Provide the configuration
 
 ### Local Deployment

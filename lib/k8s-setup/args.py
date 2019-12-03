@@ -39,7 +39,6 @@ def parse_args():
 
     The subcommands commands are:
         info        Shows the current version and configuration info
-        checkout    Checks out a specific release, and installs the prequisites
         config      Performs configuration commands
         provision   Performs the provisioning
         tool        Allows executing the underlying tools for diagnostics

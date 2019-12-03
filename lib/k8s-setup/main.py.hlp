@@ -2,23 +2,18 @@ k8s-setup performs the setup and upgrade of k8s clusters
 
 Commands:
     info        Shows the current version and configuration info
-    checkout    Checks out a specific release, and installs the prequisites
     config      Performs configuration commands
     provision   Performs the provisioning
     tool        Allows executing the underlying tools for diagnostics
-    generate    Generators (for /etc/hosts)
-
-Basic Commands:
-    info        Shows the current version and configuration info
-    checkout    Checks out a specific release, and installs the prequisites
+    generate    Generators (for /etc/hosts)    
 
 Configuration:
-    config set <file>   Sets the configuration file in the user profile
-    config validate     Validates the current configuration
+    config set --file <file>   Sets the configuration file in the user profile
+    config set --value KEY=VALUE Sets a single configuration value
 
-    See the provides files in ./conf as a reference.
-    For 'virtual' mode, the 'vagrant.yml' file should be used.
-    For 'production' mode, you should provide an own conf file.
+    See the provided files in ./conf as a reference.
+    For 'vagrant' mode, the 'vagrant.yml' file is used.
+    For 'production' mode, you should provide an own file.
     The provided file, is automatically merged with the 'defaults.yml' file.
 
 Provisioning:
@@ -28,12 +23,14 @@ Provisioning:
     provision incluster Provisioning of an already provisioned k8s-cluster
     
     provision hosts:
-    Represents the 'lib/ansible/hostplaybook.yml'. If running in 'virtual' mode,
-    it provisions the VM instances. Then, regardless of the mode, it provisions
-    all nodes to have everything installed to used 'kubeadm'
+    Provisions all configured hosts, including k8s requirements and binaries, but
+    without a cluster being provisioned. If running in 'vagrant' mode, it provisions 
+    the VM instances.
 
     provision cluster:
     Runs the correct 'kubeadm' commands to provision the kubernetes cluster.
+    It provisions the local machine for the cluster. It downloads kubectl and helm3,
+    and configures a 'admin@k8sdev.local' kubectl context.
 
     provision incluster:
     Runs all kubectl or helm operations, to provision the clusters objects.
@@ -59,6 +56,6 @@ Modes of Operation:
     Production: 
     Executing against already existing hosts, from a distinct provisioner host
 
-    Virtual: 
+    Vagrant: 
     Executing against Vagrant / VirtualBox hosts, from a local provisioner host.
     Currently only running on Linux, and only tested with Ubuntu 18.04.3 LTS.
