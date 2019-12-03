@@ -1,0 +1,36 @@
+#!/bin/bash
+set -eu
+
+# check if we need to change the directory (provisioner executes from /lib/ansible)
+if [ ! -x "k8s-setup" ]; then
+    cd ../..
+    pwd
+fi
+
+wd=$(mktemp -d)
+
+# render the k8s-setup info
+./k8s-setup info > $wd/setup-info
+
+# render sysinfo
+echo "user: \"$USERNAME\"" > $wd/sys-info
+echo "host: \"$(hostname)\"" >> $wd/sys-info
+echo "date: \"$(date -Iseconds)\"" >> $wd/sys-info
+
+# apply to cluster
+cmname=k8s-setup-info
+cmnamespace=default
+
+# test if it already exists
+if kubectl -n $cmnamespace get configmap $cmname > /dev/null 2>&1; then
+    # configmap exists, delete it
+    kubectl -n $cmnamespace delete configmap $cmname > /dev/null 
+fi
+
+# create it
+kubectl -n $cmnamespace create configmap $cmname \
+    --from-file=$wd/setup-info \
+    --from-file=$wd/sys-info    \
+    > /dev/null 
+
+rm -rf $wd

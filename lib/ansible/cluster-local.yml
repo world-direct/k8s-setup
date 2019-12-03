@@ -52,3 +52,16 @@
       register: cmd
       failed_when: cmd.rc > 0 and cmd.rc < 255
       changed_when: cmd.rc == 0
+
+    - name: clusterlocal - sync write-k8s-setup-info script
+      template:
+        src: localtemplates/write-k8s-setup-info
+        dest: "{{script_path}}/write-k8s-setup-info"
+        mode: 344
+
+    - name: clusterlocal - run 'write-k8s-setup-info' to persist metadata as configmap
+      shell: "{{script_path}}/write-k8s-setup-info"
+      register: cmd
+      failed_when: cmd.rc > 0 and cmd.rc < 255
+      changed_when: cmd.rc == 0
+      

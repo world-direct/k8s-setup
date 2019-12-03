@@ -103,6 +103,35 @@ depending on the reflected environmet variables.
     * incluster: Provisions all kubernetes objects in an existing cluster.
 
 
+## Get Information
+
+By using the `./k8s-setup info` command, you get some metadata of the k8s-setup 
+state and configuration.
+
+```
+$ ./k8s-setup info
+config-files:
+- conf/defaults.yml
+- localpath/k8s-setup/conf/vagrant.yml
+configuration:
+  ansible_inventory_filepath: lib/vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
+  cluster-dns-name: k8stest.local
+  k8s-version: 1.16.3
+  lnxclp-nodes: 1
+  lnxwrk-nodes: 1
+  mode: vagrant
+  winwrk-nodes: 0
+version: v0.1-alpha-base-7-gd978c740a5c526+dirty
+```
+
+When running the 'cluster' provisioning scope, a ConfigMap named 'k8s-setup-info'
+is created in the 'default' namespace. It contains this information in the 'setup-info' field.
+There is an additional field named 'sys-info', containing information like the
+date, the user of the name of the provisioning host.
+
+Please note that the provisioning logic don't read this data. It only serves
+informational purposes.
+
 # Vagrant Development Environment
 
 ## Networking
