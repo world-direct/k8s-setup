@@ -13,7 +13,7 @@ wd=$(mktemp -d)
 ./k8s-setup info > $wd/setup-info
 
 # render sysinfo
-echo "user: \"$USERNAME\"" > $wd/sys-info
+echo "user: \"$USER\"" > $wd/sys-info
 echo "host: \"$(hostname)\"" >> $wd/sys-info
 echo "date: \"$(date -Iseconds)\"" >> $wd/sys-info
 
