@@ -95,13 +95,13 @@
     name: Kubernetes
     description: Kubernetes
     baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
-    enabled: yes
+    enabled: no
     gpgcheck: yes
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
 - name: "kubernetes - kubelet kubeadm kubectl ({{k8s_version}}) installed"
   yum:
-    disable_excludes: kubernetes
+    enablerepo: Kubernetes
     name:
       - "kubelet-{{k8s_version}}-0"
       - "kubeadm-{{k8s_version}}-0"
