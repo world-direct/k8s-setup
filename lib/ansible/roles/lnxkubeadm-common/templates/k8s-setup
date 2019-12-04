@@ -72,14 +72,12 @@ joinwrk()
     echo "Running kubeadm join"
     $joincmd
 
-    kubeconfig
-
     exit 0
 }
 
 joinclp()
 {
-    if [ ! -e "/tmp/k8s-setup-join-cmd" ]; then
+    if [ ! -e "/tmp/k8s-setup-joincmd" ]; then
         echo "/tmp/k8s-setup-joincmd not found"
         exit 1
     fi
@@ -167,7 +165,7 @@ case $command in
         ;;
 
     joinclp)
-        joinlp;;
+        joinclp;;
 
     reset)
         reset

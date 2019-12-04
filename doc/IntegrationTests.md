@@ -21,7 +21,23 @@ The Sub-Tests are based on the previous setup, runs additional checks:
 - Ingress is bound to 'k8s_loadbalancers_ingress_ip'
 - Services can be of type LoadBalancer
 - wd-nginx-test application can be browsed using the ingress-rule
+- The cluster is operational if machines are restarted (tests #73)
+- New clp nodes can be joined after cluster afterwards (tests #74)
 
+
+## IT1: Test cluster overall availablility when machines die
+
+This test will use a cluster with three control plane, and two worker nodes.
+A service (like wd-nginx-test) is deployed on the cluster, when the following
+events happen:
+
+- a control plane node is disconnected from network
+- a control plane node is restarted
+- a worker node is disconnected from network
+- a worker node is restarted
+
+Ensures:
+- The service is available with an outage of max. 10 seconds.
 
 # Features considered "untestable"
 

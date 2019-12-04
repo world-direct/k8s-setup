@@ -8,12 +8,10 @@
   run_once: true
   register: join_cmd
 
-- name: clustersetup - sync ./joink8s join script
-  template:
-    src: joink8s
-    dest: "{{ k8s_setup_dir }}/joink8s"
-    mode: 755
+- name: clustersetup - writing /tmp/k8s-setup-joincmd
+  copy:
+    dest: /tmp/k8s-setup-joincmd
+    content: "{{ join_cmd.stdout }}"
 
-- name: "clustersetup - running join script (you may cat {{ k8s_setup_logdir }}/kubeadm.log to check progress"
-  shell: "{{ k8s_setup_dir }}/joink8s >> {{ k8s_setup_logdir }}/kubeadm.log"
-
+- name: "clustersetup - running k8s-setup joinwrk (you may cat {{ k8s_setup_logdir }}/k8s-setup.log to check progress"
+  shell: "{{ k8s_setup_dir }}/k8s-setup joinwrk >> {{ k8s_setup_logdir }}/k8s-setup.log"
