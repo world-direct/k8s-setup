@@ -8,15 +8,20 @@
     state: latest
   when: setup_update_all_packages
 
-# http://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
 - name: system - swap disabled
   when: ansible_facts['swaptotal_mb'] != 0
   shell: |
     swapoff -a
-  notify:
-    - system - disable swap permanently in /etc/fstab
 
-- meta: flush_handlers
+- name: system - disable swap permanently in /etc/fstab
+  replace:
+    path: /etc/fstab
+
+    # now we are matching the line if 'swap' is contained in the 3rd column
+    # see 'man fstab' for reference. This should work on all Linux systems
+    # test: https://regex101.com/r/F4s7l1/1
+    regexp: '(^[^#][^\s#]+\s+\S+\s+swap)'
+    replace: '# \1'
 
 - name: ntpd - ensure ntpd is at the latest version
   yum: pkg=ntp state=latest

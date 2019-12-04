@@ -4,5 +4,9 @@
 - name: system - disable swap permanently in /etc/fstab
   replace:
     path: /etc/fstab
-    regexp: '(\/swapfile)'
+
+    # now we are matching the line if 'swap' is contained in the 3rd column
+    # see 'man fstab' for reference. This should work on all Linux systems
+    # test: https://regex101.com/r/F4s7l1/3
+    regexp: '(^[^#][^\s#]+\s+\S+\s+swap)'
     replace: '# \1'
