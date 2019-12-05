@@ -1,0 +1,7 @@
+# About this chart
+
+nginx-ingress has been installed:
+
+    namespace: {{ .Release.Namespace }}
+    name:      {{ .Values.account_name }}
+

@@ -45,14 +45,14 @@
           default_ip_range: "{{k8s_loadbalancers_default_ip_range}}"
           ingress_ip: "{{k8s_loadbalancers_ingress_ip}}"
 
-    - name: incluster - namespace kube-traefik-ingress
+    - name: incluster - namespace kube-nginx-ingress
       wd_k8snamespace:
-        namespace: kube-traefik-ingress
+        namespace: kube-nginx-ingress
 
-    - name: incluster - chart wd-traefik-ingress installed
+    - name: incluster - chart wd-nginx-ingress installed
       wd_helm3:
-        chart: "{{ charts_dir }}/wd-traefik-ingress"
-        namespace: kube-traefik-ingress
+        chart: "{{ charts_dir }}/wd-nginx-ingress"
+        namespace: kube-nginx-ingress
         atomic: yes
 
     - name: incluster - namespace kube-dashboard
