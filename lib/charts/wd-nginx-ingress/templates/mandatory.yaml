@@ -10,6 +10,8 @@
 #     app.kubernetes.io/name: ingress-nginx
 #     app.kubernetes.io/part-of: ingress-nginx
 
+# added --enable-ssl-passthrough parameter to deployment
+
 ---
 
 kind: ConfigMap
@@ -229,6 +231,7 @@ spec:
             - --udp-services-configmap=$(POD_NAMESPACE)/udp-services
             - --publish-service=$(POD_NAMESPACE)/ingress-nginx
             - --annotations-prefix=nginx.ingress.kubernetes.io
+            - --enable-ssl-passthrough
           securityContext:
             allowPrivilegeEscalation: true
             capabilities:

@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: kubernetes-dashboard
   namespace: {{ .Release.Namespace }}
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
 spec:
   rules:
   - host: dashboard.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
@@ -11,4 +13,4 @@ spec:
       - path: /
         backend:
           serviceName: kubernetes-dashboard
-          servicePort: 80
+          servicePort: 443

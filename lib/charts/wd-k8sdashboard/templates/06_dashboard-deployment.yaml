@@ -36,14 +36,14 @@ spec:
     spec:
       containers:
         - name: kubernetes-dashboard
-          image: kubernetesui/dashboard:v2.0.0-beta6
+          image: kubernetesui/dashboard:v2.0.0-beta7
           imagePullPolicy: Always
           ports:
-            - containerPort: 9090
+            - containerPort: 8443
               protocol: TCP
           args:
             - --namespace={{ .Release.Namespace }}
-            - --enable-skip-login=true
+            - --auto-generate-certificates
             # Uncomment the following line to manually specify Kubernetes API server Host
             # If not specified, Dashboard will attempt to auto discover the API server and connect
             # to it. Uncomment only if the default does not work.
@@ -56,9 +56,9 @@ spec:
               name: tmp-volume
           livenessProbe:
             httpGet:
-              scheme: HTTP
+              scheme: HTTPS
               path: /
-              port: 9090
+              port: 8443
             initialDelaySeconds: 30
             timeoutSeconds: 30
           securityContext:

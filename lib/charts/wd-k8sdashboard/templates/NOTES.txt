@@ -3,11 +3,9 @@
 This was created by the {{ .Chart.AppVersion }} of 
 https://github.com/kubernetes/dashboard/tree/v2.0.0-beta6/aio/deploy/recommended 
 
-Performed the following modifications:
-* Removed '00-dashboard-namespace.yml', because namespaces are created externally
-* Replaced 'namespace: kubernetes-dashboard' with 'namespace={{"{{"}} .Release.Namespace }}'
+To create a token for login, you can install the helm chart for the admin token,
+and execute the commands displayed in the console.
 
+To install the wd-admintoken use:
 
-https://github.com/kubernetes/dashboard/blob/master/docs/user/installation.md
-
-
+    helm3 install admintoken ./lib/charts/wd-admintoken/
