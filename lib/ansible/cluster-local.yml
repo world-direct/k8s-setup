@@ -64,4 +64,8 @@
       register: cmd
       failed_when: cmd.rc > 0 and cmd.rc < 255
       changed_when: cmd.rc == 0
-      
+
+    # TODO: this is just a workaround for https://github.com/world-direct/k8s-setup/issues/77
+    - name: clusterlocal - workaround for Issue \#77 scale coredns down to 1 replica
+      shell: kubectl -n kube-system scale deployment coredns --replicas=1
+      when: global_mode == "vagrant"
