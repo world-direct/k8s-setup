@@ -55,6 +55,16 @@
         namespace: kube-nginx-ingress
         atomic: yes
 
+    - name: incluster - namespace kube-certmanager
+      wd_k8snamespace:
+        namespace: kube-certmanager
+
+    - name: incluster - chart wd-certmanager installed
+      wd_helm3:
+        chart: "{{ charts_dir }}/wd-certmanager"
+        namespace: kube-certmanager
+        atomic: yes
+
     - name: incluster - namespace kube-dashboard
       wd_k8snamespace:
         namespace: kube-dashboard
