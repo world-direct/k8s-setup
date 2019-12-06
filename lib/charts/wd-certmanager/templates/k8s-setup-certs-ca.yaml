@@ -1,0 +1,19 @@
+############################
+## k8s-setup-certs-ca for CA Issuer
+############################
+kind: Secret
+type: kubernetes.io/tls
+apiVersion: v1
+metadata:
+  name: k8s-setup-certs-ca
+  # we use the 'clusterResourceNamespace', because we will use a 'ClusterIssuer'
+  # see https://cert-manager.io/docs/configuration/ca/
+{{- if .Values.clusterResourceNamespace }}
+  namespace: {{ .Values.clusterResourceNamespace }}
+{{- else }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
+data:
+  tls.crt: {{ .Files.Get ".ca/cacrt.pem" | b64enc }}
+  tls.key: {{ .Files.Get ".ca/cakey.pem" | b64enc }}
+

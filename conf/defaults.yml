@@ -86,6 +86,46 @@ k8s_loadbalancers_ingress_ip:           # example: 10.0.0.80
 # this is the IP range for all other services of type=LoadBalancer
 k8s_loadbalancers_default_ip_range:     # example: 10.0.0.81-10.0.0.99
 
+## CA Configuration
+#############################################################
+
+## 'CA' mode: This mode uses a file-based CA to issue Server-Certificates
+## with 'certmanager' (see https://cert-manager.io/docs/configuration/ca/)
+##
+## Enable CA mode by:
+# k8s_certs_mode: CA
+#
+## If you want k8s-setup to automatically generate a CA keypair for you:
+# k8s_certs_ca:
+#   generate: true
+## If you want an existing CA (like an intermediate CA for the cluster) to be used
+## This assumes that there is a sub-directory 'ca' within your configuration-directory,
+## where the ctr.pem and key.pem files are contained.
+# k8s_certs_ca:
+#   crt_filepath: ca/crt.pem
+#   key_filepath: ca/key.pem
+#
+## Notes: Regardless if the ca files are generated or existing files are used,
+## the provisioner creates a secret named 'k8s-setup-certs-ca' in the 'kube-certmanager'
+## namespace.
+##
+## Enable ACMD mode by:
+# k8s_certs_mode: ACME
+# k8s_certs_acme:
+#   email: registereduser@mail.com  # the let's encrypt user
+#
+#   # 'staging' = https://acme-staging-v02.api.letsencrypt.org/directory (https://letsencrypt.org/docs/staging-environment/)
+#   # 'production' = https://acme-v02.api.letsencrypt.org/directory
+#   # any other string is taken as an url for any other ACME envrionment
+#   # 'staging' is the default
+#   environment: staging|production|<url> # a well-known let's encrypt environment, or custom url
+
+
+# the 'CA' mode uses an existing CA, or generates a CA dynamically
+k8s_certs_mode: CA
+k8s_certs_ca:
+  generate: true    # generate a CA for the cluster on first provisioning
+
 
 ## Provisioning Client configuration
 #############################################################

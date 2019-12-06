@@ -30,7 +30,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/lib/k8s-setup/main.py",
             "args": [
-                "info"
+                "provision", "incluster"
             ],
             "console": "internalConsole",
             "stopOnEntry": true

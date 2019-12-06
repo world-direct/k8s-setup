@@ -1,0 +1,7 @@
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: k8s-setup-certs-ca-issuer
+spec:
+  ca:
+    secretName: k8s-setup-certs-ca
