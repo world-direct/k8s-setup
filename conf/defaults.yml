@@ -163,3 +163,8 @@ harbor:
 lnxclp_custom_firewall_rules: []
 lnxwrk_custom_firewall_rules: []
 winwrk_custom_firewall_rules: []
+
+
+## Dashboard options
+#############################################################
+dashboard_token_ttl_s: 10800 # Session-Timeout for dashboard (10800=3 Hours)

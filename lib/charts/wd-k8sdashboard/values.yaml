@@ -1,1 +1,2 @@
 cluster_dns_name: 
+token_ttl: 10800
