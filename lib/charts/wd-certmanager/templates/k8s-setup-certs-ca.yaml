@@ -1,3 +1,4 @@
+{{- if eq .Values.mode "CA" }}
 ############################
 ## k8s-setup-certs-ca for CA Issuer
 ############################
@@ -16,4 +17,4 @@ metadata:
 data:
   tls.crt: {{ .Files.Get ".ca/cacrt.pem" | b64enc }}
   tls.key: {{ .Files.Get ".ca/cakey.pem" | b64enc }}
-
+{{- end }}

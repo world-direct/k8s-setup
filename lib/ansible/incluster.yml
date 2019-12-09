@@ -64,6 +64,13 @@
         chart: "{{ charts_dir }}/wd-certmanager"
         namespace: kube-certmanager
         atomic: yes
+        values:
+          webhook:
+            enabled: false
+          mode: "{{ k8s_certs_mode }}"
+          acme:
+            email: "{{ k8s_certs_acme.email | default('NOACME') }}"
+            server: "{{ k8s_certs_acme.server | default('NOACME') }}"
 
     - name: incluster - namespace kube-dashboard
       wd_k8snamespace:
@@ -73,7 +80,7 @@
       wd_helm3:
         chart: "{{ charts_dir }}/wd-k8sdashboard"
         namespace: kube-dashboard
-        atomic: no
+        atomic: yes
         values:
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
           token_ttl: "{{dashboard_token_ttl_s}}"

@@ -113,12 +113,10 @@ k8s_loadbalancers_default_ip_range:     # example: 10.0.0.81-10.0.0.99
 # k8s_certs_mode: ACME
 # k8s_certs_acme:
 #   email: registereduser@mail.com  # the let's encrypt user
-#
+#   server: <url> # a well-known let's encrypt environment, or custom url
 #   # 'staging' = https://acme-staging-v02.api.letsencrypt.org/directory (https://letsencrypt.org/docs/staging-environment/)
 #   # 'production' = https://acme-v02.api.letsencrypt.org/directory
-#   # any other string is taken as an url for any other ACME envrionment
-#   # 'staging' is the default
-#   environment: staging|production|<url> # a well-known let's encrypt environment, or custom url
+
 
 
 # the 'CA' mode uses an existing CA, or generates a CA dynamically

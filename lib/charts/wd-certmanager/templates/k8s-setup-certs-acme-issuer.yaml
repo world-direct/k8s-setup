@@ -1,0 +1,17 @@
+{{- if eq .Values.mode "ACME" }}
+# see https://cert-manager.io/docs/configuration/acme/
+apiVersion: cert-manager.io/v1alpha2
+kind: ClusterIssuer
+metadata:
+  name: k8s-setup-default
+spec:
+  acme:
+    email: {{ .Values.acme.email }} 
+    server: {{ .Values.acme.server }} 
+    privateKeySecretRef:
+      name: k8s-setup-default-acme-issuer-key
+    solvers:
+    - http01:
+        ingress:
+          class: nginx
+{{- end }}

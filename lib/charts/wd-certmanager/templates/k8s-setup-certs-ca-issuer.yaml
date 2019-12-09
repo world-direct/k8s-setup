@@ -1,7 +1,9 @@
+{{- if eq .Values.mode "CA" }}
 apiVersion: cert-manager.io/v1alpha2
 kind: ClusterIssuer
 metadata:
-  name: k8s-setup-certs-ca-issuer
+  name: k8s-setup-default
 spec:
   ca:
     secretName: k8s-setup-certs-ca
+{{- end }}
