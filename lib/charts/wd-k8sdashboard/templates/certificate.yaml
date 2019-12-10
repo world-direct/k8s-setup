@@ -6,7 +6,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 spec:
   commonName: dashboard.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
-  dnsName:
+  dnsNames:
     - dashboard.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
   organization:
     - world-direct.at
