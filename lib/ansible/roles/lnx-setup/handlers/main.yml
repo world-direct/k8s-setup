@@ -1,6 +1,3 @@
-- name: system - restart ntpd
-  service: name=ntpd state=restarted
-
 - name: system - disable swap permanently in /etc/fstab
   replace:
     path: /etc/fstab

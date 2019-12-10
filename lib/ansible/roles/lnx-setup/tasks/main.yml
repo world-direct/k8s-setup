@@ -23,11 +23,6 @@
     regexp: '(^[^#][^\s#]+\s+\S+\s+swap)'
     replace: '# \1'
 
-- name: ntpd - ensure ntpd is at the latest version
-  yum: pkg=ntp state=latest
-  notify:
-  - system - restart ntpd
-
 ###########################################
 ## Firewall
 
