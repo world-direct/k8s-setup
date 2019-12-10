@@ -5,15 +5,23 @@ metadata:
   name: tls-certificate
   namespace: {{ .Release.Namespace }}
 spec:
+
+  # vars
   commonName: dashboard.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
   dnsNames:
     - dashboard.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
   organization:
     - world-direct.at
+
+  # cert params
   usages:
     - server auth
-  duration: 2160h   # 90d
-  renewBefore: 360h # 15d
+    - client auth
+  duration: 2160h     # 90d
+  renewBefore: 360h   # 15d
+  keyAlgorithm: ecdsa # ACME doesn't support ECDSA
+
+  # framework
   secretName: kubernetes-dashboard-certs
   issuerRef:
     name: k8s-setup-default
