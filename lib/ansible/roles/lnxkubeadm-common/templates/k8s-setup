@@ -22,21 +22,20 @@ state()
     CONFFILE=/etc/kubernetes/kubelet.conf
 
     if [ ! -f "$CONFFILE" ]; then
-        echo "k8s_configured=no"
+        echo "hostrole: none"
         exit 0
     fi
 
     EXPECTED_URL="https://$k8s_apiserver_endpoint"
     CONFIGURED_URL=$(cat $CONFFILE | grep "server: " | awk '{print $2}')
 
-    echo "Configured URL: $CONFIGURED_URL"
-    echo "Expected URL: $EXPECTED_URL"
+    echo "cluster-url: $CONFIGURED_URL"
 
     if [ "$EXPECTED_URL" == "$CONFIGURED_URL" ]; then
-        echo "k8s_configured=yes"
+        echo "hostrole: lnxclp"    # TODO: check other roles
         exit 0
     else
-        >&2 echo "This node is not member of the configured cluster! You may create a new node from scratch. "
+        >&2 echo "This node part of cluster $CONFIGURED_URL. Exiting"
         exit 1
     fi
 }

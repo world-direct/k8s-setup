@@ -20,10 +20,6 @@ ansible_inventory_filepath: ../lib/vagrant/.vagrant/provisioners/ansible/invento
 # if this is enabled, all yum packages are updated on start
 setup_update_all_packages: no
 
-# the playbook will only init a new cluster, if this enabled
-# this is for safty, to make sure that an existing cluster is untouched
-setup_create_new_k8s_cluster: yes
-
 # Vagrant has the nat adapter on eth0. This sucks a little.
 host_primary_interface_name: eth1
 

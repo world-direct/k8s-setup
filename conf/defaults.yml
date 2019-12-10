@@ -31,7 +31,7 @@ ansible_inventory_filepath:
 # Provisioning the cluster will bring the cluster to this version
 # Currently only install is implemented, but after implementing upgrade,
 # you can control upgrading as well with this option.
-k8s_version: 1.16.3
+k8s_version: 1.17.0
 
 # recommended version
 # https://kubernetes.io/docs/setup/production-environment/container-runtimes/#docker
@@ -46,10 +46,6 @@ win_docker_version: "19.03.3"
 
 # if this is enabled, all yum packages are updated on host provisioning
 setup_update_all_packages: no
-
-# the playbook will only init a new cluster, if this enabled
-# this is for safty, to make sure that an existing cluster is untouched
-setup_create_new_k8s_cluster: yes
 
 # the interface to use
 host_primary_interface_name: eth0
@@ -133,7 +129,7 @@ k8s_certs_ca:
 # You may 'source /.local/scripts/use-context' script, to activate and validate
 # The current kubectl context
 client_helm_version: v3.0.0-rc.2
-client_kubectl_version: v1.16.2
+client_kubectl_version: v1.17.0
 
 # This is the directory where kubectl and helm are stored
 # This should be in $PATH for provisioning to workok

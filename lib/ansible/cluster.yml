@@ -2,7 +2,6 @@
 # It performs OS configuration, installs docker and the kubernetes binaries kubectl, kubelet and kubeadm
 # It also performs a check of the current host cluster state (init/join)
 # It runs kubeclt for
-#   - init a new cluster (is setup_create_new_k8s_cluster is set)
 #   - join other nodes to the cluster
 ---
 
@@ -16,11 +15,6 @@
   tasks:
 
     - block: 
-
-      # fail if the master node is not configured, and no cluster setup should be performed
-      - fail:
-          msg: "Kubernetes is not configured on {{ansible_hostname}}, and 'setup_create_new_k8s_cluster' is false."
-        when: setup_create_new_k8s_cluster == false
 
       # add the lnxclp-vip to the setup node first
       - include_role:

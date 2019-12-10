@@ -37,6 +37,6 @@
   register: k8sstate_cmd
 
 - set_fact:
-    k8s_configured: "{{ true if 'k8s_configured=yes' in k8sstate_cmd.stdout else false }}"
+    k8s_configured: "{{ false if 'hostrole: none' in k8sstate_cmd.stdout else true }}"
   no_log: yes
 

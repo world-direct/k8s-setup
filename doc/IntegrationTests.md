@@ -39,6 +39,17 @@ events happen:
 Ensures:
 - The service is available with an outage of max. 10 seconds.
 
+## IT2: Test cluster downgrade will fail
+
+Tests that clusters can't be downgraded to an older version. This is not possible
+with kubeadm, so we can't support this.
+
+Implementation:
+- Provision a cluster with version v1.17.0
+- Provision the same cluster with version v1.16.0
+- The setup should fail with a meaningful error message.
+
+
 # Features considered "untestable"
 
 The features below can't be tested in because of resource availablilty:

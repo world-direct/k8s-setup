@@ -99,6 +99,12 @@
     gpgcheck: yes
     gpgkey: https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
+- name: "kubernetes - check if kubelet is already installed"
+  yum:
+    enablerepo: Kubernetes
+    list: installed
+  register: yumres
+
 - name: "kubernetes - kubelet kubeadm kubectl ({{k8s_version}}) installed"
   yum:
     enablerepo: Kubernetes
@@ -106,6 +112,7 @@
       - "kubelet-{{k8s_version}}-0"
       - "kubeadm-{{k8s_version}}-0"
       - "kubectl-{{k8s_version}}-0"
+  when: yumres | json_query('results[?name=="kubelet"]') | count == 0
   register: out_k8s_install
 
 - name: kubernetes - pull required kubernetes images
