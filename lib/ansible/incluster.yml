@@ -80,7 +80,7 @@
       wd_helm3:
         chart: "{{ charts_dir }}/wd-k8sdashboard"
         namespace: kube-dashboard
-        atomic: yes
+        atomic: no
         values:
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
           token_ttl: "{{dashboard_token_ttl_s}}"
