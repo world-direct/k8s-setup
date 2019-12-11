@@ -65,6 +65,7 @@
         namespace: kube-certmanager
         atomic: yes
         values:
+          podDnsPolicy: Default
           webhook:
             enabled: false
           mode: "{{ k8s_certs_mode }}"
