@@ -1,0 +1,37 @@
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: InitConfiguration
+# bootstrapTokens:
+# - token: "${KUBEADM_TOKEN}"
+#   description: "default kubeadm bootstrap token"
+#   ttl: "0"
+localAPIEndpoint:
+  advertiseAddress: "{{ ansible_facts[host_primary_interface_name].ipv4.address }}"
+  bindPort: 6443
+---
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+
+kubernetesVersion: "v{{k8s_version}}"
+clusterName: kubernetes
+controlPlaneEndpoint: "{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}"
+certificatesDir: /etc/kubernetes/pki
+imageRepository: k8s.gcr.io
+networking:
+  dnsDomain: "{{k8s_cluster_dnsname}}"
+  podSubnet: "{{k8s_pod_network_cidr}}"
+  serviceSubnet: "{{k8s_service_cidr}}"
+
+apiServer:
+  timeoutForControlPlane: 4m0s  
+  extraArgs:
+    authorization-mode: Node,RBAC
+
+dns:
+  type: CoreDNS
+
+etcd:
+  local:
+    dataDir: /var/lib/etcd
+
+scheduler: {}
+controllerManager: {}

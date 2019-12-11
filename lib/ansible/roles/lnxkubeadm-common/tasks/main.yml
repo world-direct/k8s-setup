@@ -31,6 +31,12 @@
     dest: "{{ k8s_setup_dir }}/k8s-setup.env"
     mode: 755
 
+- name: clustersetup - sync ./kubeadm-config.yaml configuration file
+  template:
+    src: kubeadm-initconfig.yaml
+    dest: "{{ k8s_setup_dir }}/kubeadm-initconfig.yaml"
+    mode: 755
+
 - name: "clustersetup - running 'k8s-setup state' to check configuration state"
   command: "{{ k8s_setup_dir }}/k8s-setup state"
   changed_when: false

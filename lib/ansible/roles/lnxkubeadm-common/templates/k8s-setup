@@ -43,17 +43,18 @@ state()
 init()
 {
 
-    # perform the initialization
-    kubeadm init \
-        --control-plane-endpoint $k8s_apiserver_endpoint \
-        --service-dns-domain $k8s_cluster_dnsname \
-        --pod-network-cidr $k8s_pod_network_cidr \
-        --service-cidr $k8s_service_cidr \
-        --apiserver-advertise-address $k8s_apiserver_advertise_address \
-        --kubernetes-version $k8s_version \
-        --apiserver-bind-port 6443 \
-        --upload-certs
+    # # perform the initialization
+    # kubeadm init \
+    #     --control-plane-endpoint $k8s_apiserver_endpoint \
+    #     --service-dns-domain $k8s_cluster_dnsname \
+    #     --pod-network-cidr $k8s_pod_network_cidr \
+    #     --service-cidr $k8s_service_cidr \
+    #     --apiserver-advertise-address $k8s_apiserver_advertise_address \
+    #     --kubernetes-version $k8s_version \
+    #     --apiserver-bind-port 6443 \
+    #     --upload-certs
 
+    kubeadm init --config ./kubeadm-initconfig.yaml --upload-certs
     kubeconfig
 
     exit 0
