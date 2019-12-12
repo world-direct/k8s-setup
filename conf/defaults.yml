@@ -65,11 +65,8 @@ k8s_service_cidr: 10.96.0.0/16
 # this is the VIP of the clp load balancer
 k8s_apiserver_vip: 
 
-# the base dnsname for the cluster  **)
+# the base dnsname for the cluster
 k8s_cluster_dnsname: 
-
-# the hostname used for the apiserver (without the k8s_cluster_dnsname) **)
-k8s_apiserver_hostname: apiserver
 
 # to install the flannel CNI plugin
 # we will evalute the 'Host Gateway Mode' as an alternative, specially how it 
@@ -81,6 +78,15 @@ k8s_loadbalancers_ingress_ip:           # example: 10.0.0.80
 
 # this is the IP range for all other services of type=LoadBalancer
 k8s_loadbalancers_default_ip_range:     # example: 10.0.0.81-10.0.0.99
+
+## Hostnames
+#############################################################
+
+# the hostname used for the apiserver (without the k8s_cluster_dnsname) **)
+k8s_apiserver_hostname: apiserver
+
+# the hostname used for 'dex' (without the k8s_cluster_dnsname) **)
+k8s_dex_hostname: dex
 
 ## CA Configuration
 #############################################################

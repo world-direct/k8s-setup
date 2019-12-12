@@ -1,0 +1,28 @@
+---
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: https-certificate
+  namespace: {{ .Release.Namespace }}
+spec:
+
+  # vars
+  commonName: {{ .Values.hostname }}
+  dnsNames:
+    - {{ .Values.hostname }}
+  organization:
+    - world-direct.at
+
+  # cert params
+  usages:
+    - server auth
+    - client auth
+  duration: 2160h     # 90d
+  renewBefore: 360h   # 15d
+  keyAlgorithm: ecdsa # ACME doesn't support ECDSA
+
+  # framework
+  secretName: https-certificate
+  issuerRef:
+    name: k8s-setup-default
+    kind: ClusterIssuer
