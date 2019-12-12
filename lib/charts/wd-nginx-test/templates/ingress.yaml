@@ -2,7 +2,17 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: wd-nginx-test
+  annotations:
+    cert-manager.io/cluster-issuer: k8s-setup-default
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/ssl-passthrough: 'false'
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
 spec:
+  tls:
+   - hosts:
+       - wd-nginx-test.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
+     secretName: wd-nginx-test-cert
   rules:
   - host: wd-nginx-test.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
     http:
@@ -11,18 +21,3 @@ spec:
         backend:
           serviceName: wd-nginx-test
           servicePort: 80
-
----
-apiVersion: cert-manager.io/v1alpha2
-kind: Certificate
-metadata:
-  name: tls-certificate
-  namespace: {{ .Release.Namespace }}
-spec:
-  secretName: tls-certificate-secret
-  dnsNames:
-  - wd-nginx-test.{{ required "A valid cluster_dns_name is required" .Values.cluster_dns_name }}
-  - wd-nginx-test
-  issuerRef:
-    name: k8s-setup-default
-    kind: ClusterIssuer
