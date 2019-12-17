@@ -17,11 +17,11 @@ data:
     oauth2:
       skipApprovalScreen: true
     staticClients:
-    - id: example-app
+    - id: kubernetes
       redirectURIs:
       - 'http://127.0.0.1:5555/callback'
-      name: 'Example App'
-      secret: ZXhhbXBsZS1hcHAtc2VjcmV0
+      name: kubernetes
+      secret: 5a0a502aa7fa1fa829e02bdca5f21c11
     enablePasswordDB: true
     staticPasswords:
     - email: "admin@example.com"
