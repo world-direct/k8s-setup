@@ -1,4 +1,4 @@
-# NOTE: This is far away from being a complete OIDC Test-Script!
+# NOTE: This is far away from being a complete OIDC Test-script!
 # - it contains assumptions about the kind of responses (e.g. redirection to /approval)
 # - it contains assumptions about urls being relative or absolute
 # - it parses the HTML form with regex, not with a HTML parser
@@ -12,7 +12,7 @@ login=admin@example.com
 password=password
 
 # get endpoints
-oidconf=$(curl $prov -k)
+oidconf=$(curl -s $prov -k)
 issuer=$(echo $oidconf | jq ".issuer" -r)
 authep=$(echo $oidconf | jq ".authorization_endpoint" -r)
 tokenep=$(echo $oidconf | jq ".token_endpoint" -r)
@@ -24,8 +24,8 @@ echo "*** Token-Endpoint: $tokenep"
 # request token (open form)
 redirect_uri=http://127.0.0.1:5555/callback
 function uriencode { jq -nr --arg v "$1" '$v|@uri'; }
-authreq="$authep?response_type=code&scope=openid&client_id=$client_id&redirect_uri=$(uriencode $redirect_uri)"
-authres=$(curl -kL $authreq)
+authreq="$authep?response_type=code&scope=openid%20offline_access&client_id=$client_id&redirect_uri=$(uriencode $redirect_uri)"
+authres=$(curl -s -kL $authreq)
 
 # extract the 'action' from the form
 form_action=
@@ -40,7 +40,7 @@ fi
 # submitting the login-form
 # we expect a redirection to /approval?req=r5otb2asnqq4heo3e4rbnqfzm
 # we can't use just -L, because we need to catch the redirect to redirect_uri
-approval_rel=$(curl -ki \
+approval_rel=$(curl -s -ki \
     --data-urlencode "login=$login" \
     --data-urlencode "password=$password"  \
     $form_action \
@@ -52,7 +52,7 @@ approval=$issuer$approval_rel
 echo "*** Approval-Url: $approval" #  no OIDC standard, dex impl. detail
 
 # get the auth_code by fetching approval, but without executing 302 to redirect_url
-location=$(curl -ki $approval \
+location=$(curl -s -ki $approval \
     | grep "location: " \
     | awk '{print $2}' \
     | tr -d '\n\r')
@@ -67,11 +67,29 @@ fi
 
 echo "*** Authcode: $authcode"
 
-# get token
-curl -kv \
+# get id_token and refresh_token
+full_token=$(
+curl -s -k \
     --data-urlencode "grant_type=authorization_code" \
     --data-urlencode "code=$authcode" \
     --data-urlencode "redirect_uri=$redirect_uri"   \
     --data-urlencode "client_id=$client_id"   \
     --data-urlencode "client_secret=$client_secret"   \
-    "$tokenep" | jq
+    "$tokenep" )
+
+# echo $full_token | jq
+refresh_token=$(echo $full_token | jq ".refresh_token" -r)
+echo "*** Refresh-Token: $refresh_token"
+
+# get id_token from refresh_token
+refreshed_token=$(
+    curl -s -k \
+    --data-urlencode "grant_type=refresh_token" \
+    --data-urlencode "refresh_token=$refresh_token" \
+    --data-urlencode "client_id=$client_id"   \
+    --data-urlencode "client_secret=$client_secret"   \
+    "$tokenep")
+    
+# echo $refreshed_token| jq
+id_token=$(echo $refreshed_token | jq ".id_token" -r)
+echo "*** id-Token: $id_token"
