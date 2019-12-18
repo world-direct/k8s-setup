@@ -14,6 +14,7 @@
     dest: /tmp/k8s-setup-joincmd
     content: "{{ join_cmd.stdout }}"
 
+  # https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm-init/#uploading-control-plane-certificates-to-the-cluster
 - name: clustersetup - get certificate-key from lnxclp_setup
   shell: kubeadm init phase upload-certs --upload-certs | tail -n 1
   delegate_to: "{{ groups['lnxclp_setup'] | first }}"

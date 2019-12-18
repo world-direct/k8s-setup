@@ -28,7 +28,7 @@ spec:
         - name: config
           mountPath: /etc/dex/cfg
 
-        - name: https-certificate
+        - name: sign-certificate
           mountPath: /etc/dex/tls
 
       volumes:
@@ -39,6 +39,6 @@ spec:
           - key: config.yaml
             path: config.yaml
 
-      - name: https-certificate
+      - name: sign-certificate
         secret:
-          secretName: https-certificate
+          secretName: sign-certificate

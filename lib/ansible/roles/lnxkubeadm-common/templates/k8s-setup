@@ -52,9 +52,11 @@ init()
     #     --apiserver-advertise-address $k8s_apiserver_advertise_address \
     #     --kubernetes-version $k8s_version \
     #     --apiserver-bind-port 6443 \
-    #     --upload-certs
 
-    kubeadm init --config ./kubeadm-initconfig.yaml --upload-certs
+    kubeadm init --config ./kubeadm-initconfig.yaml \
+        --skip-token-print  \
+        --skip-certificate-key-print
+
     kubeconfig
 
     exit 0

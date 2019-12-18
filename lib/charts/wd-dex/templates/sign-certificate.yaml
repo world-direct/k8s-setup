@@ -2,7 +2,7 @@
 apiVersion: cert-manager.io/v1alpha2
 kind: Certificate
 metadata:
-  name: https-certificate
+  name: sign-certificate
   namespace: {{ .Release.Namespace }}
 spec:
 
@@ -19,10 +19,10 @@ spec:
     - client auth
   duration: 2160h     # 90d
   renewBefore: 360h   # 15d
-  keyAlgorithm: ecdsa # ACME doesn't support ECDSA
+  keyAlgorithm: rsa
 
   # framework
-  secretName: https-certificate
+  secretName: sign-certificate
   issuerRef:
-    name: k8s-setup-default
-    kind: ClusterIssuer
+    name: kube-ca-issuer
+    kind: Issuer

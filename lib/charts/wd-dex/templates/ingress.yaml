@@ -4,11 +4,18 @@ metadata:
   name: {{ .Values.hostname }}
   namespace: {{ .Release.Namespace }}
   annotations:
-    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    cert-manager.io/cluster-issuer: k8s-setup-default
+    kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
+    nginx.ingress.kubernetes.io/ssl-passthrough: 'false'
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
 spec:
+  tls:
+    - secretName: https-certificate
+      hosts:
+       - {{ required "A valid hostname" .Values.hostname }}
   rules:
-  - host: {{ required "A valid 'hostname' is required" .Values.hostname }}
+  - host: {{ .Values.hostname }}
     http:
       paths:
       - path: /

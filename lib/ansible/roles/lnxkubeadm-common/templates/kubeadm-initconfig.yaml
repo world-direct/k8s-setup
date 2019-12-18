@@ -12,10 +12,19 @@ apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 
 kubernetesVersion: "v{{k8s_version}}"
-clusterName: kubernetes
+clusterName: kubernetes   # this is the 'internal' clusterName, not the external dnsname
 controlPlaneEndpoint: "{{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}:{{k8s_apiserver_port}}"
+
 certificatesDir: /etc/kubernetes/pki
+apiServerCertSANs:
+  - kubernetes
+  - kubernetes.default
+  - kubernetes.default.svc
+  - kubernetes.default.svc.{{k8s_cluster_dnsname}}
+  - {{k8s_apiserver_hostname}}.{{k8s_cluster_dnsname}}
+
 imageRepository: k8s.gcr.io
+
 networking:
   dnsDomain: "{{k8s_cluster_dnsname}}"
   podSubnet: "{{k8s_pod_network_cidr}}"
@@ -25,6 +34,12 @@ apiServer:
   timeoutForControlPlane: 4m0s  
   extraArgs:
     authorization-mode: Node,RBAC
+    oidc-issuer-url: https://dex.{{k8s_cluster_dnsname}}
+    oidc-client-id: kubernetes
+    oidc-username-claim: email
+    oidc-ca-file: /etc/kubernetes/pki/ca.crt
+    oidc-username-claim: email
+    oidc-groups-claim: groups
 
 dns:
   type: CoreDNS
@@ -34,4 +49,5 @@ etcd:
     dataDir: /var/lib/etcd
 
 scheduler: {}
+
 controllerManager: {}
