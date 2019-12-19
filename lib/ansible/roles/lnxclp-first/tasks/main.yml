@@ -15,3 +15,14 @@
     # this is relative to the /lib/ansible directory on localhost
     dest: "../../.local/admin.conf"
     flat: true
+
+- name: clustersetup - fetch internal CA files to provisioning client for later dex Issuer creation
+  fetch:
+    src: "/etc/kubernetes/pki/{{item}}"
+
+    # this is relative to the /lib/ansible directory on localhost
+    dest: "../../.local/{{item}}"
+    flat: true
+  loop:
+    - ca.crt
+    - ca.key

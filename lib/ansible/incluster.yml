@@ -6,6 +6,9 @@
       charts_dir: "{{playbook_dir}}/../charts"
   tasks:
 
+    ############################################################################
+    ## Provisioner Setup
+
     - name: incluster - run 'use-context' for verification
       shell: "{{playbook_dir}}/../../.local/scripts/use-context"
       register: cmd
@@ -22,6 +25,9 @@
         path: ~/.bashrc
         line: source <(helm3 completion bash)
 
+    ############################################################################
+    ## CNI Provider: flannel
+
     - name: incluster - namespace kube-flannel
       wd_k8snamespace:
         namespace: kube-flannel
@@ -31,6 +37,9 @@
         chart: "{{ charts_dir }}/wd-flannel"
         atomic: yes
         namespace: kube-flannel
+
+    ############################################################################
+    ## LoadBalancer: metallb
 
     - name: incluster - namespace kube-metallb
       wd_k8snamespace:
@@ -45,6 +54,9 @@
           default_ip_range: "{{k8s_loadbalancers_default_ip_range}}"
           ingress_ip: "{{k8s_loadbalancers_ingress_ip}}"
 
+    ############################################################################
+    ## Ingress-Controller: nginx-ingress
+
     - name: incluster - namespace kube-nginx-ingress
       wd_k8snamespace:
         namespace: kube-nginx-ingress
@@ -54,6 +66,9 @@
         chart: "{{ charts_dir }}/wd-nginx-ingress"
         namespace: kube-nginx-ingress
         atomic: yes
+
+    ############################################################################
+    ## Certifiates: CertManger
 
     - name: incluster - namespace kube-certmanager
       wd_k8snamespace:
@@ -73,6 +88,9 @@
             email: "{{ k8s_certs_acme.email | default('NOACME') }}"
             server: "{{ k8s_certs_acme.server | default('NOACME') }}"
 
+    ############################################################################
+    ## Kubernetes Dashboard
+
     - name: incluster - namespace kube-dashboard
       wd_k8snamespace:
         namespace: kube-dashboard
@@ -86,9 +104,18 @@
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
           token_ttl: "{{dashboard_token_ttl_s}}"
 
+    ############################################################################
+    ## Authentication: dex
+
     - name: incluster - namespace kube-dex
       wd_k8snamespace:
         namespace: kube-dex
+
+    - name: incluster - ensure kube-ca-issuer-cert tls secret for dex
+      shell: kubectl -n kube-dex create secret tls --cert {{playbook_dir}}/../../.local/ca.crt --key {{playbook_dir}}/../../.local/ca.key kube-ca-issuer-cert || true
+      register: res
+      changed_when: "' created' in res.stdout"
+      failed_when: "' created' not in res.stdout and 'already exists' not in res.stderr"
 
     - name: incluster - chart wd-dex installed
       wd_helm3:
@@ -99,6 +126,9 @@
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
           hostname: "dex.{{k8s_cluster_dnsname}}"
 
+    ############################################################################
+    ## Test-Application: wd-nginx-test
+
     - name: incluster - chart wd-nginx-test installed
       wd_helm3:
         chart: "{{ charts_dir }}/wd-nginx-test"
@@ -106,9 +136,15 @@
         values:
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
 
+    ############################################################################
+    ## PersistentVolumeClaims: trident
+
     - name: Include trident tasks, if trident is enabled is set
       include_tasks: tasks/tridentinstall.yml
       when: trident.enabled
+
+    ############################################################################
+    ## Registry: harbor
 
     - name: incluster - namespace kube-harbor
       wd_k8snamespace:
