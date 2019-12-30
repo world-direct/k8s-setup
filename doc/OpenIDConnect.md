@@ -55,3 +55,12 @@ openssl req -new -key ssl/key.pem -out ssl/csr.pem -subj "/CN=kube-ca" -config s
 openssl x509 -req -in ssl/csr.pem -CA ssl/ca.pem -CAkey ssl/ca-key.pem -CAcreateserial -out ssl/cert.pem -days 10 -extensions v3_req -extfile ssl/req.cnf
 
 ```
+
+# Tools
+
+https://medium.com/@mrbobbytables/kubernetes-day-2-operations-authn-authz-with-oidc-and-a-little-help-from-keycloak-de4ea1bdbbe
+https://www.keycloak.org/docs/latest/authorization_services/
+https://itnext.io/protect-kubernetes-dashboard-with-openid-connect-104b9e75e39c
+https://github.com/panva/node-oidc-provider/
+https://github.com/int128/kubelogin
+https://medium.com/@int128/kubectl-with-openid-connect-43120b451672
