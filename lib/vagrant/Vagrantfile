@@ -116,6 +116,10 @@ Vagrant.configure(2) do |config|
             ansible.groups["winwrk"] << "winwrk#{nr}"
         end
 
+        if ENV['GLOBAL_VAGRANT_SINGLENODE_LNXCLUSTER']
+            ansible.groups["lnxwrk"] << "lnxclp1"
+        end
+
         ansible.playbook = "../ansible/ping.yml"
         ansible.compatibility_mode = "2.0"
 

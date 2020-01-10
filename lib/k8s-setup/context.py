@@ -158,4 +158,10 @@ class Context(object):
         env['K8S_APISERVER_VIP'] = str(self.config['k8s_apiserver_vip'])
         env['K8S_APISERVER_HOST'] = str(self.config['k8s_apiserver_hostname'] + "." + self.config['k8s_cluster_dnsname'])
 
+        if bool(self.config.get('global_vagrant_singlenode_lnxcluster', False)):
+            logger.debug("singlenode_lnxcluster enabled")
+            env['GLOBAL_VAGRANT_LNXCLP_COUNT'] = "1"
+            env['GLOBAL_VAGRANT_LNXWRK_COUNT'] = "0"
+            env['GLOBAL_VAGRANT_WINWRK_COUNT'] = "0"
+
         return env

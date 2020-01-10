@@ -53,6 +53,13 @@
       failed_when: cmd.rc > 0 and cmd.rc < 255
       changed_when: cmd.rc == 0
 
+    - name: clusterlocal -- if singlenode cluster, remove taint to schedule on master
+      shell: kubectl taint node --all node-role.kubernetes.io/master-
+      register: cmd
+      failed_when: false
+      changed_when: cmd.rc == 0
+      when: global_vagrant_singlenode_lnxcluster == true
+
     - name: clusterlocal - sync write-k8s-setup-info script
       template:
         src: localtemplates/write-k8s-setup-info

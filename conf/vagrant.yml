@@ -38,6 +38,10 @@ k8s_loadbalancers_ingress_ip: 10.0.0.80
 # this is the IP range for all other services of type=LoadBalancer
 k8s_loadbalancers_default_ip_range: 10.0.0.81-10.0.0.99
 
+# this instructs k8s-setup to setup a cluster with only one linux node
+# this overwrites the configuration-values: global_vagrant_lnxclp_count, 
+# global_vagrant_lnxwrk_count and global_vagrant_winwrk_count
+global_vagrant_singlenode_lnxcluster: true
 
 ## Provisioning Client configuration
 #############################################################
