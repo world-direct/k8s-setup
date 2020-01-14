@@ -34,7 +34,7 @@ apiServer:
   timeoutForControlPlane: 4m0s  
   extraArgs:
     authorization-mode: Node,RBAC
-    oidc-issuer-url: https://dex.{{k8s_cluster_dnsname}}
+    oidc-issuer-url: https://auth.{{k8s_cluster_dnsname}}
     oidc-client-id: kubernetes
     oidc-username-claim: email
     oidc-ca-file: /etc/kubernetes/pki/ingressca.pem

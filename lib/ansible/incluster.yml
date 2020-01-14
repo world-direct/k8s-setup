@@ -124,7 +124,7 @@
         atomic: yes
         values:
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
-          hostname: "dex.{{k8s_cluster_dnsname}}"
+          hostname: "auth.{{k8s_cluster_dnsname}}"
 
     ############################################################################
     ## Test-Application: wd-nginx-test

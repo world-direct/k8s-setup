@@ -3,7 +3,7 @@
 # Declare name/value pairs to be passed into your templates.
 # name: value
 
-hostname: dex.k8stest.local
+hostname: auth.k8stest.local
 
 image: quay.io/dexidp/dex
 imagetag: "v2.19.0"

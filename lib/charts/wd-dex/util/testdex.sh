@@ -4,7 +4,7 @@
 # - it parses the HTML form with regex, not with a HTML parser
 
 # input data (values have to match the 'dex' configmap, see templates/configmap.yaml)
-prov=https://dex.k8stest.local/.well-known/openid-configuration
+prov=https://auth.k8stest.local/.well-known/openid-configuration
 client_id=kubernetes
 client_secret=5a0a502aa7fa1fa829e02bdca5f21c11
 redirect_uri=http://localhost:5555/callback

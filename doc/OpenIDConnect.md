@@ -36,7 +36,7 @@ keyUsage = nonRepudiation, digitalSignature, keyEncipherment
 subjectAltName = @alt_names
 
 [alt_names]
-DNS.1 = dex.example.com
+DNS.1 = auth.example.com
 EOF
 
 openssl genrsa -out ssl/ca-key.pem 2048
