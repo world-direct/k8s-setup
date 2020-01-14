@@ -10,6 +10,19 @@
   roles:
     - lnxkubeadm-common
 
+# copy ca file for apiserver oidc
+- hosts: lnxclp
+  tasks:
+    - name: clustersetup - Ensure /etc/kubernetes/pki
+      file:
+        name: /etc/kubernetes/pki
+        state: directory
+
+    - name: clustersetup - Ensure ingress CA file for oidc
+      copy:
+        src: ../../.local/cacrt.pem
+        dest: /etc/kubernetes/pki/ingressca.pem
+
 # check if cluster-state of the lnxclp_setup
 - hosts: lnxclp_setup
   tasks:

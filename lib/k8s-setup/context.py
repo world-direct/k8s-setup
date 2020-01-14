@@ -103,7 +103,21 @@ class Context(object):
         self.mode = self.config['global_mode']
         self.ansible_inventory_filepath = self.config['ansible_inventory_filepath']
         
+        self.validate_config()
+
         logger.debug("Using mode '%s', inventory-file '%s'" % (self.mode, self.ansible_inventory_filepath))
+
+    def validate_config(self):
+        logger.debug("validating config")
+
+        c = self.config
+
+        k8s_certs_mode = c["k8s_certs_mode"]
+        logger.debug("k8s_certs_mode: %s" % k8s_certs_mode)
+
+        if k8s_certs_mode != "CA" and k8s_certs_mode != "ACME":
+            raise ValueError('k8s_certs_mode need to be "CA" or "ACME"')
+
 
     def set_file(self, filepath):
 
