@@ -132,6 +132,11 @@ date, the user of the name of the provisioning host.
 Please note that the provisioning logic don't read this data. It only serves
 informational purposes.
 
+## Output debug Messages
+
+You can enable Debug level logging, by setting the `K8S_SETUP_DEBUG` environment
+variable to '1'.
+
 # Vagrant Development Environment
 
 ## Networking

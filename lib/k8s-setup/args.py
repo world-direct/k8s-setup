@@ -2,34 +2,21 @@
 
 import argparse
 import sys
+import os
 
 def parse_args():
 
     class Args(object):
         
-        def __init__(self, command, debug):
+        def __init__(self, command):
             self.command = command
-            self.debug = debug
+            self.debug = True if os.environ.get("K8S_SETUP_DEBUG") else False
+
             # additional attributes are added in each subparser
         pass
 
     # https://chase-seibert.github.io/blog/2014/03/21/python-multilevel-argparse.html
     class ArgsParser(object):
-
-        def add_global_args(self, parser):
-            """
-            This function adds global args to all subparsers.
-            I tried to add them in the toplevep 'parser', but I didn't manage
-            to get it work in 3 minutes.
-            Because I'm late in the schedule, I may try later to improve this.
-            TODO: Check top level args
-            """
-
-            parser.add_argument('-d', '--debug',
-                help="Enable debug log to stdout",
-                action='store_true',
-                default=False
-            )
 
         def __init__(self):
             parser = argparse.ArgumentParser(
@@ -60,17 +47,13 @@ def parse_args():
             parser = argparse.ArgumentParser(prog='k8s-setup info',
                 description='Shows the current version and configuration info')
 
-            self.add_global_args(parser)
-
-            args = parser.parse_args(sys.argv[2:])
-            res = Args("info", args.debug)
+            parser.parse_args(sys.argv[2:])
+            res = Args("info")
             return res
 
         def checkout(self):
             parser = argparse.ArgumentParser(prog='k8s-setup checkout',
                 description='Download objects and refs from another repository')
-
-            self.add_global_args(parser)
 
             parser.add_argument('--no-deps',
                 help="Don't automatically install dependencies",
@@ -85,7 +68,7 @@ def parse_args():
 
             args = parser.parse_args(sys.argv[2:])
 
-            res = Args('checkout', args.debug)
+            res = Args('checkout')
             res.version = args.version
             res.no_deps = args.no_deps
             return res
@@ -93,8 +76,6 @@ def parse_args():
         def config(self):
             parser = argparse.ArgumentParser(prog='k8s-setup config',
                 description='Performs configuration commands')
-
-            self.add_global_args(parser)
 
             parser.add_argument(
                 "operation", help="must be 'set'",
@@ -119,7 +100,7 @@ def parse_args():
                 print("Eighter --file or --value has to be specified")
                 exit(1)
 
-            res = Args('config', args.debug)
+            res = Args('config')
             res.file = args.file
             res.value = args.value
             
@@ -128,8 +109,6 @@ def parse_args():
         def provision(self):
             parser = argparse.ArgumentParser(prog='k8s-setup provision',
                 description='Performs provisioning')
-
-            self.add_global_args(parser)
 
             parser.add_argument('scope', 
                 help="Sets the configuration file in the user profile",
@@ -144,7 +123,7 @@ def parse_args():
             )
             args = parser.parse_args(sys.argv[2:])
 
-            res = Args('provision', args.debug)
+            res = Args('provision')
             res.scope = args.scope
             res.ansible_options = args.ansible_options
             return res
@@ -153,8 +132,6 @@ def parse_args():
             parser = argparse.ArgumentParser(prog='k8s-setup tool',
                 description='Allows to execute the underlying tool cli programs')
 
-            self.add_global_args(parser)
-            
             parser.add_argument('name', 
                 help="The tool name",
                 choices=['ansible', 'ansible-playbook', 'ansible-inventory', 'vagrant'],
@@ -173,7 +150,7 @@ def parse_args():
             )
             args = parser.parse_args(sys.argv[2:])
 
-            res = Args('tool', args.debug)
+            res = Args('tool')
             res.name = args.name[0]
             res.show_only = args.show_only
             res.toolargs = args.toolargs
@@ -182,8 +159,6 @@ def parse_args():
         def generate(self):
             parser = argparse.ArgumentParser(prog='k8s-setup generate',
                 description='Generates artifactes')
-
-            self.add_global_args(parser)
 
             parser.add_argument('type', 
                 help="the type of the artifact",
@@ -196,7 +171,7 @@ def parse_args():
 
             args = parser.parse_args(sys.argv[2:])
 
-            res = Args('generate', args.debug)
+            res = Args('generate')
             res.type = args.type
             res.merge = args.merge
             return res
