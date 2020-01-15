@@ -37,7 +37,7 @@ def cmd_info(context, args):
     vals = dict()
 
     # version
-    versionsh = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../version.sh"))
+    versionsh = os.path.abspath(os.path.join(os.path.dirname(__file__), "../version.sh"))
     logger.debug("using script %s" % versionsh)
     version=subprocess.check_output(versionsh).strip()
     vals["version"] = version

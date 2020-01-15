@@ -11,3 +11,5 @@ __pycache__/
 # Files in /local are created by running the provisioning
 # You should not delete those manually
 /.local
+
+*.egg-info
