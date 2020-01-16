@@ -87,7 +87,7 @@ class Generator(object):
                     # not one of our rules
                     print(line)
 
-        # output our rules    
+        # output our rules
         for rule in rules:
             print("%-12s %-40s # k8s-setup: %s" % rule)
         

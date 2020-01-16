@@ -1,51 +1,103 @@
 #!/usr/bin/env python
 
+# https://click.palletsprojects.com/en/7.x/complex/
+
+
 import click
+import logging
+from context import Context
+import sys
+
+pass_context = click.make_pass_decorator(Context)
 
 @click.group()
-def cli():
+@click.option("--debug", "-d", is_flag=True, help="Outputs debug level log messages")
+@click.version_option()
+@click.pass_context
+def cli(clickctx, debug):
+
+    
+    level = logging.DEBUG if debug else logging.INFO
+    fmt = "%(asctime)s %(levelname)s [%(name)s] %(message)s" \
+            if debug else \
+        "%(asctime)s %(levelname)s %(message)s"
+
+    logging.basicConfig(level=level)
+
+    colorfmt = "%(log_color)s{}%(reset)s".format(fmt)
+    datefmt = '%Y-%m-%d %H:%M:%S'
+
+    # Suppress overly verbose logs from libraries that aren't helpful
+    logging.getLogger('requests').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+    logging.getLogger('aiohttp.access').setLevel(logging.WARNING)
+
+    try:
+        from colorlog import ColoredFormatter
+        logging.getLogger().handlers[0].setFormatter(ColoredFormatter(
+            colorfmt,
+            datefmt=datefmt,
+            reset=True,
+            log_colors={
+                'DEBUG': 'cyan',
+                'INFO': 'green',
+                'WARNING': 'yellow',
+                'ERROR': 'red',
+                'CRITICAL': 'red',
+            }
+        ))
+    except ImportError:
+        pass
+
+    logger = logging.getLogger('')
+    logger.setLevel(level) 
+
+    clickctx.obj = Context()
     pass
 
-@click.command()
-def info():
+#######################################
+## k8s-setup info
+@cli.command()
+@pass_context
+def info(context):
     """Shows the current version and configuration info"""
     click.echo('cmd_info')
 
-cli.add_command(info)
+    from info import Info
+    info = Info(context)
+    info.run(sys.stdout)
+    exit(0)
 
-@click.group()
-def config():
+#######################################
+## k8s-setup config
+
+@cli.command()
+@pass_context
+def config(context):
     """Performs configuration commands"""
-    
-    @click.command()
-    @click.option("--file", help="Specifies the global configuration file")
-    def set(file):
-        click.echo("config set file %s " % file)
 
-    config.add_command(set)
+#######################################
+## k8s-setup provision
 
-cli.add_command(config)
-
-@click.command()
+@cli.command()
 def provision():
     """Performs the provisioning"""
     click.echo('cmd_provision')
 
-cli.add_command(provision)
+#######################################
+## k8s-setup tool
 
-@click.command()
+@cli.command()
 def tool():
     """Allows executing the underlying tools for diagnostics"""
     click.echo('cmd_tool')
 
-cli.add_command(tool)
+#######################################
+## k8s-setup generate
 
-@click.command()
-def generate():
+@cli.command()
+def generate(artifact):
     """Generators (for /etc/hosts)"""
-    click.echo('cmd_generate')
-
-cli.add_command(generate)
 
 def main():
-    cli()
+    cli(auto_envvar_prefix="K8S_SETUP")

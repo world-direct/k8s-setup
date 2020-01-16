@@ -132,10 +132,28 @@ date, the user of the name of the provisioning host.
 Please note that the provisioning logic don't read this data. It only serves
 informational purposes.
 
+## Enable Shell Completion
+
+With the help of the wonderfull [click](https://click.palletsprojects.com/) library
+k8s-setup has buildin completion for bash and zsh.
+
+You need to activate this, like:
+
+```sh
+
+# bash (you may put this in .bashrc)
+eval "$(_K8S_SETUP_COMPLETE=source k8s-setup)"
+
+# zsh (you may put this in .zshrc)
+eval "$(_K8S_SETUP_COMPLETE=source_zsh k8s-setup)"
+```
+
 ## Output debug Messages
 
 You can enable Debug level logging, by setting the `K8S_SETUP_DEBUG` environment
 variable to '1'.
+
+You can also use the --debug command line option.
 
 # Vagrant Development Environment
 
