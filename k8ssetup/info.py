@@ -60,8 +60,12 @@ class Info:
 
     @classmethod
     def getVersion(cls):
+
         """
-        Returns the version determinated by the git repository status
+        If the package is no repository, the setuptools version is returned
+
+        If we are in "Development Mode" (pip install --editable), and have a 
+        Git Repository, the version determinated by the git repository status
         It is determinated by git describe --tags, using the v* tags
 
         Format:
@@ -84,6 +88,11 @@ class Info:
         # logger.debug("using script %s" % versionsh)
         # version=subprocess.check_output(versionsh).strip()
         # return version[1:]
+
+        if not os.path.exists(".git"):
+            with open("../VERSION.txt", 'r') as fs:
+                version = fs.readline()
+                return version
 
         repo = Info.getGitRepo()
 
