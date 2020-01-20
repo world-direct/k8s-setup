@@ -10,7 +10,7 @@ fi
 wd=$(mktemp -d)
 
 # render the k8s-setup info
-./k8s-setup info > $wd/setup-info
+cp .local/k8s-setup-info $wd/setup-info
 
 # render sysinfo
 echo "user: \"$USER\"" > $wd/sys-info

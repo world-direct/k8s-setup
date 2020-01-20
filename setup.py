@@ -1,25 +1,35 @@
 #!/usr/bin/env python
-from setuptools import setup
-from k8ssetup import Info
+from setuptools import setup, find_packages
 
-# write MANIFEST.in
-# we generate this, because we only need the files which are not gitignored
 import os
-with open("MANIFEST.in", 'w') as fs:
-    for file in Info.getLibFiles():
-        fs.write("include %s\n" % file)
 
-    fs.write("include VERSION.txt")
+hasrepo = os.path.exists(".git")
 
-# get the version information and write it into VERSION.txt
-version = Info.getVersion()
-with open("VERSION.txt", 'w') as fs:
-    fs.write(version)
+# check if we are operating on the repo.
+# if true, than we take the files and the version from the repo status
+version="0.0"
+if hasrepo:
+
+    from git import Git
+    repo = Git(".")
+
+    # write VERSION.txt
+    from k8ssetup import version
+    version = version.getVersionFromRepo(repo)
+    with open("VERSION.txt", 'w') as fs:
+        fs.write(version)
+
+    # write MANIFEST.in
+    # we generate this, because we only need the files which are not gitignored
+    files = repo.ls_files("lib").splitlines() + repo.ls_files("conf").splitlines() + ["VERSION.txt"]
+    with open("MANIFEST.in", 'w') as fs:
+        for file in files:
+            fs.write("include %s\n" % file)
 
 setup(
     name='k8s-setup',
     version=version,
-    packages=['k8ssetup'],
+    packages=find_packages(),
     url="https://github.com/world-direct/k8s-setup",
     author="gprossliner",
     author_email="createissue@github.com",

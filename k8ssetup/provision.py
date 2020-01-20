@@ -4,7 +4,7 @@ import logging
 import os
 import shutil
 
-from tool import Tool
+from .tool import Tool
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +29,11 @@ class Provision():
     def cluster(self):
         logger.info("Provisioning scope 'cluster'")
 
+        logger.debug("Write .local/k8s-setup-info")
+        from .info import Info
+        with open(".local/k8s-setup-info", 'w') as fs:
+            Info(self.context).run(fs)
+
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
         tool.ansible_playbook_auto("./lib/ansible/cluster-local.yml", add_localhost=True, become=False)
@@ -41,7 +46,7 @@ class Provision():
         logger.debug("k8s_certs_mode=%s" % k8s_certs_mode)
 
         if(k8s_certs_mode == 'CA'):
-            import cert
+            from .cert import generate_selfsigned_ca
 
             crtpath = None
             keypath = None
@@ -55,7 +60,7 @@ class Provision():
                     logger.info("CA already generated in %s %s" % (crtpath, keypath))
                 else:
                     logger.info("Generate CA files to %s %s" % (crtpath, keypath))
-                    crt, key = cert.generate_selfsigned_ca("generated-ca.k8stest.local")
+                    crt, key = generate_selfsigned_ca("generated-ca.k8stest.local")
 
                     with open(crtpath, "w") as f:
                         f.write(crt)
@@ -74,7 +79,7 @@ class Provision():
 
             # symlink the files to the chart, because helm can't access files
             # outside of the chart directory
-            cafilespath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../charts/wd-certmanager/.ca")
+            cafilespath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../lib/charts/wd-certmanager/.ca")
             cafilespath = os.path.relpath(cafilespath)
             logger.debug("Using path %s to symlink ca-files" % cafilespath)
 

@@ -3,7 +3,7 @@
 import logging
 import os
 
-from context import Context
+from .context import Context
 
 logger = logging.getLogger(__name__)
 

@@ -4,7 +4,7 @@ import subprocess
 import logging
 import os
 
-from context import Context
+from .context import Context
 
 logger = logging.getLogger(__name__)
 
@@ -12,9 +12,6 @@ class Tool(object):
     
     def __init__(self, context):
         self.context = context
-
-    def add_default_args(program, args):
-        pass
 
     def get_cwd(self, program):
 
@@ -26,6 +23,8 @@ class Tool(object):
     def run(self, program, args, dont_check_exitcode = False):
         program = str(program)
         env = self.context.get_environment()
+
+        if not args: args=[]
 
         if program.startswith("ansible"):
             if(os.path.exists(self.context.ansible_inventory_filepath)):

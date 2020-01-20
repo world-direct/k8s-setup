@@ -119,7 +119,7 @@ class HelmBase:
         if values:
             # args.append("-f <(echo '%s')" % values)
             # this works in bash, but not in ansible, so let's make a tmp file
-            valfile = tempfile.NamedTemporaryFile("w+a", delete=(not keepvaluesfile))
+            valfile = tempfile.NamedTemporaryFile("w", delete=(not keepvaluesfile))
             valfile.writelines(values)
             valfile.flush()
 

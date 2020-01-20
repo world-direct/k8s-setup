@@ -12,15 +12,20 @@ designed in a way, that Windows support is possible. It just needs to be impleme
 
 # How to use
 
-## Install
+## Install by pip
+
+Every released version will have a pip source package created. This will be published
+to PyPi. Additional instructions will follow.
+
+## Install by git
 
 1. Clone the repository
 2. Install python (>=2.7) and pip
-3. Install k8s-setup 
-3. [Vagrant](https://www.vagrantup.com/intro/getting-started/install.html) (tested against Vagrant 2.2.4)
-4. VirtualBox (tested against VirtualBox 6.0.12)
+3. Install the package editable by `pip install GitPython && pip install --editable .`
+4. [Vagrant](https://www.vagrantup.com/intro/getting-started/install.html) (tested against Vagrant 2.2.4)
+5. VirtualBox (tested against VirtualBox 6.0.12)
 
-The steps 3. and 4. are only required, if you want to setup a local virtual cluster.
+The steps 4. and 5. are only required, if you want to setup a local virtual cluster.
 
 ## Provide the configuration
 

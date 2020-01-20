@@ -1,3 +1,4 @@
 #!/bin/sh
 
-./k8ssetup/main.py $@
+# this is just a forwarder for the setuptools installed package
+k8ssetup $@

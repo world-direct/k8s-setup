@@ -2,9 +2,9 @@
 
 import os
 import sys
-import logging
 import yaml
 
+import logging
 logger = logging.getLogger(__name__)
 
 class Context(object):
