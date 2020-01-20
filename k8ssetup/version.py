@@ -68,7 +68,7 @@ def getVersionFromRepo(repo):
 
     version = tagversion
 
-    if dirty or nahead > 0:
+    if dirty or nahead != "0":
         # long output
         version += ".dev%s+%s" % (nahead, sha)
         logger.debug("We are head of the tag and / or dirty, so use the long output: %s" % version)
