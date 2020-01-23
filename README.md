@@ -193,3 +193,6 @@ $ ip route | grep 10.0.0.0
 
 So you can just access the network from you host. You may add an entry in your
 /etc/hosts file, like `10.0.0.2 apiserver.k8stest.local`
+
+
+https://setuptools.readthedocs.io/en/latest/setuptools.html#automatic-resource-extraction
