@@ -42,9 +42,15 @@ else:
     with open("k8ssetup/VERSION.txt", 'w') as fs:
         version = fs.readline()
 
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
     name='k8s-setup',
     version=version,
+    description="Setup local and production hybrid clusters, using Ansible and Vagrant",
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=['k8ssetup'],
     url="https://github.com/world-direct/k8s-setup",
     author="gprossliner",
