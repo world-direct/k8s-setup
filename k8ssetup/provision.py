@@ -34,13 +34,6 @@ class Provision():
         with open(".local/k8s-setup-info", 'w') as fs:
             Info(self.context).run(fs)
 
-        tool = Tool(self.context)
-        tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
-        tool.ansible_playbook_auto("./lib/ansible/cluster-local.yml", add_localhost=True, become=False)
-
-    def incluster(self):
-        logger.info("Provisioning scope 'incluster'")
-
         # check for the CA certificate, if 'k8s_certs_mode' == 'CA'
         k8s_certs_mode = self.context.config['k8s_certs_mode']
         logger.debug("k8s_certs_mode=%s" % k8s_certs_mode)
@@ -87,10 +80,17 @@ class Provision():
             if os.path.isdir(cafilespath):
                 shutil.rmtree(cafilespath)
 
-            # the .ca file is in .gitignore, so it's ok to keep the (for debugging)
+            # the .ca file is in .gitignore, so it's ok to keep the links (for debugging)
             os.mkdir(cafilespath)
             os.symlink(os.path.abspath(crtpath), os.path.join(cafilespath, "cacrt.pem"))
             os.symlink(os.path.abspath(keypath), os.path.join(cafilespath, "cakey.pem"))
+
+        tool = Tool(self.context)
+        tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
+        tool.ansible_playbook_auto("./lib/ansible/cluster-local.yml", add_localhost=True, become=False)
+
+    def incluster(self):
+        logger.info("Provisioning scope 'incluster'")
 
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/incluster.yml", add_localhost=True, become=False)

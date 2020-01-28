@@ -34,7 +34,7 @@ def getVersion():
         repo = Git(".")
         return getVersionFromRepo(repo)
 
-    with open("../VERSION.txt", 'r') as fs:
+    with open("./VERSION.txt", 'r') as fs:
         version = fs.readline()
         return version
 

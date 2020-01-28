@@ -24,6 +24,13 @@ class Context(object):
         fn_default_config="defaults.yml"
         fn_vagrant_config="vagrant.yml"
 
+        srcdir = os.path.dirname(__file__)
+        curdir = os.path.abspath(os.curdir)
+
+        if srcdir != curdir:
+            logger.debug("Setting current directory from %s to %s" % (curdir, srcdir))
+            os.chdir(srcdir)
+
         def add_config_file(file):
 
             file = os.path.normpath(file)
@@ -75,7 +82,7 @@ class Context(object):
 
         # read the current config
         if not os.path.islink(pn_current_config):
-            pn_vagrantconf = os.path.abspath(os.path.join(pn_conf, fn_vagrant_config))
+            pn_vagrantconf = os.path.join(pn_conf, fn_vagrant_config)
             logger.debug("'%s' doesnt exist, defaulting to %s" % (pn_current_config, pn_vagrantconf))
             self.set_file(pn_vagrantconf)
         
