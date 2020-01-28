@@ -1,5 +1,8 @@
 
+import sys
 
+if sys.version_info[0] >= 3:
+    unicode = str
 
 def generate_selfsigned_ca(clustername):
     """
@@ -25,7 +28,7 @@ def generate_selfsigned_ca(clustername):
     )
     
     name = x509.Name([
-        x509.NameAttribute(NameOID.COMMON_NAME, unicodefn(clustername))
+        x509.NameAttribute(NameOID.COMMON_NAME, unicode(clustername))
     ])
  
     # path_len=1 means that this certificate can sign one level of sub-certs

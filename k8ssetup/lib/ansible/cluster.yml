@@ -20,7 +20,7 @@
 
     - name: clustersetup - Ensure ingress CA file for oidc
       copy:
-        src: ../../.local/cacrt.pem
+        src: ~/.k8s-setup/cacrt.pem
         dest: /etc/kubernetes/pki/ingressca.pem
 
 # check if cluster-state of the lnxclp_setup

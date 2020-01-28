@@ -5,6 +5,7 @@ import logging
 import os
 
 from .context import Context
+from .consts import Paths
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +17,7 @@ class Tool(object):
     def get_cwd(self, program):
 
         if program == "vagrant":
-            return "./lib/vagrant"
+            return os.path.dirname(Paths.sys_vagrantfile)
 
         return "."
 

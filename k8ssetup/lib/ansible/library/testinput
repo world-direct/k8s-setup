@@ -1,1 +1,1 @@
-{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/k8stest.local/admin.conf","chart": "charts/wd-test","namespace": "default"}}
+{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/.k8s-setup/admin.conf","chart": "charts/wd-test","namespace": "default"}}

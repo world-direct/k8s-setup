@@ -8,21 +8,12 @@
   args:
     chdir: "{{ k8s_setup_dir }}"
 
-- name: clustersetup - fetch admin.conf to provisioning client for later import
+- name: clustersetup - fetch required files to provisioning client
   fetch:
-    src: /etc/kubernetes/admin.conf
-
-    # this is relative to the /lib/ansible directory on localhost
-    dest: "../../.local/admin.conf"
-    flat: true
-
-- name: clustersetup - fetch internal CA files to provisioning client for later dex Issuer creation
-  fetch:
-    src: "/etc/kubernetes/pki/{{item}}"
-
-    # this is relative to the /lib/ansible directory on localhost
-    dest: "../../.local/{{item}}"
+    src: "/etc/kubernetes/{{item}}"
+    dest: "~/.k8s-setup/{{item}}"
     flat: true
   loop:
-    - ca.crt
-    - ca.key
+    - admin.conf
+    - pki/ca.crt
+    - pki/ca.key

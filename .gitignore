@@ -1,6 +1,3 @@
-# Vagrant working directory
-.vagrant/
-
 # Ansible retry files
 *.retry
 
@@ -8,13 +5,10 @@
 __pycache__/
 *.pyc
 
-# Files in /local are created by running the provisioning
-# You should not delete those manually
-/.local
-k8ssetup/.local
-
 *.egg-info
 /dist/
 /build/
 MANIFEST.in
 VERSION.txt
+
+.vscode/.ropeproject

@@ -134,8 +134,6 @@ k8s_certs_ca:
 
 # In the cluster-local.yml playbook, the tools kubectl and helm3 will be fetched
 # accounting to this versions:
-# You may 'source /.local/scripts/use-context' script, to activate and validate
-# The current kubectl context
 client_helm_version: v3.0.0-rc.2
 client_kubectl_version: v1.17.0
 

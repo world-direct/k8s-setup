@@ -4,13 +4,18 @@
       # playbook_dir is undocumented, but check the source:
       # https://github.com/ansible/ansible/blob/143bafec9a506aff8f42ca573c7006a8c5549e12/lib/ansible/vars/hostvars.py#L40
       charts_dir: "{{playbook_dir}}/../charts"
+
+      local_path: "~/.k8s-setup"
+      admin_conf: "{{local_path}}/admin.conf"
+      script_path: "{{local_path}}/scripts"
+      log_path: "{{local_path}}/scripts/log"
   tasks:
 
     ############################################################################
     ## Provisioner Setup
 
     - name: incluster - run 'use-context' for verification
-      shell: "{{playbook_dir}}/../../.local/scripts/use-context"
+      shell: "{{script_path}}/use-context"
       register: cmd
       failed_when: cmd.rc > 0 and cmd.rc < 255
       changed_when: cmd.rc == 0
@@ -112,7 +117,7 @@
         namespace: kube-dex
 
     - name: incluster - ensure kube-ca-issuer-cert tls secret for dex
-      shell: kubectl -n kube-dex create secret tls --cert {{playbook_dir}}/../../.local/ca.crt --key {{playbook_dir}}/../../.local/ca.key kube-ca-issuer-cert || true
+      shell: kubectl -n kube-dex create secret tls --cert {{local_path}}/pki/ca.crt --key {{local_path}}/pki/ca.key kube-ca-issuer-cert || true
       register: res
       changed_when: "' created' in res.stdout"
       failed_when: "' created' not in res.stdout and 'already exists' not in res.stderr"

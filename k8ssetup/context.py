@@ -3,26 +3,16 @@
 import os
 import sys
 import yaml
+import shutil
 
 import logging
 logger = logging.getLogger(__name__)
 
+from .consts import Paths
+
 class Context(object):
 
-
-    ## Constants
-    #############################################################
-
-    pn_current_config = ".local/current-config"
-    pn_private_config = ".local/cli-config"
-
     def __init__(self):
-
-        pn_current_config = Context.pn_current_config
-        pn_private_config = Context.pn_private_config
-        pn_conf = "./conf"
-        fn_default_config="defaults.yml"
-        fn_vagrant_config="vagrant.yml"
 
         srcdir = os.path.dirname(__file__)
         curdir = os.path.abspath(os.curdir)
@@ -30,6 +20,14 @@ class Context(object):
         if srcdir != curdir:
             logger.debug("Setting current directory from %s to %s" % (curdir, srcdir))
             os.chdir(srcdir)
+
+        # ensure directories
+        def checkdir(dir):
+            if not os.path.isdir(dir):
+                logger.debug("Creating required directoy %s" % dir)
+                os.mkdir(dir)
+
+        checkdir(Paths.sys_homeroot)
 
         def add_config_file(file):
 
@@ -65,7 +63,7 @@ class Context(object):
                     if not os.path.isabs(val):
 
                         dirname = os.path.dirname(
-                            filepath if filepath != pn_current_config else os.readlink(filepath)
+                            filepath if filepath != Paths.sys_currentconfig else os.readlink(filepath)
                         )
 
                         absval = os.path.relpath(os.path.join(dirname, val))
@@ -78,19 +76,18 @@ class Context(object):
         ## Read configuration
         #############################################################
         self.config_files = []  # from lowest to highest priority
-        add_config_file(os.path.join(pn_conf, fn_default_config))
+        add_config_file(Paths.src_confdefaults)
 
         # read the current config
-        if not os.path.islink(pn_current_config):
-            pn_vagrantconf = os.path.join(pn_conf, fn_vagrant_config)
-            logger.debug("'%s' doesnt exist, defaulting to %s" % (pn_current_config, pn_vagrantconf))
-            self.set_file(pn_vagrantconf)
-        
-        add_config_file(pn_current_config)
+        if os.path.islink(Paths.sys_currentconfig):
+            add_config_file(Paths.sys_currentconfig)
+        else:
+            logger.debug("'%s' doesnt exist, defaulting to %s" % (Paths.sys_currentconfig, Paths.src_confvagrant))
+            add_config_file(Paths.src_confvagrant)
 
         # add private config if set
-        if os.path.isfile(pn_private_config):
-            add_config_file(pn_private_config)
+        if os.path.isfile(Paths.sys_cliconfig):
+            add_config_file(Paths.sys_cliconfig)
 
         # TODO: check if all self.config_files exists
 
@@ -112,6 +109,21 @@ class Context(object):
         
         self.validate_config()
 
+        if self.mode == "vagrant":
+            # vagrant places the .vagrant directory relative to the Vagrantfile
+            # because we should not put anything in the python dist-packages,
+            # we will copy the vagrantfile to /var/k8s-setup/Vagrantfile
+            if not os.path.islink(Paths.sys_vagrantfile):
+                os.symlink(os.path.abspath(Paths.src_vagrantfile), Paths.sys_vagrantfile)
+
+            # to generate the inventory, we need to provide a playbook file (lib/ansible/vagrantpp.yml)
+            # because we are running from ~/.k8s-setup, this can't be bound to the source path
+            # so we link it here to ~/.k8s-setup/vagrantpp.yml
+            if not os.path.islink(Paths.sys_vagrantpp):
+                os.symlink(os.path.abspath(Paths.src_vagrantpp), Paths.sys_vagrantpp)
+
+            self.ansible_inventory_filepath = Paths.sys_vagrantgeneratedinventory
+
         logger.debug("Using mode '%s', inventory-file '%s'" % (self.mode, self.ansible_inventory_filepath))
 
     def validate_config(self):
@@ -128,28 +140,22 @@ class Context(object):
 
     def set_file(self, filepath):
 
-        localpath=os.path.dirname(Context.pn_current_config)
-        if not os.path.isdir(localpath):
-            os.mkdir(localpath)
-
         if not os.path.isfile(filepath):
             print("File '%s' not found. Exiting" % filepath)
             exit(1)
 
-        if os.path.islink(Context.pn_current_config):
-            logger.debug("'%s' exist. Removing" % (Context.pn_current_config))
-            os.remove(Context.pn_current_config)
+        if os.path.islink(Paths.sys_currentconfig):
+            logger.debug("'%s' exist. Removing" % (Paths.sys_currentconfig))
+            os.remove(Paths.sys_currentconfig)
 
-        logger.debug("Creating symlink '%s' --> '%s'" % (Context.pn_current_config, filepath))
-        os.symlink(filepath, Context.pn_current_config)
+        logger.debug("Creating symlink '%s' --> '%s'" % (Paths.sys_currentconfig, filepath))
+        os.symlink(filepath, Paths.sys_currentconfig)
 
     def set_config_value(self, name, value):
-        pn_private_config = Context.pn_private_config
-
         vals=None
 
-        if os.path.isfile(pn_private_config):
-            with open(pn_private_config, 'r') as fs:
+        if os.path.isfile(Paths.sys_cliconfig):
+            with open(Paths.sys_cliconfig, 'r') as fs:
                 content = fs.read()
                 vals = yaml.load(content, Loader=yaml.SafeLoader)
 
@@ -162,7 +168,7 @@ class Context(object):
             logger.debug("Deleting private config %s=%s" % (name, value))
             del vals[name]
 
-        with open(pn_private_config, 'w+') as fs:
+        with open(Paths.sys_cliconfig, 'w+') as fs:
             content = yaml.dump(vals, Dumper=yaml.SafeDumper)
             fs.write(content)
 
@@ -177,6 +183,7 @@ class Context(object):
 
         # provide the VAGRANT_APISERVER_IP and VAGRANT_APISERVER_HOSTNAME setting
         env['K8S_APISERVER_VIP'] = str(self.config['k8s_apiserver_vip'])
+        env['K8S_CLUSTER_DNSNAME'] = str(self.config['k8s_cluster_dnsname'])
         env['K8S_APISERVER_HOST'] = str(self.config['k8s_apiserver_hostname'] + "." + self.config['k8s_cluster_dnsname'])
 
         if bool(self.config.get('global_vagrant_singlenode_lnxcluster', False)):

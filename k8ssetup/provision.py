@@ -5,6 +5,7 @@ import os
 import shutil
 
 from .tool import Tool
+from .consts import Paths
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +30,9 @@ class Provision():
     def cluster(self):
         logger.info("Provisioning scope 'cluster'")
 
-        logger.debug("Write .local/k8s-setup-info")
+        logger.debug("Write k8s-setup-info")
         from .info import Info
-        with open(".local/k8s-setup-info", 'w') as fs:
+        with open(Paths.sys_homeroot + "/k8s-setup-info", 'w') as fs:
             Info(self.context).run(fs)
 
         # check for the CA certificate, if 'k8s_certs_mode' == 'CA'
@@ -45,8 +46,8 @@ class Provision():
             keypath = None
 
             if self.context.config['k8s_certs_ca']['generate']:
-                crtpath = ".local/cacrt.pem"
-                keypath = ".local/cakey.pem"
+                crtpath = Paths.sys_homeroot + "/cacrt.pem"
+                keypath = Paths.sys_homeroot + "/cakey.pem"
                 logger.debug("Check if %s and %s exists" % (crtpath, keypath))
 
                 if os.path.isfile(crtpath) and os.path.isfile(keypath):
@@ -55,10 +56,10 @@ class Provision():
                     logger.info("Generate CA files to %s %s" % (crtpath, keypath))
                     crt, key = generate_selfsigned_ca("generated-ca.k8stest.local")
 
-                    with open(crtpath, "w") as f:
+                    with open(crtpath, "wb") as f:
                         f.write(crt)
 
-                    with open(keypath, "w") as f:
+                    with open(keypath, "wb") as f:
                         f.write(key)
 
             else:
@@ -72,7 +73,7 @@ class Provision():
 
             # symlink the files to the chart, because helm can't access files
             # outside of the chart directory
-            cafilespath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "../lib/charts/wd-certmanager/.ca")
+            cafilespath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "./lib/charts/wd-certmanager/.ca")
             cafilespath = os.path.relpath(cafilespath)
             logger.debug("Using path %s to symlink ca-files" % cafilespath)
 

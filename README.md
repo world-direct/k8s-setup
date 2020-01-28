@@ -14,8 +14,8 @@ designed in a way, that Windows support is possible. It just needs to be impleme
 
 ## Install by pip
 
-Every released version will have a pip source package created. This will be published
-to PyPi. Additional instructions will follow.
+Every released version will have a wheel package pushed to PyPI. You can install
+it by `pip install k8s-setup`
 
 ## Install by git
 
@@ -38,13 +38,13 @@ To access the cluster from your machine, you should have an host record for the
 apiserver. The IP is configured by the `k8s_apiserver_vip` configuration setting.
 The hostname is constructed by the `k8s_apiserver_hostname` and `k8s_cluster_dnsname` settings.
 
-To generate the correct /etc/hosts file, you can run `./k8s-setup generate hostsfile --merge`.
+To generate the correct /etc/hosts file, you can run `k8s-setup generate hostsfile --merge`.
 The --merge flag instructs the generator to merge the current /etc/hosts file with
 the generated records.
 
 NOTE: Because write-access to /etc/hosts needs root permissions, you can't just
 simply redirect the output to /etc/hosts. I used a temporary file, with a move
-operation: `./k8s-setup generate hostsfile --merge > /tmp/hosts && sudo mv /tmp/hosts /etc/hosts`
+operation: `k8s-setup generate hostsfile --merge > /tmp/hosts && sudo mv /tmp/hosts /etc/hosts`
 First you should run the generator before running the provisioner, because it needs
 a 'apiserver' host. After provisioning is done, run it again, so that the ingress hosts are included.
 
@@ -68,7 +68,7 @@ system default settings. You can override them in your custom configuration file
 The path can be absolute, or relative to the repository root. By default the
 `./conf/vagrant.yml` is selected.
 
-This Information is stored in `.local/current-config`. It is persistent, so normally you only have to execute it once.
+This Information is stored in `~/k8s-setup/current-config`. It is persistent, so normally you only have to execute it once.
 4. You may verify if everything is ok by running `k8s-setup info`
 
 ## Provide the configuration in an own repository
@@ -110,11 +110,11 @@ depending on the reflected environmet variables.
 
 ## Get Information
 
-By using the `./k8s-setup info` command, you get some metadata of the k8s-setup 
+By using the `k8s-setup info` command, you get some metadata of the k8s-setup 
 state and configuration.
 
 ```
-$ ./k8s-setup info
+$ k8s-setup info
 config-files:
 - conf/defaults.yml
 - localpath/k8s-setup/conf/vagrant.yml

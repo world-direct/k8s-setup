@@ -105,7 +105,7 @@ kubectl config set-credentials OIDC \
   --auth-provider-arg=client-id=$client_id \
   --auth-provider-arg=client-secret=$client_secret \
   --auth-provider-arg=refresh-token=$refresh_token \
-  --auth-provider-arg=idp-certificate-authority=.local/cacrt.pem \
+  --auth-provider-arg=idp-certificate-authority=~/.k8s-setup/cacrt.pem \
   --auth-provider-arg=id-token=$id_token
 
 # https://kubernetes.io/docs/reference/access-authn-authz/authentication/#option-2-use-the-token-option

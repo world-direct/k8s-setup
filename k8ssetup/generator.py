@@ -49,7 +49,7 @@ class Generator(object):
             logger.debug("%d %s" % (res.status_code, res.reason))
             running = res.status_code == 200
         except requests.exceptions.ConnectionError as err:
-            logger.debug(err.message)
+            logger.exception(err)
             if(err.response):
                 logger.debug("%d %s" % (err.response.status_code, err.response.reason))
 
@@ -75,13 +75,12 @@ class Generator(object):
             for line in lines:
 
                 # parse line into tuple parts := (ip, host)
-                parsed=()
                 line = line.strip()
                 parts = line.split()
                 if(len(parts) < 2):
                     # unparsable
                     print(line)
-                    continue;
+                    continue
 
                 if not parts[1].endswith(cluster_dnsname):
                     # not one of our rules

@@ -11,9 +11,6 @@ global_mode: vagrant
 # So no port-forward rules are needed.
 global_vagrant_hosts_network: 10.0.0.*
 
-# don't change this path, this is the path where vagrant writes the inventory
-ansible_inventory_filepath: ../lib/vagrant/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory
-
 ## System Setup options
 #############################################################
 

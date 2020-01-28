@@ -96,6 +96,39 @@ def config_set(context, file, value):
         context.set_config_value(parts[0], parts[1])
 
 #######################################
+## k8s-setup vagrant
+@cli.group()
+@pass_context
+def vagrant(context):
+    """Executes vagrant commands"""
+    pass
+
+@vagrant.command("ssh")
+@click.argument("machine", type=click.STRING, required=True)
+@pass_context
+def vagrant_ssh(context, machine):
+    logger.debug ('cmd:vagrant-ssh(machine=%s)' % (machine))
+    from .tool import Tool
+    tool = Tool(context)
+    return tool.run("vagrant", ["ssh", machine])
+
+@vagrant.command("destroy")
+@click.argument("machine", type=click.STRING, required=False)
+@pass_context
+def vagrant_destroy(context, machine):
+    logger.debug ('cmd:vagrant-ssh(machine=%s)' % (machine))
+    from .tool import Tool
+    tool = Tool(context)
+    args = ["destroy"]
+
+    if machine:
+        args.append(machine)
+
+    args.append("-f")
+
+    return tool.run("vagrant", args)
+
+#######################################
 ## k8s-setup provision
 
 @cli.command()

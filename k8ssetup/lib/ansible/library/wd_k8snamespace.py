@@ -2,7 +2,7 @@
 
 # RUN WITH WITH
 # cd /provisioning  # this needs to be the cwd
-# req='{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/k8stest.local/admin.conf", "namespace": "kube-global"}}'
+# req='{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/.k8s-setup/admin.conf", "namespace": "kube-global"}}'
 # echo $req | python library/wd_k8snamespace.py 
 #
 # DEBUG WITH:

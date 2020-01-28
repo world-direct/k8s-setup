@@ -1,9 +1,5 @@
 - set_fact:
-
-    # this file has been fetched from the lnx_setup host, by the lnxclp-new role
-    # playbook_dir is undocumented, but check the source:
-    # https://github.com/ansible/ansible/blob/143bafec9a506aff8f42ca573c7006a8c5549e12/lib/ansible/vars/hostvars.py#L40
-    local_path: "{{playbook_dir}}/../../.local"
+    local_path: "~/.k8s-setup"
 
   no_log: yes
 
