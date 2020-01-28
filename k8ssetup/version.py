@@ -22,13 +22,14 @@ def getVersion():
 
     Cases:
     * 0.1 => Directly on a tag "v0.1"
+    * 0.1.dev => Directly on a tag "v0.1-alpha", but tag is prelease according to semver (like '-alpha' here)
     * 0.1.dev0+bb231b5x => Latest tag was "v0.1", 0 commits ahead, commitid = bb231b5, dirty tree
     * 0.1.dev4+ca6992 => Latest tag was "v0.1", 4 commits ahead, commitid = ca6992f
     * 0.1.dev4+ca6992x => Latest tag was "v0.1", 4 commits ahead, commitid = ca6992f, dirty tree
 
     """
 
-    hasrepo = os.path.exists(".git")
+    hasrepo = os.path.exists(".git") or os.path.exists("../.git")
     if hasrepo:
         from git import Git
         repo = Git(".")
@@ -62,18 +63,22 @@ def getVersionFromRepo(repo):
 
     tagversion = tag.split("-")[0]
     logger.debug("get 'tagversion': %s" % tagversion)
-    
-    tagtext = "" if tag == tagversion else tag[len(tagversion)+1:]
-    logger.debug("remaining 'tagtext' (unused): %s" % tagtext)
 
     version = tagversion
+    
+    dev=dirty or nahead != "0"
 
-    if dirty or nahead != "0":
+    tagtext = "" if tag == tagversion else tag[len(tagversion)+1:]
+    if tagtext:
+        logger.debug("remaining 'tagtext': %s => .dev version" % tagtext)
+        dev=True
+
+    if dev:
         # long output
         version += ".dev%s+%s" % (nahead, sha)
         logger.debug("We are head of the tag and / or dirty, so use the long output: %s" % version)
 
-    if(dirty):
+    if dirty:
         version = version + "x"
         logger.debug("We are dirty, so add 'x' to the version: %s" % version)
 
