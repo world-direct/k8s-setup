@@ -64,24 +64,25 @@ def getVersionFromRepo(repo):
     tagversion = tag.split("-")[0]
     logger.debug("get 'tagversion': %s" % tagversion)
 
-    version = tagversion
-    
-    dev=dirty or nahead != "0"
+    primaryversion = tagversion
 
     tagtext = "" if tag == tagversion else tag[len(tagversion)+1:]
     if tagtext:
         logger.debug("remaining 'tagtext': %s => .dev version" % tagtext)
-        dev=True
 
-    if dev:
-        # long output
-        version += ".dev%s+%s" % (nahead, sha)
-        logger.debug("We are head of the tag and / or dirty, so use the long output: %s" % version)
+    version = primaryversion
 
     if dirty:
-        version = version + "x"
-        logger.debug("We are dirty, so add 'x' to the version: %s" % version)
+        version += ".dev%s+%sX" % (nahead, sha)
+        logger.debug("We are dirty, so use the long output: %s" % version)
+        return version
 
-    logger.debug("Final version is: %s" % version)
-    return version
+    if nahead:
+        version += ".dev%s+%s" % (nahead, sha)
+        logger.debug("We are ahead of the tag, so use the long output: %s" % version)
+        return version
 
+    if tagtext:
+        version += ".dev0"
+        logger.debug("We are on a prelease tag, so use .dev0 version: %s" % version)
+        return version
