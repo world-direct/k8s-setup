@@ -55,7 +55,7 @@ def getVersionFromRepo(repo):
     sha = parts.pop().lstrip("g")
     logger.debug("popped 'commit-id': %s" % sha)
 
-    nahead = parts.pop()
+    nahead = int(parts.pop())
     logger.debug("popped 'commits ahead': %s" % nahead)
 
     tag = "-".join(parts).lstrip("v")
