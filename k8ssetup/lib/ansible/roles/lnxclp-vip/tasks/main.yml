@@ -89,9 +89,16 @@
     state: yes
     persistent: yes
 
-- name: apiserver-vip - IP is up (ping {{k8s_apiserver_vip}} -c 10)
+- name: apiserver-vip - IP is up (ping {{k8s_apiserver_vip}} -c 3)
+  shell: "ping {{k8s_apiserver_vip}} -c 3"
+  changed_when: false
+  failed_when: false
+  register: res
+
+- name: apiserver-vip - IP is up (ping {{k8s_apiserver_vip}} -c 10 with retries)
   shell: "ping {{k8s_apiserver_vip}} -c 10"
   changed_when: false
+  when: res.failed
   retries: 5
   delay: 1
 
