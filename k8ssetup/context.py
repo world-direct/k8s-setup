@@ -107,7 +107,11 @@ class Context(object):
         self.mode = self.config['global_mode']
         self.ansible_inventory_filepath = self.config['ansible_inventory_filepath']
         
-        self.validate_config()
+        try:
+            self.validate_config()
+        except ValueError as err:
+            logger.error(str(err))
+            exit(1)
 
         if self.mode == "vagrant":
             # vagrant places the .vagrant directory relative to the Vagrantfile
@@ -139,6 +143,9 @@ class Context(object):
 
         if k8s_certs_mode == "ACME" and not c["k8s_certs_acme"]["ca_certificate"]:
             raise ValueError('k8s_certs_mode "ACME" needs the pem encoded ca certificate in k8s_certs_acme.ca_certificate')
+
+        if c["k8s_apiserver_vip_virtual_router_id"] == -1:
+            raise ValueError('k8s_apiserver_vip_virtual_router_id is mandatory, but not set')
 
     def set_file(self, filepath):
 

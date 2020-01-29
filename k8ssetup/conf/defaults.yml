@@ -66,6 +66,8 @@ k8s_service_cidr: 10.96.0.0/16
 
 # this is the VIP of the clp load balancer
 k8s_apiserver_vip: 
+  
+k8s_apiserver_vip_virtual_router_id: -1
 
 # the base dnsname for the cluster
 k8s_cluster_dnsname: 
@@ -168,3 +170,12 @@ winwrk_custom_firewall_rules: []
 ## Dashboard options
 #############################################################
 dashboard_token_ttl_s: 10800 # Session-Timeout for dashboard (10800=3 Hours)
+
+## Mail and reporting settings
+## This is used by:
+##    - keepalived notification_email
+#############################################################
+
+# Both settings needs to be set to enable email notification
+notification_smtp_server: ""
+notification_email_recipient: ""
