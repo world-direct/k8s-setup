@@ -15,5 +15,3 @@
     flat: true
   loop:
     - admin.conf
-    - pki/ca.crt
-    - pki/ca.key
