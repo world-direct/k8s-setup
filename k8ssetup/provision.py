@@ -94,7 +94,7 @@ class Provision():
         else:
             # create the cacrt.pem file for apiserver OIDC
             with open(Paths.sys_cacrt, "wb") as f:
-                f.write(self.context.config["k8s_certs_ca"]["certificate"])
+                f.write(self.context.config["k8s_certs_acme"]["ca_certificate"])
 
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)

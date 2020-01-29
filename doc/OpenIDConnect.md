@@ -13,10 +13,12 @@ k8s_certs_ca.certificate, like:
 
 ```yaml
 k8s_certs_mode: ACME
-k8s_certs_ca:
+k8s_certs_acme:
+  email: mail@mail.com
+  server: https://acme-v02.api.letsencrypt.org/directory
 
   # CM=Let's Encrypt Authority X3, Serial=0a0141420000015385736a0b85eca708
-  certificate: |
+  ca_certificate: |
     -----BEGIN CERTIFICATE-----
     MIIEkjCCA3qgAwIBAgIQCgFBQgAAAVOFc2oLheynCDANBgkqhkiG9w0BAQsFADA/
     MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT

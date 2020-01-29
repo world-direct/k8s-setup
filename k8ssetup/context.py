@@ -137,8 +137,8 @@ class Context(object):
         if k8s_certs_mode != "CA" and k8s_certs_mode != "ACME":
             raise ValueError('k8s_certs_mode need to be "CA" or "ACME"')
 
-        if k8s_certs_mode == "ACME" and not c["k8s_certs_ca"]["certificate"]:
-            raise ValueError('k8s_certs_mode "ACME" needs the pem encoded ca certificate in k8s_certs_ca.certificate')
+        if k8s_certs_mode == "ACME" and not c["k8s_certs_acme"]["ca_certificate"]:
+            raise ValueError('k8s_certs_mode "ACME" needs the pem encoded ca certificate in k8s_certs_acme.ca_certificate')
 
     def set_file(self, filepath):
 
