@@ -43,6 +43,7 @@ class HelmChart:
         self.description = description
         self.type = type
         self.version = version
+        self.versionedname = name + "-" + version
 
 class HelmRelease:
 
@@ -52,7 +53,7 @@ class HelmRelease:
         self.revision = revision
         self.updated = updated
         self.status = status
-        self.chartname = chartname
+        self.versionedchartname = chartname
         self.appversion = appversion
 
 class HelmBase:
@@ -200,8 +201,8 @@ def apply_state(module):
             helm.install(releasename, chart, module.namespace, module.keepvaluesfile, module.atomic, module.values)
 
             return True # no release for this chart
-        
-        if release.appversion != chart.appversion:
+
+        if release.appversion != chart.appversion or release.versionedchartname != chart.versionedname:
             log("PERFORM UPDATE")
             helm.upgrade(release, chart)
             return True
