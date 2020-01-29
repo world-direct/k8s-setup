@@ -21,8 +21,6 @@ class Provision():
         if(self.context.mode == "vagrant"):
             # run 'vagrant up', which runs also the vagrant playbook
             tool.run("vagrant", ["up", "--provision"])
-        else:
-            tool.ansible_playbook_auto("./lib/ansible/ping.yml")
 
         # run the 'hosts.yml'
         tool.ansible_playbook_auto("./lib/ansible/hosts.yml", become = True)
