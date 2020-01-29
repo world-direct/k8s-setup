@@ -116,12 +116,6 @@
       wd_k8snamespace:
         namespace: kube-dex
 
-    - name: incluster - ensure kube-ca-issuer-cert tls secret for dex
-      shell: kubectl -n kube-dex create secret tls --cert {{local_path}}/pki/ca.crt --key {{local_path}}/pki/ca.key kube-ca-issuer-cert || true
-      register: res
-      changed_when: "' created' in res.stdout"
-      failed_when: "' created' not in res.stdout and 'already exists' not in res.stderr"
-
     - name: incluster - chart wd-dex installed
       wd_helm3:
         chart: "{{ charts_dir }}/wd-dex"

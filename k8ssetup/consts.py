@@ -15,6 +15,8 @@ class Paths(object):
     sys_homeroot = sys_homedir + "/.k8s-setup"
     sys_currentconfig = sys_homeroot + "/current-config"
     sys_cliconfig = sys_homeroot + "/cli-config"
+    sys_cacrt = sys_homeroot + "/cacrt.pem"
+    sys_cakey = sys_homeroot + "/cakey.pem"
 
     sys_vagrantfile = sys_homeroot + "/Vagrantfile"
     sys_vagrantpp = sys_homeroot + "/vagrantpp.yml"

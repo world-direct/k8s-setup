@@ -46,8 +46,8 @@ class Provision():
             keypath = None
 
             if self.context.config['k8s_certs_ca']['generate']:
-                crtpath = Paths.sys_homeroot + "/cacrt.pem"
-                keypath = Paths.sys_homeroot + "/cakey.pem"
+                crtpath = Paths.sys_cacrt
+                keypath = Paths.sys_cakey
                 logger.debug("Check if %s and %s exists" % (crtpath, keypath))
 
                 if os.path.isfile(crtpath) and os.path.isfile(keypath):
@@ -71,6 +71,10 @@ class Provision():
 
                     # TODO: validate that the files are ok
 
+                # copy the crtfile, because this is needed for apiserver OIDC
+                logger.debug("Copy ca file %s to %s" % (crtpath, Paths.sys_cacrt))
+                shutil.copyfile(crtpath, Paths.sys_cacrt)
+
             # symlink the files to the chart, because helm can't access files
             # outside of the chart directory
             cafilespath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "./lib/charts/wd-certmanager/.ca")
@@ -85,6 +89,12 @@ class Provision():
             os.mkdir(cafilespath)
             os.symlink(os.path.abspath(crtpath), os.path.join(cafilespath, "cacrt.pem"))
             os.symlink(os.path.abspath(keypath), os.path.join(cafilespath, "cakey.pem"))
+
+        # "ACME" mode
+        else:
+            # create the cacrt.pem file for apiserver OIDC
+            with open(Paths.sys_cacrt, "wb") as f:
+                f.write(self.context.config["k8s_certs_ca"]["certificate"])
 
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
