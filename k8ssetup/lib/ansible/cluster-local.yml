@@ -1,7 +1,7 @@
 # This playbook setups the local context to the provisioned cluster
 - hosts: localhost
   vars:
-    local_path: "~/.k8s-setup"
+    local_path: "$HOME/.k8s-setup"
     admin_conf: "{{local_path}}/admin.conf"
     script_path: "{{local_path}}/scripts"
     log_path: "{{local_path}}/scripts/log"

@@ -5,7 +5,7 @@
       # https://github.com/ansible/ansible/blob/143bafec9a506aff8f42ca573c7006a8c5549e12/lib/ansible/vars/hostvars.py#L40
       charts_dir: "{{playbook_dir}}/../charts"
 
-      local_path: "~/.k8s-setup"
+      local_path: "$HOME/.k8s-setup"
       admin_conf: "{{local_path}}/admin.conf"
       script_path: "{{local_path}}/scripts"
       log_path: "{{local_path}}/scripts/log"
