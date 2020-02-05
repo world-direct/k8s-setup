@@ -65,3 +65,12 @@ harbor:
   enable_persistence: false
   admin_password: Harbor12345
   secret_key: not-a-secure-key
+
+## dex configuration
+#############################################################
+dex_staticClients:
+- id: kubernetes
+  redirectURIs:
+  - 'http://127.0.0.1:5555/callback'
+  name: 'Kubernetes'
+  secret: 5a0a502aa7fa1fa829e02bdca5f21c11

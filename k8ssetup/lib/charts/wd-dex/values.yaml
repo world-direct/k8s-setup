@@ -9,3 +9,6 @@ image: quay.io/dexidp/dex
 imagetag: "v2.19.0"
 
 replicas: 1
+
+connectors: []
+staticClients: []

@@ -2,7 +2,7 @@
 
 # RUN WITH WITH
 # cd /provisioning  # this needs to be the cwd
-# req='{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/.k8s-setup/admin.conf","chart": "../charts/wd-flannel","namespace": "kube-flannel","atomic":"yes"}}'
+# req='{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/.k8s-setup/admin.conf","chart": "charts/wd-flannel","namespace": "kube-global"}}'
 # echo $req | python library/wd_helm3.py 
 #
 # DEBUG WITH:
@@ -109,34 +109,90 @@ class HelmBase:
         # Construct return object
         obj = HelmChart(chartsource, r['name'], r.get('appVersion'), r.get('description'), r.get('type'), r['version'])
 
-        return obj
+        return obj;
 
-    def install(self, name, chart, namespace, keepvaluesfile, atomic, valuesfile, values=None):
+    def valuesfile(self, name, values, args):
+        """
+        Creates or updates the valuesfile.
+        Returns: (dirty)
+        Appends -f <filename> to args
+        """
+
+        dirty = False
+        valuesblob = values.encode("utf-8")
+
+        # check if the directory for the values files exist
+        valuesdir=os.path.expanduser("~/.k8s-setup/helm")
+        if not os.path.isdir(valuesdir): os.mkdir(valuesdir)
+
+        # check the file
+        valfilename = os.path.join(valuesdir, name)
+        if not os.path.isfile(valfilename):
+            dirty = True
+        else:
+            
+            import hashlib
+
+            # check MD5 of existing file changes
+            md5hash = hashlib.md5()
+            with open(valfilename, 'rb') as valfile:
+                blob = valfile.read()
+                md5hash.update(blob)
+                filemd5 = md5hash.hexdigest()
+                self.__log("Hash of %s: %s" % (valfilename, filemd5))
+
+            # check MD5 of values
+            md5hash = hashlib.md5()
+            md5hash.update(valuesblob)
+            valuesmd5 = md5hash.hexdigest()
+
+            self.__log("Hash of values: %s" % (valuesmd5))
+
+            dirty = filemd5 != valuesmd5
+
+        if dirty:
+            with open(valfilename, "w") as valfile:
+                valfile.writelines(values)
+                valfile.flush()
+
+        args.append("-f")
+        args.append(valfilename)
+
+        return dirty
+
+
+    def install(self, name, chart, namespace, atomic, values=None):
         args = ["--namespace", namespace, "install", name, chart.source]
 
         if atomic:
             args.append("--atomic")
 
         if values:
-            # args.append("-f <(echo '%s')" % values)
-            # this works in bash, but not in ansible, so let's make a tmp file
-            valfile = tempfile.NamedTemporaryFile("w", delete=(not keepvaluesfile))
-            valfile.writelines(values)
-            valfile.flush()
-
-            args.append("-f")
-            args.append(valfile.name)
-
-
-        if valuesfile:
-            args.append("--values %s" % valuesfile)
+            self.valuesfile(name, values, args)
 
         res = self.__helm(args)
         self.__log(res)
 
-    def upgrade(self, release, chart):
-        res = self.__helm(['-n', release.namespace, 'upgrade', release.name, chart.source])
+    def upgrade(self, release, chart, values):
+        args = ['-n', release.namespace, 'upgrade', release.name, chart.source]
+
+        if values:
+            self.valuesfile(release.name, values, args)
+
+        res = self.__helm(args)
         self.__log(res)
+
+    def updateifdirty(self, release, chart, values):
+        args = ['-n', release.namespace, 'upgrade', release.name, chart.source]
+
+        if values:
+            if self.valuesfile(release.name, values, args):
+                self.__log("VALUES CHANGED")
+                res = self.__helm(args)
+                self.__log(res)
+                return True
+
+        return False
 
     def uninstall(self, release):
         res = self.__helm(["--namespace", release.namespace, "uninstall", release.name])
@@ -202,14 +258,16 @@ def apply_state(module):
 
         if not release:
             log("INSTALL CHART")
-            helm.install(releasename, chart, module.namespace, module.keepvaluesfile, module.atomic, module.valuesfile, module.values)
+            helm.install(releasename, chart, module.namespace, module.atomic, module.values)
 
             return True # no release for this chart
-
+        
         if release.appversion != chart.appversion or release.versionedchartname != chart.versionedname:
             log("PERFORM UPDATE")
-            helm.upgrade(release, chart)
+            helm.upgrade(release, chart, module.values)
             return True
+        else:
+            return helm.updateifdirty(release, chart, module.values)
 
         # already installed
         return False
@@ -235,8 +293,6 @@ def main():
         "namespace": {"required": False, "type": "str"},
         "kubeconfig": {"required": False, "type": "str"},
         "atomic": {"default": False, "type": "bool"},
-        "keepvaluesfile": {"default": False, "type": "bool"},
-        "valuesfile": {"required": False, "type": "str"},
         "values": {
             "required": False,
             "type": "json"
@@ -257,8 +313,6 @@ def main():
     module.name = module.params['name']
     module.state = module.params['state']
     module.values = module.params['values']
-    module.valuesfile = module.params['valuesfile']
-    module.keepvaluesfile = module.params['keepvaluesfile']
     module.atomic = module.params['atomic']
 
     try:

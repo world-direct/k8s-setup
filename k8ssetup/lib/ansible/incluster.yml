@@ -120,10 +120,11 @@
       wd_helm3:
         chart: "{{ charts_dir }}/wd-dex"
         namespace: kube-dex
-        atomic: yes
         values:
           cluster_dns_name: "{{k8s_cluster_dnsname}}"
           hostname: "auth.{{k8s_cluster_dnsname}}"
+          connectors: "{{dex_connectors}}"
+          staticClients: "{{dex_staticClients}}"
 
     ############################################################################
     ## Test-Application: wd-nginx-test
@@ -155,7 +156,6 @@
         chart: "{{ charts_dir }}/harbor"
         namespace: kube-harbor
         atomic: no
-        keepvaluesfile: yes
         values:
 
           # check https://github.com/goharbor/harbor-helm#configuration
