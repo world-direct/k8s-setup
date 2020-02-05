@@ -2,7 +2,7 @@
 
 # RUN WITH WITH
 # cd /provisioning  # this needs to be the cwd
-# req='{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/.k8s-setup/admin.conf","chart": "charts/wd-flannel","namespace": "kube-global"}}'
+# req='{"ANSIBLE_MODULE_ARGS":{"kubeconfig": "~/.k8s-setup/admin.conf","chart": "../charts/wd-flannel","namespace": "kube-flannel","atomic":"yes"}}'
 # echo $req | python library/wd_helm3.py 
 #
 # DEBUG WITH:
@@ -91,7 +91,7 @@ class HelmBase:
         res = self.__helmyaml(["--namespace", namespace, "list"])
 
         def release(r):
-            return HelmRelease(r['Name'], r['Namespace'], r['Revision'], r['Updated'], r['Status'], r['Chart'], r['AppVersion'])
+            return HelmRelease(r['name'], r['namespace'], r['revision'], r['updated'], r['status'], r['chart'], r['app_version'])
 
         return map(release, res)
 
@@ -109,9 +109,9 @@ class HelmBase:
         # Construct return object
         obj = HelmChart(chartsource, r['name'], r.get('appVersion'), r.get('description'), r.get('type'), r['version'])
 
-        return obj;
+        return obj
 
-    def install(self, name, chart, namespace, keepvaluesfile, atomic, values=None):
+    def install(self, name, chart, namespace, keepvaluesfile, atomic, valuesfile, values=None):
         args = ["--namespace", namespace, "install", name, chart.source]
 
         if atomic:
@@ -126,6 +126,10 @@ class HelmBase:
 
             args.append("-f")
             args.append(valfile.name)
+
+
+        if valuesfile:
+            args.append("--values %s" % valuesfile)
 
         res = self.__helm(args)
         self.__log(res)
@@ -198,7 +202,7 @@ def apply_state(module):
 
         if not release:
             log("INSTALL CHART")
-            helm.install(releasename, chart, module.namespace, module.keepvaluesfile, module.atomic, module.values)
+            helm.install(releasename, chart, module.namespace, module.keepvaluesfile, module.atomic, module.valuesfile, module.values)
 
             return True # no release for this chart
 
@@ -232,6 +236,7 @@ def main():
         "kubeconfig": {"required": False, "type": "str"},
         "atomic": {"default": False, "type": "bool"},
         "keepvaluesfile": {"default": False, "type": "bool"},
+        "valuesfile": {"required": False, "type": "str"},
         "values": {
             "required": False,
             "type": "json"
@@ -252,6 +257,7 @@ def main():
     module.name = module.params['name']
     module.state = module.params['state']
     module.values = module.params['values']
+    module.valuesfile = module.params['valuesfile']
     module.keepvaluesfile = module.params['keepvaluesfile']
     module.atomic = module.params['atomic']
 

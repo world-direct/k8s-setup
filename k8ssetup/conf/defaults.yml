@@ -136,7 +136,7 @@ k8s_certs_ca:
 
 # In the cluster-local.yml playbook, the tools kubectl and helm3 will be fetched
 # accounting to this versions:
-client_helm_version: v3.0.0-rc.2
+client_helm_version: v3.0.3
 client_kubectl_version: v1.17.0
 
 # This is the directory where kubectl and helm are stored
@@ -179,3 +179,8 @@ dashboard_token_ttl_s: 10800 # Session-Timeout for dashboard (10800=3 Hours)
 # Both settings needs to be set to enable email notification
 notification_smtp_server: ""
 notification_email_recipient: ""
+
+## dex configuration
+#############################################################
+dex_connectors: []
+dex_staticPasswords: []
