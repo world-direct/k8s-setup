@@ -14,7 +14,7 @@
 # press CTRL+D to close stdin
 # Then the breakpoints should be stopped at
 
-from ansible.module_utils.basic import *
+from ansible.module_utils.basic import AnsibleModule
 
 import os
 import sys
@@ -77,7 +77,7 @@ class HelmBase:
             args.append("--kubeconfig")
             args.append(self.kubeconfig)
 
-        rc, stdout, strerr = self.__runhelm(args)
+        _, stdout, _ = self.__runhelm(args)
         return stdout
 
     def __helmyaml(self, args):
@@ -109,7 +109,7 @@ class HelmBase:
         # Construct return object
         obj = HelmChart(chartsource, r['name'], r.get('appVersion'), r.get('description'), r.get('type'), r['version'])
 
-        return obj;
+        return obj
 
     def valuesfile(self, name, values, args):
         """
@@ -206,6 +206,7 @@ def log(str):
 
 class HelmAnsible(HelmBase):
 
+    # pylint: disable=method-hidden
     def __log(self, str):
         log(str)  # call global log function
 
@@ -282,7 +283,6 @@ def apply_state(module):
     return False
 
 def release_absent(module):
-    meta = {}
     return False
 
 def main():

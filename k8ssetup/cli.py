@@ -18,7 +18,6 @@ pass_context = click.make_pass_decorator(Context)
 @click.version_option()
 @click.pass_context
 def cli(clickctx, debug):
-
     
     level = logging.DEBUG if debug else logging.INFO
     fmt = "%(asctime)s %(levelname)s [%(name)s] %(message)s" \

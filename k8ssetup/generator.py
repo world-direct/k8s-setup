@@ -90,3 +90,5 @@ class Generator(object):
         for rule in rules:
             print("%-12s %-40s # k8s-setup: %s" % rule)
         
+        return 0
+        
