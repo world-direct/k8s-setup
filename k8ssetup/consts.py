@@ -17,8 +17,15 @@ class Paths(object):
     sys_cliconfig = sys_homeroot + "/cli-config"
     sys_cacrt = sys_homeroot + "/cacrt.pem"
     sys_cakey = sys_homeroot + "/cakey.pem"
+    sys_factsdir = sys_homeroot + "/facts"
+    sys_factsgroups = sys_factsdir + "/GROUPS"
 
     sys_vagrantfile = sys_homeroot + "/Vagrantfile"
     sys_vagrantpp = sys_homeroot + "/vagrantpp.yml"
     sys_vagrantgeneratedinventory = os.path.dirname(sys_vagrantfile) + \
         "/.vagrant/provisioners/ansible/inventory/vagrant_ansible_inventory"
+
+class Groups(object):
+    lnxclp = "lnxclp"
+    lnxclp_setup = "lnxclp_setup"
+    lnxwrk = "lnxwrk"

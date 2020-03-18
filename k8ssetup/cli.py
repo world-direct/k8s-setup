@@ -15,9 +15,20 @@ pass_context = click.make_pass_decorator(Context)
 
 @click.group()
 @click.option("--debug", "-d", is_flag=True, help="Outputs debug level log messages")
+@click.option("--debugport", help="enables the python process to attach 'ptvsd', and wait for attach")
 @click.version_option()
 @click.pass_context
-def cli(clickctx, debug):
+def cli(clickctx, debug, debugport):
+
+    if debugport:
+        import ptvsd
+
+        # Allow other computers to attach to ptvsd at this IP address and port.
+        ptvsd.enable_attach(address=('0.0.0.0', debugport), redirect_output=True)
+
+        # Pause the program until a remote debugger is attached
+        print("Waiting for ptvsd debugger attach to port %s" % debugport)
+        ptvsd.wait_for_attach()
     
     level = logging.DEBUG if debug else logging.INFO
     fmt = "%(asctime)s %(levelname)s [%(name)s] %(message)s" \

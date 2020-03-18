@@ -14,92 +14,40 @@ class Provision():
     def __init__(self, context):
         self.context = context
 
-    def hosts(self):
-        logger.info("Provisioning scope 'hosts'")
-
-        tool = Tool(self.context)
+    def started(self):
         if(self.context.mode == "vagrant"):
+
+            logger.info("Ensure vagrant hosts started")
+            tool = Tool(self.context)
+
             # run 'vagrant up', which runs also the vagrant playbook
             tool.run("vagrant", ["up", "--provision"])
 
+    def hosts(self):
+        logger.info("Provisioning scope 'hosts'")
+        self.started()
+
+        tool = Tool(self.context)
+        
         # run the 'hosts.yml'
         tool.ansible_playbook_auto("./lib/ansible/hosts.yml", become = True)
 
     def cluster(self):
         logger.info("Provisioning scope 'cluster'")
+        # self.started()
 
-        logger.debug("Write k8s-setup-info")
-        from .info import Info
-        with open(Paths.sys_homeroot + "/k8s-setup-info", 'w') as fs:
-            Info(self.context).run(fs)
+        from .clusterprovisioning import ClusterProvisioning
+        clusterprovisioning = ClusterProvisioning(self.context)
+        clusterprovisioning.run()
 
-        # check for the CA certificate, if 'k8s_certs_mode' == 'CA'
-        k8s_certs_mode = self.context.config['k8s_certs_mode']
-        logger.debug("k8s_certs_mode=%s" % k8s_certs_mode)
+        exit(0)
 
-        if(k8s_certs_mode == 'CA'):
-            from .cert import generate_selfsigned_ca
-
-            crtpath = None
-            keypath = None
-
-            if self.context.config['k8s_certs_ca']['generate']:
-                crtpath = Paths.sys_cacrt
-                keypath = Paths.sys_cakey
-                logger.debug("Check if %s and %s exists" % (crtpath, keypath))
-
-                if os.path.isfile(crtpath) and os.path.isfile(keypath):
-                    logger.info("CA already generated in %s %s" % (crtpath, keypath))
-                else:
-                    logger.info("Generate CA files to %s %s" % (crtpath, keypath))
-                    crt, key = generate_selfsigned_ca("generated-ca.k8stest.local")
-
-                    with open(crtpath, "wb") as f:
-                        f.write(crt)
-
-                    with open(keypath, "wb") as f:
-                        f.write(key)
-
-            else:
-                crtpath=self.context.config["k8s_certs_ca"]["crt_filepath"]
-                keypath=self.context.config["k8s_certs_ca"]["key_filepath"]
-
-                if os.path.isfile(crtpath) and os.path.isfile(keypath):
-                    logger.info("Using configured ca-files: %s %s" % (crtpath, keypath))
-
-                    # TODO: validate that the files are ok
-
-                # copy the crtfile, because this is needed for apiserver OIDC
-                logger.debug("Copy ca file %s to %s" % (crtpath, Paths.sys_cacrt))
-                shutil.copyfile(crtpath, Paths.sys_cacrt)
-
-            # symlink the files to the chart, because helm can't access files
-            # outside of the chart directory
-            cafilespath = os.path.join(os.path.abspath(os.path.dirname(__file__)), "./lib/charts/wd-certmanager/.ca")
-            cafilespath = os.path.relpath(cafilespath)
-            logger.debug("Using path %s to symlink ca-files" % cafilespath)
-
-            # always recreate links
-            if os.path.isdir(cafilespath):
-                shutil.rmtree(cafilespath)
-
-            # the .ca file is in .gitignore, so it's ok to keep the links (for debugging)
-            os.mkdir(cafilespath)
-            os.symlink(os.path.abspath(crtpath), os.path.join(cafilespath, "cacrt.pem"))
-            os.symlink(os.path.abspath(keypath), os.path.join(cafilespath, "cakey.pem"))
-
-        # "ACME" mode
-        else:
-            # create the cacrt.pem file for apiserver OIDC
-            with open(Paths.sys_cacrt, "wb") as f:
-                f.write(self.context.config["k8s_certs_acme"]["ca_certificate"])
-
-        tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
         tool.ansible_playbook_auto("./lib/ansible/cluster-local.yml", add_localhost=True, become=False)
 
     def incluster(self):
         logger.info("Provisioning scope 'incluster'")
+        self.started()
 
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/incluster.yml", add_localhost=True, become=False)

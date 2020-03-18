@@ -1,0 +1,2 @@
+- name: Reload k8s-facts
+  setup: filter="ansible_local"

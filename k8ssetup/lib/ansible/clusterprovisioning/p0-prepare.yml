@@ -1,0 +1,71 @@
+################################################################################
+# prepare local ~/.k8s-setup directory
+- hosts: localhost
+  tasks:
+  - name: clusterprovisioning - ensure local facts directory
+    file:
+      name: ~/.k8s-setup/facts
+      state: directory
+
+  - name: clusterprovisioning - write GROUPS facts
+    copy:
+      content: "{{groups}}"
+      dest: ~/.k8s-setup/facts/GROUPS
+
+
+################################################################################
+# prepare the nodes /etc/k8s-setup directory
+- hosts: lnxclp:lnxwrk
+  become: yes
+  tasks:
+
+  - name: clusterprovisioning - ensure /etc/k8s-setup directory
+    file:
+      path: /etc/k8s-setup
+      state: directory
+
+  - name: clusterprovisioning - ensure custom facts
+    import_tasks: ./tasks/k8ssetup-facts-lnx.yml
+
+  - name: clusterprovisioning - write k8ssetup facts
+    copy:
+      content: "{{ansible_local.k8ssetup}}"
+      dest: /etc/k8s-setup/facts
+
+  - name: clusterprovisioning - fetch k8ssetup facts
+    fetch:
+      src: /etc/k8s-setup/facts
+      dest: ~/.k8s-setup/facts/{{ inventory_hostname }}
+      flat: yes
+
+  - name: clusterprovisioning - sync kubeadm.yml
+    template:
+      src: kubeadm.yml
+      dest: /etc/k8s-setup/kubeadm.yml
+
+  - name: clusterprovisioning - sync k8s-setup script for node operations
+    copy:
+      src: k8s-setup
+      dest: /etc/k8s-setup/k8s-setup
+      mode: 755
+
+  - name: clusterprovisioning - sync ./k8s-setup.env script containing configuration values
+    template:
+      src: k8s-setup.env
+      dest: /etc/k8s-setup/k8s-setup.env
+
+
+################################################################################
+# ensure ingressca.pem file for apiserver oidc
+- hosts: lnxclp
+  become: yes
+  tasks:
+    - name: clusterprovisioning - ensure /etc/kubernetes/pki
+      file:
+        name: /etc/kubernetes/pki
+        state: directory
+
+    - name: clusterprovisioning - ensure ingress CA file for oidc
+      copy:
+        src: ~/.k8s-setup/cacrt.pem
+        dest: /etc/kubernetes/pki/ingressca.pem

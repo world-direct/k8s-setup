@@ -1,0 +1,28 @@
+- hosts: lnxclp_setup
+  roles:
+
+  - role: lnxclp-vip
+    vars:
+      vip_enable_tcp_check: no
+
+  - role: kubebin
+    vars:
+      kubelet_version: "{{k8s_version}}"
+      kubeadm_version: "{{k8s_version}}"
+      kubectl_version: "{{k8s_version}}"
+
+  tasks:
+  - block:
+
+    - name: "clustersetup - running k8s-setup init (you may cat /var/log/k8s-setup.log to check progress)"
+      shell: "./k8s-setup init > /var/log/k8s-setup.log"
+      args:
+        chdir: /etc/k8s-setup
+
+    - name: clustersetup - fetch admin.conf to provisioning client
+      fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: ~/.k8s-setup/admin.conf
+        flat: true
+
+    become: yes

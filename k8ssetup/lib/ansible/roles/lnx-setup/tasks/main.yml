@@ -51,15 +51,16 @@
     name: docker-ce-stable
     description: docker-ce-stable
     baseurl: https://download.docker.com/linux/centos/7/x86_64/stable
-    enabled: yes
+    enabled: no
     gpgcheck: yes
     gpgkey: https://download.docker.com/linux/centos/gpg
 
 
 # https://unixy.net/secure/knowledgebase/104/What-does-el5-el6-and-el7-mean.html
 - name: "docker - docker ce {{lnx_docker_version}} installed"
-  package:
-    name: "docker-ce-{{lnx_docker_version}}.ce"
+  yum:
+      enablerepo: docker-ce-stable
+      name: "docker-ce-{{lnx_docker_version}}.ce"
 
 - name: docker - enable net.bridge.bridge-nf-call-iptables
   sysctl:

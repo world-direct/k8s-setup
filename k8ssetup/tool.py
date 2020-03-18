@@ -21,7 +21,7 @@ class Tool(object):
 
         return "."
 
-    def run(self, program, args, dont_check_exitcode = False):
+    def run(self, program, args, dont_check_exitcode = False, capture_output = False):
         program = str(program)
         env = self.context.get_environment()
 
@@ -40,18 +40,33 @@ class Tool(object):
         logger.debug("cwd=%s" % cwd)
         logger.debug("run %s" % " ".join(args))
 
-        rc = subprocess.call(
-            args, 
-            cwd=cwd, 
-            env=env)
+        stdout = None
+
+        if capture_output:
+            p = subprocess.Popen(
+                args, 
+                cwd=cwd, 
+                env=env,
+                stdout = subprocess.PIPE
+                )
+            
+            stdout = p.communicate()
+            rc = p.returncode
+
+        else:
+
+            rc = subprocess.call(
+                args, 
+                cwd=cwd, 
+                env=env)
 
         logger.debug("EXIT rc=%d" % rc)
         if not dont_check_exitcode and rc != 0:
             exit(rc)
 
-        return rc
+        return rc, stdout
 
-    def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False, dont_check_exitcode = False):
+    def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False, dont_check_exitcode = False, capture_output = False):
 
         args = []
         
@@ -72,5 +87,4 @@ class Tool(object):
 
         args.append(playbook_path)
 
-        rc = self.run("ansible-playbook", args, dont_check_exitcode)
-        return rc
+        return self.run("ansible-playbook", args, dont_check_exitcode, capture_output)

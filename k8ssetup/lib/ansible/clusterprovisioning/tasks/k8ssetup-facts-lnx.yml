@@ -1,0 +1,15 @@
+- name: clusterprovisioning - ensure ansible facts.d directory
+  file:
+    path: /etc/ansible/facts.d
+    state: directory
+
+- name: clusterprovisioning - ensure 'k8ssetup' custom fact
+  register: res
+  copy:
+    dest: /etc/ansible/facts.d/k8ssetup.fact
+    src: k8ssetup-lnx.fact
+    mode: 0775
+
+- name: clusterprovisioning - reload custom facts, if anything changed
+  import_tasks: reload-k8ssetup-facts.yml
+  when: res.changed

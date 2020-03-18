@@ -1,0 +1,54 @@
+#!/bin/sh
+
+echo "{"
+
+# kubeadm version
+echo \"kubeadm\":
+
+    command -v kubeadm > /dev/null
+    if [ $? -eq "0" ]; then
+        v=$(kubeadm version -oyaml | grep "gitVersion:" | awk '{print $2}' | cut -c 2-)
+    else
+        v=
+    fi
+
+    echo \"$v\"
+
+# kubectl version
+echo ,\"kubectl\":
+
+    command -v kubectl > /dev/null
+    if [ $? -eq "0" ]; then
+        v=$(kubectl version --client --short | grep "Client Version: " | awk '{print $3}' | cut -c 2-)
+    else
+        v=
+    fi
+
+    echo \"$v\"
+
+# kubelet version
+echo ,\"kubelet\":
+
+    command -v kubelet > /dev/null
+    if [ $? -eq "0" ]; then
+        v=$(kubelet --version | grep "Kubernetes " | awk '{print $2}' | cut -c 2-)
+    else
+        v=
+    fi
+
+    echo \"$v\"
+
+# server version
+echo ,\"server\":
+
+    command -v kubectl > /dev/null
+    if [ $? -eq "0" ]; then
+        v=$(kubectl version --short 2>/dev/null | grep "Server Version: " | awk '{print $3}'| cut -c 2-)
+    else
+        v=
+    fi
+
+    echo \"$v\"
+
+
+echo "}"

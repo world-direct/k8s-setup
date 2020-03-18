@@ -1,0 +1,27 @@
+- block:
+
+  - name: kubelet ({{kubelet_version}}) installed
+    yum:
+      enablerepo: Kubernetes
+      name:
+        - "kubelet-{{kubelet_version}}-0"
+
+  - name: kubeadm ({{kubeadm_version}}) installed
+    yum:
+      enablerepo: Kubernetes
+      name:
+        - "kubeadm-{{kubeadm_version}}-0"
+
+  - name: kubectl ({{kubectl_version}}) installed
+    yum:
+      enablerepo: Kubernetes
+      name:
+        - "kubectl-{{kubectl_version}}-0"
+
+  - name: kubelet - kubelet enabled and started
+    service:
+      name: kubelet
+      enabled: yes
+      state: started
+      
+  become: yes
