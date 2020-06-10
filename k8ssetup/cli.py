@@ -182,14 +182,14 @@ def tool(context, name, toolargs):
 
 @cli.command()
 @click.argument("type", type=click.Choice(["hostsfile"]))
-@click.option("--merge", type=click.BOOL, help="Merges the existing /etc/hosts", default=False)
+@click.option("--merge", type=click.BOOL, help="Merges the existing /etc/hosts", is_flag=True, default=False)
 @pass_context
 def generate(context, type, merge):
     """Generators (for /etc/hosts)"""
 
     from .generator import Generator
 
-    logger.debug ('cmd:generate(type=%s, merge=%d)' % (type, merge))
+    logger.debug ('cmd:generate(type=%s, merge=%s)' % (type, merge))
     generator = Generator(context)
 
     if type == "hostsfile":
