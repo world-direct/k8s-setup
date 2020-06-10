@@ -28,8 +28,14 @@ class Generator(object):
         import urllib3
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+
         # load the default config
-        config.load_kube_config()
+        configured=False
+        try:
+            config.load_kube_config()
+            configured=True
+        except config.config_exception.ConfigException:
+            pass
 
         # rule tuple: (ip, host, comment)
         rules = []
@@ -42,16 +48,17 @@ class Generator(object):
 
         # test if cluster is running
         running=False
-        try:
-            healthz = "https://%s/healthz" % apiserverip
-            logger.debug("GET %s" % healthz)
-            res = requests.get(healthz, verify=False)
-            logger.debug("%d %s" % (res.status_code, res.reason))
-            running = res.status_code == 200
-        except requests.exceptions.ConnectionError as err:
-            logger.exception(err)
-            if(err.response):
-                logger.debug("%d %s" % (err.response.status_code, err.response.reason))
+        if configured:
+            try:
+                healthz = "https://%s/healthz" % apiserverip
+                logger.debug("GET %s" % healthz)
+                res = requests.get(healthz, verify=False)
+                logger.debug("%d %s" % (res.status_code, res.reason))
+                running = res.status_code == 200
+            except requests.exceptions.ConnectionError as err:
+                logger.exception(err)
+                if(err.response):
+                    logger.debug("%d %s" % (err.response.status_code, err.response.reason))
 
         # ingresses hosts
         if running:
@@ -60,7 +67,7 @@ class Generator(object):
                 for rule in item.spec.rules:
                     rules.append((ingressip, rule.host, "ingress rule" ))
         else:
-            logger.warning("Unable to connect to kuberneetes endpoint. Only the apiserver host is created")
+            logger.warning("Unable to connect to kubernetes endpoint. Only the apiserver host is created")
 
         if merge:
             lines = tuple(open("/etc/hosts", "r"))
