@@ -61,7 +61,8 @@ setup(
         'ansible >= 2.8.6',
         'kubernetes >= 10.0',
         'colorlog >= 4.1.0',
-        'pyyaml >= 5.2'
+        'pyyaml >= 5.2',
+        'jmespath >= 0.10.0'
     ],
     # data_files={
     #     "/":datafiles
