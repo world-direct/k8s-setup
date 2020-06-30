@@ -23,7 +23,7 @@ class Provision():
             tool.run("vagrant", ["up", "--provision"])
 
         # run the 'hosts.yml'
-        tool.ansible_playbook_auto("./lib/ansible/hosts.yml", become = True)
+        tool.ansible_playbook_auto("./lib/ansible/hosts.yml")
 
     def cluster(self):
         logger.info("Provisioning scope 'cluster'")
@@ -95,14 +95,14 @@ class Provision():
                 f.write(self.context.config["k8s_certs_acme"]["ca_certificate"])
 
         tool = Tool(self.context)
-        tool.ansible_playbook_auto("./lib/ansible/cluster.yml", become = True)
-        tool.ansible_playbook_auto("./lib/ansible/cluster-local.yml", add_localhost=True, become=False)
+        tool.ansible_playbook_auto("./lib/ansible/cluster.yml")
+        tool.ansible_playbook_auto("./lib/ansible/cluster-local.yml", add_localhost=True)
 
     def incluster(self):
         logger.info("Provisioning scope 'incluster'")
 
         tool = Tool(self.context)
-        tool.ansible_playbook_auto("./lib/ansible/incluster.yml", add_localhost=True, become=False)
+        tool.ansible_playbook_auto("./lib/ansible/incluster.yml", add_localhost=True)
 
     def all(self):
         self.hosts()

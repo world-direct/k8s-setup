@@ -51,15 +51,12 @@ class Tool(object):
 
         return rc
 
-    def ansible_playbook_auto(self, playbook_path, add_localhost = False, become = False, dont_check_exitcode = False):
+    def ansible_playbook_auto(self, playbook_path, add_localhost = False, dont_check_exitcode = False):
 
         args = []
         
         for config_file in self.context.config_files:
             args.append("-e@%s" % config_file)
-
-        if become:
-            args.append("--become")
 
         limit = ["all"]
 

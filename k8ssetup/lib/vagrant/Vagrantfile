@@ -98,8 +98,20 @@ Vagrant.configure(2) do |config|
 
             # only the setup node needs to be configured statically
             "lnxclp_setup" => ["lnxclp1"],
+            "lnxclp_setup:vars" => {
+                "ansible_become" => true
+            },
+
             "lnxclp" => [],
+            "lnxclp:vars" => {
+                "ansible_become" => true
+            },
+
             "lnxwrk" => [],
+            "lnxwrk:vars" => {
+                "ansible_become" => true
+            },
+
             "winwrk" => [],
             "winwrk:vars" => {
                 "ansible_winrm_scheme" => "http",
