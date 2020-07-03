@@ -17,15 +17,28 @@ designed in a way, that Windows support is possible. It just needs to be impleme
 Every released version will have a wheel package pushed to PyPI. You can install
 it by `pip install k8s-setup`
 
+Please note that, depending on your distibution, you may fix your PATH environment
+variable to include `$HOME/.local/bin`. This is not only required for k8s-setup to 
+be started, but also for k8s-setup to run successfully.
+
+See [pip install --user should check that the user's $PATH is correct](https://github.com/pypa/pip/issues/3813)
+
 ## Install by git
 
 1. Clone the repository
-2. Install python (>=2.7) and pip
+2. Install python (>=2.7) and [pip](https://wiki.ubuntuusers.de/pip/)
 3. Install the package editable by `pip install GitPython && pip install --editable .`
 4. [Vagrant](https://www.vagrantup.com/intro/getting-started/install.html) (tested against Vagrant 2.2.4)
 5. VirtualBox (tested against VirtualBox 6.0.12)
+6. Ensure 'curl' is installed
 
 The steps 4. and 5. are only required, if you want to setup a local virtual cluster.
+
+You need a working VirtualBox installation. There may be issues regarding EFI Secure Boot,
+or with any Kernel module. [Resolve a hostonlyif create error with vagrant](https://coderwall.com/p/ydma0q/resolve-a-hostonlyif-create-error-with-vagrant) states `modprobe vboxnetadp`.
+As there was another error "Failed to open/create the internal network 'HostInterfaceNetworking-vboxnet0'", I needed to run `modprobe vboxnetflt` to run.
+As this was a new Installation of VirtualBox, a reboot may also fix this. It would be nice to
+test this further.
 
 ## Provide the configuration
 
