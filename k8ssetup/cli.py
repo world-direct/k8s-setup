@@ -54,6 +54,9 @@ def cli(clickctx, debug):
     logger = logging.getLogger('')
     logger.setLevel(level) 
 
+    logger.debug ('Python sys.version: %s' % str(sys.version_info))
+    logger.debug ('Python sys.path: %s' % (sys.path))
+
     clickctx.obj = Context()
     pass
 
