@@ -37,8 +37,8 @@ class Tool(object):
         args = [program] + args
 
         cwd = os.path.abspath(self.get_cwd(program))
-        logger.debug("cwd=%s" % cwd)
-        logger.debug("run %s" % " ".join(args))
+        logger.debug("cd %s" % cwd)
+        logger.debug("%s" % " ".join(args))
 
         rc = subprocess.call(
             args, 

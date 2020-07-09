@@ -183,22 +183,28 @@ class Context(object):
 
     def get_environment(self):
 
+        logger.debug("Setting up environment for tool")
+
         env = os.environ.copy()
+
+        def setenv(name, value):
+            logger.debug("export %s=%s" % (name, value))
+            env[name] = str(value)
 
         # copy each global_vagrant_* setting
         for key in self.config.keys():
             if key.startswith('global_vagrant_'):
-                env[key.upper()] = str(self.config[key])
+                setenv(key.upper(), self.config[key])
 
         # provide the VAGRANT_APISERVER_IP and VAGRANT_APISERVER_HOSTNAME setting
-        env['K8S_APISERVER_VIP'] = str(self.config['k8s_apiserver_vip'])
-        env['K8S_CLUSTER_DNSNAME'] = str(self.config['k8s_cluster_dnsname'])
-        env['K8S_APISERVER_HOST'] = str(self.config['k8s_apiserver_hostname'] + "." + self.config['k8s_cluster_dnsname'])
+        setenv('K8S_APISERVER_VIP', self.config['k8s_apiserver_vip'])
+        setenv('K8S_CLUSTER_DNSNAME', self.config['k8s_cluster_dnsname'])
+        setenv('K8S_APISERVER_HOST', self.config['k8s_apiserver_hostname'] + "." + self.config['k8s_cluster_dnsname'])
 
         if bool(self.config.get('global_vagrant_singlenode_lnxcluster', False)):
-            logger.debug("singlenode_lnxcluster enabled")
-            env['GLOBAL_VAGRANT_LNXCLP_COUNT'] = "1"
-            env['GLOBAL_VAGRANT_LNXWRK_COUNT'] = "0"
-            env['GLOBAL_VAGRANT_WINWRK_COUNT'] = "0"
+            logger.debug("# singlenode_lnxcluster enabled #")
+            setenv('GLOBAL_VAGRANT_LNXCLP_COUNT', "1")
+            setenv('GLOBAL_VAGRANT_LNXWRK_COUNT', "0")
+            setenv('GLOBAL_VAGRANT_WINWRK_COUNT', "0")
 
         return env
