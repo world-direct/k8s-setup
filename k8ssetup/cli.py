@@ -136,7 +136,7 @@ def vagrant_destroy(context, machine):
 @cli.command()
 @click.argument(
     'scope', 
-    type=click.Choice(['all', 'hosts', 'cluster', 'incluster']), 
+    type=click.Choice(['all', 'hosts', 'cluster', 'incluster', 'accesscontrol']), 
     nargs=-1)
 @click.option("--ansible-options", type=click.STRING, help="additional options for ansible")
 @pass_context
@@ -154,6 +154,7 @@ def provision(context, scope, ansible_options):
     if "hosts" in scope: provision.hosts()
     if "cluster" in scope: provision.cluster()
     if "incluster" in scope: provision.incluster()
+    if "accesscontrol" in scope: provision.accesscontrol()
 
 #######################################
 ## k8s-setup tool

@@ -104,7 +104,26 @@ class Provision():
         tool = Tool(self.context)
         tool.ansible_playbook_auto("./lib/ansible/incluster.yml", add_localhost=True)
 
+    def accesscontrol(self):
+
+        if not "accesscontrol" in self.context.config:
+            logger.warn("There is no 'accesscontrol' configuration, it will not be provisioned")
+            return
+
+        cfg = self.context.config["accesscontrol"]
+        srcglob = cfg["srcglob"]
+        nsp = cfg["namespace"]
+        nameprefix = cfg["nameprefix"]
+        logger.info("Provisioning scope 'accesscontrol' srcglob=%s namespace=%s nameprefix=%s" % (srcglob, nsp, nameprefix))
+
+        from .accesscontrol import AccessControl
+        ac = AccessControl(srcglob, nsp, nameprefix)
+
+        print(ac.generateyaml())
+
+
     def all(self):
         self.hosts()
         self.cluster()
         self.incluster()
+        self.accesscontrol()
