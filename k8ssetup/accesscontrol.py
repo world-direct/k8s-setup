@@ -25,9 +25,14 @@ class AccessControl(object):
         generator = ActlGenerator(self.namespace, self.nameprefix)
         l = generator.generatelist(loader.spec)
         return yaml.dump(l)
+    
+    def purge(self, objectlinks):
+        purger = ActlPurger(self.namespace, self.nameprefix)
+        status = purger.status()
+        logger.debug("Purgable Objects: %s", status)
 
-    def provision(self):
-        print(self.generateyaml())
+        purger.purge(status, objectlinks)
+        
 
 class AcltLoader(object):
 
@@ -86,6 +91,14 @@ class ActlGenerator(object):
                 else:
                     items.append(res)
 
+
+        # add the actl label to all objects
+        for item in items:
+            metadata = item['metadata']
+            if not 'labels' in metadata:
+                metadata['labels'] = {}
+            labels = metadata['labels']
+            labels['accesscontrol.world-direct.at/managed'] = "True"
 
         return {
             "apiVersion" : "v1",
@@ -191,3 +204,44 @@ class ActlGenerator(object):
             })
 
         return objects
+
+class ActlPurger(object):
+
+    def __init__(self, namespace, nameprefix):        
+        self.namespace = namespace
+        self.nameprefix = nameprefix
+
+    def status(self):
+        """Returns the links of all existing purgable objects"""
+
+        from .kubectl import kubectl
+
+        res = []
+
+        # list all clusterrolebindings
+        output = kubectl(['kubectl', 'get', 'clusterrolebindings', '-l', 'accesscontrol.world-direct.at/managed=True', '-o', "jsonpath={range .items[*].metadata}{\"- \"}{@.selfLink}{\"\\n\"}"])
+        res.extend(yaml.safe_load(output))
+
+        # list all rolebindings
+        output = kubectl(['kubectl', 'get', 'rolebindings', '-A', '-l', 'accesscontrol.world-direct.at/managed=True', '-o', "jsonpath={range .items[*].metadata}{\"- \"}{@.selfLink}{\"\\n\"}"])
+        res.extend(yaml.safe_load(output))
+
+        # list all serviceaccounts in our namespaces
+        output = kubectl(['kubectl', 'get', 'serviceaccounts', '-A', '-l', 'accesscontrol.world-direct.at/managed=True', '-o', "jsonpath={range .items[*].metadata}{\"- \"}{@.selfLink}{\"\\n\"}"])
+        res.extend(yaml.safe_load(output))
+
+        return res
+
+    def purge(self, purgableObjects, liveObjects):
+
+        from .kubectl import kubectl
+        toPurge = set(purgableObjects) - set(liveObjects)
+
+        if(len(toPurge)):
+            logger.info("Obsolete Objects: %s" % toPurge)
+
+            for purgeObj in toPurge:
+                kubectl(["kubectl", "delete", "--raw", purgeObj])
+        else:
+            logger.info("No obsolete Objects!")
+

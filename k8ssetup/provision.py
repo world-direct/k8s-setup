@@ -3,6 +3,7 @@
 import logging
 import os
 import shutil
+import yaml
 
 from .tool import Tool
 from .consts import Paths
@@ -119,8 +120,17 @@ class Provision():
         from .accesscontrol import AccessControl
         ac = AccessControl(srcglob, nsp, nameprefix)
 
-        print(ac.generateyaml())
+        kubeyaml = ac.generateyaml()
 
+        # call kubectl
+        from .kubectl import kubectl
+        output = kubectl(['kubectl', 'apply', '-f', '-', '-o', "jsonpath={range .items[*].metadata}{\"- \"}{@.selfLink}{\"\\n\"}"], kubeyaml)
+        
+        # read the links of the processed objects
+        objects = yaml.safe_load(output)
+
+        # purge all objects in scope that have not been applied
+        ac.purge(objects)
 
     def all(self):
         self.hosts()
