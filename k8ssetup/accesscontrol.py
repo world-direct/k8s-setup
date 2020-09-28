@@ -220,15 +220,21 @@ class ActlPurger(object):
 
         # list all clusterrolebindings
         output = kubectl(['kubectl', 'get', 'clusterrolebindings', '-l', 'accesscontrol.world-direct.at/managed=True', '-o', "jsonpath={range .items[*].metadata}{\"- \"}{@.selfLink}{\"\\n\"}"])
-        res.extend(yaml.safe_load(output))
+        r = yaml.safe_load(output)
+        if r:
+            res.extend(yaml.safe_load(output))
 
         # list all rolebindings
         output = kubectl(['kubectl', 'get', 'rolebindings', '-A', '-l', 'accesscontrol.world-direct.at/managed=True', '-o', "jsonpath={range .items[*].metadata}{\"- \"}{@.selfLink}{\"\\n\"}"])
-        res.extend(yaml.safe_load(output))
+        r = yaml.safe_load(output)
+        if r:
+            res.extend(yaml.safe_load(output))
 
         # list all serviceaccounts in our namespaces
         output = kubectl(['kubectl', 'get', 'serviceaccounts', '-A', '-l', 'accesscontrol.world-direct.at/managed=True', '-o', "jsonpath={range .items[*].metadata}{\"- \"}{@.selfLink}{\"\\n\"}"])
-        res.extend(yaml.safe_load(output))
+        r = yaml.safe_load(output)
+        if r:
+            res.extend(yaml.safe_load(output))
 
         return res
 
