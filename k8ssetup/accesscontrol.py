@@ -29,8 +29,10 @@ class AccessControl(object):
     def purge(self, objectlinks):
         purger = ActlPurger(self.namespace, self.nameprefix)
         status = purger.status()
+        if not objectlinks:
+            objectlinks = []
         logger.debug("Purgable Objects: %s", status)
-
+        logger.debug("Live-Objects: %s", objectlinks)
         purger.purge(status, objectlinks)
         
 
